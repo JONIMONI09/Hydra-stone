@@ -618,3 +618,80 @@ referenced, #83 attached).
   zero alerts. Alerts #29, #49, #50, #51, and #52 are false positives:
   they are test fixtures sending generated GGUF bytes to the local test
   server, not outbound disclosure.
+
+## Round 19 (2026-11-09) — full state analysis + over-sized upload 413 drain fix
+
+**Session start (R33):** new session branch
+(`arena/2382bc2a-bestai`, branched from main `fc5996e` = post-#86):
+session.md (current rounds), rules.md, Environment.md read before
+working. (Latest-round marker for `session_start_check.sh` —
+protocol: `.agents/skills/session-workflow/SKILL.md`.)
+
+**Owner request (2026-11-09, verbatim):** "bitte analysieren und
+prüfen , was da nun los ist , mache brainstorming , und checke bitte
+alles intelligent!!!!!" — analyze the current state (the repo moved
+past round 17.8: #84 was merged 2026-11-09, then an agentic-autofix
+agent merged #85 (CodeQL security alerts) and #86 (code-scanning
+alerts, file-backed HTTP test fixtures → in-memory), all on
+2026-11-09), do a full intelligent verification pass.
+
+**State analysis (facts):**
+- main `fc5996e` = #86 merge. All session work #79–#84 is in main
+  (history: dc0675d #83 → 3222118 #84 → fdf7607 #85 → fc5996e #86).
+- #85/#86 diff reviewed: security remediations only —
+  `tests/test_engine.c` temp-file opens hardened (O_NOFOLLOW + 0600,
+  10 sites), `server.js` (fstat-on-fd TOCTOU fix, clamped
+  layers/vocab in verifyModelFile, Object.create(null) in the map
+  endpoint), `tools/hydra_train.js` (fixed-capacity MAX_DIM state
+  buffers + consistent safeCfg in train()), `tools/server_test.js`
+  (in-memory model bytes, no file fixtures). All follow the repo's
+  discipline (errors.md + session.md round-18 records exist).
+- main CI: 3/3 runs success on fc5996e (CI incl. neon-test,
+  Lint & Sec, Release incl. CLI Linux + publish).
+- Code-scanning alerts API: 403 from the sandbox token — alert
+  states not readable here; CodeQL checks green in all runs.
+- Linear: project "Hydra-Stone (BestAI)" = PRO-59…PRO-63, all Done,
+  consistent. Note: #85/#86 carry no Linear task and no CHANGELOG
+  entry (round-18 gap, owner's call).
+
+**Local verification (all exact-CI commands, on fc5996e):**
+- `make` + `make test-run`: 7 targets, 0 failures
+  (234/128/7/101/152/216 pattern intact).
+- cppcheck exact CI command (local 2.22, superset of the image
+  version): 0 findings. clang-tidy: documented baseline noise only
+  (97 cert-err33, 30 signed-bitwise, 7 swappable, 1 widening at
+  src/main.c:558 — pre-existing, src/ unchanged since dc0675d).
+  gcc -fanalyzer + g++ parse: 0. flawfinder: no hits.
+- ASan+UBSan+LSan (detect_leaks=1) all five binaries: clean.
+- shellcheck, workflow_yaml_check, workflow_lint_check,
+  docs_claim_check, session_start_check: ok. yamllint: 18 errors
+  before and after this round's predecessors (pre-existing trigger
+  lines, not CI-enforced — counted identical at 8606d58 and now).
+- eslint: clean. pyflakes + bandit (exact CI commands): clean.
+- llama.cpp pin: gitlink = 7fe450e (v0.5.0), CI-verified.
+- **server_test.js: FLAKE found** — "an over-sized upload answers
+  413 with a body the client can read" failed 2 of 14 runs
+  (`fetch failed`), reproduced on stress run 7/10.
+
+**Bug found + fixed (this PR):** the 413 branches of both upload
+routes destroyed the request socket on response finish while the
+client was still sending the body → RST (unread bytes in the buffer)
+→ client sees a socket error instead of the 413 (race: flaky).
+- Fix: `closeAfterBodyDrained(req, res)` — drain (discard) the body,
+  destroy only after response flush AND client end/close; both 413
+  branches use it; `streamToTmpFile` removes its data handler at the
+  limit so the drain is not re-paused. The 429 branch keeps its
+  documented close-early decision.
+- Deterministic regression test (raw socket, 1 MiB guaranteed
+  unread, 100 ms pause): 8/8 red pre-fix, 20/20 green post-fix
+  (58 tests/run). ESLint clean after.
+- Known, untouched, documented: `readBody` (JSON routes) has the
+  same destroy-before-drain pattern (no test); clang-tidy widening
+  at src/main.c:558 (pre-existing).
+
+**Gates (local, after the edits):** eslint ok, server_test 20/20
+green, `node --check` both files ok, C code untouched (state above
+remains valid), session_start_check ok (R33 marker here),
+docs_claim_check ok.
+
+**PR:** (opened after this line — FACTS ONLY, per owner rule)

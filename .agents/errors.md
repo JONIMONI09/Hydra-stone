@@ -3,6 +3,39 @@
 > Every error gets an entry immediately, with symptom, cause, fix and
 > prevention. Newest entries at the top.
 
+## 2026-11-09 (round 19) — over-sized upload 413 resets the socket while the client is still sending (flaky server test)
+
+- **Symptom:** `node tools/server_test.js` failed intermittently
+  (2 of 14 runs during the round-19 verification pass) in
+  "an over-sized upload answers 413 with a body the client can read":
+  `TypeError: fetch failed` (socket error) instead of the 413
+  response.
+- **Cause:** both upload routes (`/api/models/upload`,
+  `/api/models/import`) answered the 413 and then destroyed the
+  request socket on `res.on('finish')` — without waiting for the
+  client to finish sending the body. Destroying a socket that still
+  has unread body bytes in its buffer sends RST instead of FIN, so a
+  client mid-send sees a connection reset instead of the 413.
+  Whether that happens is a race between the client's body stream and
+  the server's response+destroy sequence — hence flaky, not always
+  red. The pre-check path (declared Content-Length over the limit)
+  makes it more likely: the server rejects before the body stream is
+  even attached, so every unsent byte is "unread".
+- **Fix:** `closeAfterBodyDrained(req, res)` in server.js — the rest
+  of the body is resumed and discarded (never buffered), and the
+  socket is destroyed only after BOTH the response is flushed and the
+  client has finished sending (or gone away). Used by both 413
+  branches. `streamToTmpFile` now removes its `data` handler at the
+  limit so the drain is not re-paused by that listener. Deterministic
+  regression test (raw socket: 1 MiB in the buffer, 100 ms pause,
+  then the rest — the pre-fix server fails it with ECONNRESET;
+  verified 8/8 red before the fix, 20/20 green after).
+- **Prevention:** a server that rejects a request early must not
+  close the connection before the client finished sending — answer,
+  drain, close. And a flaky test that reproduces a race is worth a
+  deterministic sibling test that pins the race ordering (raw socket
+  + guaranteed unread bytes), not just a higher run count.
+
 ## 2026-11-09 — ESLint binary missing
 
 - **Symptom:** `npm run lint` failed with `sh: 1: eslint: not found`.

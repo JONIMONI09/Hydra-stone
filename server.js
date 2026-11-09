@@ -297,17 +297,21 @@ function streamToTmpFile(req, tmpPath, limit) {
       try { fs.unlinkSync(tmpPath); } catch { /* already gone */ }
       reject(err);
     };
-    req.on('data', (chunk) => {
+    const onData = (chunk) => {
       written += chunk.length;
       if (written > limit) {
         /* Unpipe and pause - do NOT destroy. req.pause() keeps the socket
-         * alive so the 413 can still be written; the route closes it once
-         * the answer has been flushed. */
+         * alive so the 413 can still be written. The handler removes
+         * itself so the route can drain the rest of the body (see
+         * closeAfterBodyDrained) without this listener pausing the
+         * stream again on every chunk. */
+        req.removeListener('data', onData);
         req.unpipe(out);
         req.pause();
         fail(new UploadTooLarge(limit));
       }
-    });
+    };
+    req.on('data', onData);
     out.on('error', fail);
     req.on('error', fail);
     out.on('finish', () => {
@@ -317,6 +321,31 @@ function streamToTmpFile(req, tmpPath, limit) {
     });
     req.pipe(out);
   });
+}
+
+/**
+ * Ends a rejected upload's connection WITHOUT taking the socket away
+ * from the client while it is still writing.
+ *
+ * Destroying the socket before the client has finished sending the
+ * request body resets the connection: undici/curl report a socket
+ * error ("fetch failed") instead of the 413 the server just answered
+ * with. The race is timing-dependent (how fast the client streams the
+ * body), which is why the regression test is flaky rather than always
+ * red. The safe order: discard the rest of the body (never buffer it),
+ * answer, and only then close - once BOTH the response is flushed and
+ * the client has finished sending (or gone away).
+ */
+function closeAfterBodyDrained(req, res) {
+  req.resume(); /* the remainder of the body is discarded, not buffered */
+  let settled = 0;
+  const settle = () => {
+    settled += 1;
+    if (settled >= 2 && !req.destroyed) req.destroy();
+  };
+  res.on('finish', settle);
+  req.on('end', settle);
+  req.on('close', settle);
 }
 
 /**
@@ -1186,8 +1215,11 @@ const server = http.createServer(async (req, res) => {
       } catch (e) {
         /* The stream already removed the temp file. */
         if (e.tooLarge) {
-          /* Answer FIRST, close afterwards. Destroying the request here is
-           * what used to make this reply arrive empty. */
+          /* Answer FIRST, close afterwards - and only close once the
+           * client has finished sending the body (closeAfterBodyDrained):
+           * destroying the socket mid-body-send resets the connection and
+           * the client sees a socket error instead of the 413. The old
+           * req.destroy()-on-finish lost that race under load. */
           res.setHeader('Connection', 'close');
           sendJSON(res, e.status, {
             error: e.message,
@@ -1196,7 +1228,7 @@ const server = http.createServer(async (req, res) => {
             limitHuman: formatBytes(e.limitBytes),
             raiseWith: 'HYDRA_MAX_UPLOAD',
           });
-          res.on('finish', () => { if (!req.destroyed) req.destroy(); });
+          closeAfterBodyDrained(req, res);
           return;
         }
         return sendJSON(res, e.status || 400, { error: e.message });
@@ -1289,6 +1321,10 @@ const server = http.createServer(async (req, res) => {
           await streamToTmpFile(req, tmp, MAX_UPLOAD);
         } catch (e) {
           if (e.tooLarge) {
+            /* Same close ordering as the .hydra upload route: the client
+             * must be able to finish sending the body and still receive
+             * the 413 - destroying the socket mid-body-send resets the
+             * connection (see closeAfterBodyDrained). */
             res.setHeader('Connection', 'close');
             sendJSON(res, e.status, {
               error: e.message,
@@ -1297,7 +1333,7 @@ const server = http.createServer(async (req, res) => {
               limitHuman: formatBytes(e.limitBytes),
               raiseWith: 'HYDRA_MAX_UPLOAD',
             });
-            res.on('finish', () => { if (!req.destroyed) req.destroy(); });
+            closeAfterBodyDrained(req, res);
             return;
           }
           return sendJSON(res, e.status || 400, { error: e.message });
