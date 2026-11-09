@@ -3,6 +3,19 @@
 > Every error gets an entry immediately, with symptom, cause, fix and
 > prevention. Newest entries at the top.
 
+## 2026-11-09 — CodeQL retained one allocation finding after first fix
+
+- **Symptom:** the first CodeQL review found one remaining
+  `js/resource-exhaustion` alert at the trainer state allocation.
+- **Cause:** CodeQL did not treat the repository's custom configuration
+  clamp as an upper-bound proof.
+- **Fix:** made the allocation's upper bound explicit with
+  `Math.min(safeCfg.dim, MAX_DIM)` and reran the trainer parity test
+  successfully.
+- **Prevention:** express security-relevant allocation bounds at the
+  allocation site, not only in helper functions that static analysis may not
+  model.
+
 ## 2026-11-09 — Static-analysis venv absent
 
 - **Symptom:** the targeted cppcheck/flawfinder command failed with

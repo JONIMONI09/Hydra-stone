@@ -205,7 +205,7 @@ function evaluate(w1, w2, cfg, samples) {
   let correct = 0;
   let total = 0;
   for (const s of samples) {
-    const state = new Array(safeCfg.dim).fill(0);
+    const state = new Array(Math.min(safeCfg.dim, MAX_DIM)).fill(0);
     for (let t = 0; t < s.input.length; t += 1) {
       const { out } = step(w1, w2, safeCfg.layers, safeCfg.dim, safeCfg.vocab, state, s.input[t]);
       total += 1;
