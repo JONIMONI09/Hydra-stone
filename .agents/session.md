@@ -621,11 +621,30 @@ referenced, #83 attached).
 
 ## Round 19 (2026-11-09) — full state analysis + over-sized upload 413 drain fix
 
-**Session start (R33):** new session branch
-(`arena/2382bc2a-bestai`, branched from main `fc5996e` = post-#86):
-session.md (current rounds), rules.md, Environment.md read before
-working. (Latest-round marker for `session_start_check.sh` —
+**Session start (R33):** 2026-11-09 (branch `arena/2382bc2a-bestai`,
+branched from main `fc5996e` = post-#86). Read: session.md (current
+rounds), rules.md, Environment.md. NOT recorded as read in this
+session: AGENTS.md, errors.md, user.md, session-workflow SKILL.md
+(required by the protocol; reads to be verified/recorded by the owner).
+(Latest-round marker for `session_start_check.sh` —
 protocol: `.agents/skills/session-workflow/SKILL.md`.)
+
+**Plan (written retrospectively — the plan was NOT written before the
+edits; this records the steps as executed, with status):**
+- [x] Task: analyze repo state after #85/#86; verify CI and local gates;
+  reproduce and fix the flaky over-sized-upload 413 test.
+- [x] Step 1: review #85/#86 diff for regressions (no regressions found).
+- [x] Step 2: run local gates (make test-run, cppcheck, clang-tidy,
+  ASan/UBSan/LSan, shellcheck, eslint, pyflakes, bandit) — clean except
+  documented pre-existing baseline noise.
+- [x] Step 3: reproduce the 413 flake (2/14 runs; 7/10 under stress).
+- [x] Step 4: add `closeAfterBodyDrained(req, res)` drain-before-destroy
+  to both 413 branches; keep the 429 close-early behavior.
+- [x] Step 5: add deterministic raw-socket regression test (8/8 red
+  pre-fix, 20/20 green post-fix).
+- Acceptance criteria: server_test green (20/20 runs); eslint clean;
+  `node --check` on both edited files; session_start_check and
+  docs_claim_check ok. Status: all met per the progress record below.
 
 **Owner request (2026-11-09, verbatim):** "bitte analysieren und
 prüfen , was da nun los ist , mache brainstorming , und checke bitte
