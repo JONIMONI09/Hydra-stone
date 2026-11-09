@@ -278,16 +278,16 @@ function train(cfg, samples, epochs) {
 
   for (let epoch = 0; epoch < epochs; epoch += 1) {
     for (const sample of samples) {
-      const currentScore = scoreSample(w1, w2, cfg, sample);
+      const currentScore = scoreSample(w1, w2, safeCfg, sample);
 
       /* Find the first step that does not reproduce the target. */
-      const state = new Array(cfg.dim).fill(0);
+      const state = new Array(safeCfg.dim).fill(0);
       let stepIndex = -1;
       let token = 0;
       let state0 = 0;
       let acc0 = 0;
       for (let t = 0; t < sample.input.length; t += 1) {
-        const fwd = step(w1, w2, cfg.layers, cfg.dim, cfg.vocab, state, sample.input[t]);
+        const fwd = step(w1, w2, safeCfg.layers, safeCfg.dim, safeCfg.vocab, state, sample.input[t]);
         if (fwd.out !== sample.target[t]) {
           stepIndex = t;
           token = sample.input[t];
@@ -299,8 +299,8 @@ function train(cfg, samples, epochs) {
       if (stepIndex === -1) continue;
 
       const wantAcc =
-        (((sample.target[stepIndex] - token - 1) % cfg.vocab) + cfg.vocab) % cfg.vocab;
-      const moves = candidateMoves(w1, w2, cfg, token, state0).filter((m) => m.step !== 0);
+        (((sample.target[stepIndex] - token - 1) % safeCfg.vocab) + safeCfg.vocab) % safeCfg.vocab;
+      const moves = candidateMoves(w1, w2, safeCfg, token, state0).filter((m) => m.step !== 0);
 
       // Single moves, evaluated one at a time. A strictly improving move and
       // the best sideways move (same score, lower error) are tracked
@@ -310,8 +310,8 @@ function train(cfg, samples, epochs) {
       for (const mv of moves) {
         const prev = mv.arr[mv.idx][0];
         mv.arr[mv.idx][0] = mv.next;
-        const score = scoreSample(w1, w2, cfg, sample);
-        const err = Math.abs(circDelta((acc0 + mv.step) % cfg.vocab, wantAcc, cfg.vocab));
+        const score = scoreSample(w1, w2, safeCfg, sample);
+        const err = Math.abs(circDelta((acc0 + mv.step) % safeCfg.vocab, wantAcc, safeCfg.vocab));
         mv.arr[mv.idx][0] = prev;
         if (score < currentScore) continue;
         const better = (c) => c === null || score > c.score || (score === c.score && err < c.err);
@@ -343,12 +343,12 @@ function train(cfg, samples, epochs) {
             const pb = mb.arr[mb.idx][0];
             ma.arr[ma.idx][0] = ma.next;
             mb.arr[mb.idx][0] = mb.next;
-            const score = scoreSample(w1, w2, cfg, sample);
+            const score = scoreSample(w1, w2, safeCfg, sample);
             ma.arr[ma.idx][0] = pa;
             mb.arr[mb.idx][0] = pb;
             if (score <= currentScore) continue;
             const err = Math.abs(
-              circDelta((acc0 + ma.step + mb.step) % cfg.vocab, wantAcc, cfg.vocab),
+              circDelta((acc0 + ma.step + mb.step) % safeCfg.vocab, wantAcc, safeCfg.vocab),
             );
             if (!bestPair || score > bestPair.score || (score === bestPair.score && err < bestPair.err)) {
               bestPair = { ma, mb, score, err };

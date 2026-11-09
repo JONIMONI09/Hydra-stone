@@ -59,6 +59,12 @@ static void tmp_path_new(char *out, size_t n)
     close(fd);
 }
 
+static FILE *open_private_file(const char *path)
+{
+    int fd = open(path, O_WRONLY | O_TRUNC | O_NOFOLLOW, S_IRUSR | S_IWUSR);
+    return fd < 0 ? NULL : fdopen(fd, "wb");
+}
+
 /* Header little-endian schreiben (docs/FORMAT.md: "<IHHIIII"), damit die
  * Tests auf jeder Host-Endianness dasselbe Modell erzeugen (BUG-10). */
 static void wr_u16le(FILE *f, uint16_t v)
@@ -103,7 +109,7 @@ static void test_header_endianness(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, 333, 17, 3, sizeof(HydraModelHeader), 17u * 3u);
     const uint8_t w[51] = {0};
@@ -138,7 +144,7 @@ static int run_single_weight_case(uint8_t weight_byte, uint16_t token_in,
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) return -1;
 
     wr_header(f, vocab, 1u, 1u, (uint32_t)sizeof(HydraModelHeader), 1u);
@@ -177,7 +183,7 @@ static void test_token_mask_collisions(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, 1024u, 1u, 1u, (uint32_t)sizeof(HydraModelHeader), 1u);
     fputc(0x01, f);   /* w1 = +1, w2 = 0 */
@@ -209,7 +215,7 @@ static void test_engine_step(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     const uint32_t dim = 16, layers = 2;
     wr_header(f, 256u, dim, layers, (uint32_t)sizeof(HydraModelHeader), dim * layers);
@@ -252,7 +258,7 @@ static void write_seeded_model(const char *path, uint32_t seed,
                                uint32_t dim, uint32_t layers, uint16_t vocab)
 {
     lcg_seed(seed);
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, vocab, dim, layers, (uint32_t)sizeof(HydraModelHeader), dim * layers);
     for (uint32_t i = 0; i < dim * layers; ++i) {
@@ -731,7 +737,7 @@ static void ref_step_scalar(const HydraModelHeader *h, const uint8_t *w,
 static void write_code_pattern_model(const char *path, uint32_t dim,
                                      uint32_t layers, uint16_t vocab)
 {
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, vocab, dim, layers, (uint32_t)sizeof(HydraModelHeader), dim * layers);
     for (uint32_t i = 0; i < dim * layers; ++i) {
@@ -1097,7 +1103,7 @@ static void test_neon_v2_load_matches_scalar(void)
     CHECK(seen[0] && seen[1] && seen[2] && seen[3],
           "NEON v2 load model contains all four 2-bit codes");
 
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header_version(f, 2u, vocab, dim, layers,
                       (uint32_t)sizeof(HydraModelHeader), (dim / 4) * layers * 2u);
@@ -1202,7 +1208,7 @@ static void test_version_two_format(void)
      * The declared weights_len is exactly the read size (layers*dim/2),
      * i.e. the minimal valid v2 file. */
     {
-        FILE *f = fopen(p2, "wb");
+        FILE *f = open_private_file(p2);
         const uint8_t body[4] = {0x55, 0xAA, 0x63, 0x82};
         if (f) {
             wr_header_version(f, 2u, 64u, 4u, 2u, (uint32_t)sizeof(HydraModelHeader), 4u);
@@ -1212,7 +1218,7 @@ static void test_version_two_format(void)
     }
     /* v1 file with the same logical weights: one byte per (layer, dim). */
     {
-        FILE *f = fopen(p1, "wb");
+        FILE *f = open_private_file(p1);
         const uint8_t body[8] = {0x09, 0x09, 0x09, 0x09, 0x08, 0x00, 0x02, 0x09};
         if (f) {
             wr_header_version(f, 1u, 64u, 4u, 2u, (uint32_t)sizeof(HydraModelHeader), 8u);
@@ -1260,7 +1266,7 @@ static void test_version_two_format(void)
     {
         char p[64];
         tmp_path_new(p, sizeof(p));
-        FILE *f = fopen(p, "wb");
+        FILE *f = open_private_file(p);
         if (f) {
             wr_header_version(f, 2u, 64u, 2u, 1u, (uint32_t)sizeof(HydraModelHeader), 1u);
             fputc(0x55, f);
@@ -1277,7 +1283,7 @@ static void test_version_two_format(void)
     {
         char p[64];
         tmp_path_new(p, sizeof(p));
-        FILE *f = fopen(p, "wb");
+        FILE *f = open_private_file(p);
         if (f) {
             wr_header_version(f, 2u, 64u, 4u, 2u, (uint32_t)sizeof(HydraModelHeader), 3u);
             const uint8_t body[3] = {0x55, 0xAA, 0x63};
@@ -1296,7 +1302,7 @@ static void test_engine_rejects_garbage(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (f) {
         const uint8_t junk[32] = {0xDE,0xAD,0xBE,0xEF};
         fwrite(junk, 1, sizeof(junk), f);
@@ -1319,7 +1325,7 @@ static void test_engine_rejects_bounds_violation(void)
     /* Header behauptet mehr Gewichte als die Datei hergibt */
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (f) {
         wr_header(f, 64u, 64u, 4u, (uint32_t)sizeof(HydraModelHeader), 1024u);
         fclose(f);
@@ -1337,7 +1343,7 @@ static void test_engine_rejects_inconsistent_weights_len(void)
      * sonst liest step() hinter das mmap (OOB-Read). */
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (f) {
         wr_header(f, 64u, 64u, 4u, (uint32_t)sizeof(HydraModelHeader), 8u);
         const uint8_t w[8] = {1,1,1,1,1,1,1,1};
@@ -1364,7 +1370,7 @@ static void test_engine_rejects_layer_overflow(void)
     char path[64];
     tmp_path_new(path, sizeof(path));
     const uint32_t dim = 1, layers = 16909321u;
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, 128u, dim, layers, (uint32_t)sizeof(HydraModelHeader), layers);
     {
@@ -1395,7 +1401,7 @@ static void test_engine_rejects_offset_in_header(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (f) {
         wr_header(f, 64u, 4u, 4u, 8u, 16u);   /* weights_offset = 8 (< 24) */
         fclose(f);

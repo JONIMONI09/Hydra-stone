@@ -3,6 +3,29 @@
 > Every error gets an entry immediately, with symptom, cause, fix and
 > prevention. Newest entries at the top.
 
+## 2026-11-09 — Static-analysis venv absent
+
+- **Symptom:** the targeted cppcheck/flawfinder command failed with
+  `/tmp/lintenv/bin/cppcheck: No such file or directory` and the equivalent
+  flawfinder path was also absent.
+- **Cause:** this sandbox's ephemeral `/tmp` did not contain the documented
+  linter virtual environment.
+- **Fix:** recreate `/tmp/lintenv` and install the documented PyPI tools before
+  rerunning the checks.
+- **Prevention:** probe the environment-specific linter path and recreate it
+  from `.agents/Environment.md` whenever `/tmp` has been reset.
+
+## 2026-11-09 — Trainer parity test missing hydra-run
+
+- **Symptom:** `node tools/console_train_test.js` failed with
+  `hydra-run not found at .../hydra-run - run "make" first`.
+- **Cause:** `make test` builds the test binaries but does not build the CLI
+  executable required by the trainer parity test.
+- **Fix:** build the complete project with `make` before rerunning the parity
+  test.
+- **Prevention:** use the repository's full `make` gate before Node tests that
+  invoke the compiled CLI.
+
 ## 2026-11-01 (round 17.8) — Ubuntu 26.04 dropped qemu-user-static too; third install-step failure on the same step
 
 - **Symptom:** after the #82 merge (`b086a92`), `CI` → `neon-test`
