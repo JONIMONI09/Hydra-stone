@@ -3,6 +3,13 @@
 > Every error gets an entry immediately, with symptom, cause, fix and
 > prevention. Newest entries at the top.
 
+## 2026-11-09 — ESLint binary missing
+
+- **Symptom:** `npm run lint` failed with `sh: 1: eslint: not found`.
+- **Cause:** the sandbox did not have the repository's npm dev dependencies installed.
+- **Fix:** install dependencies with `npm ci` before rerunning the existing lint gate.
+- **Prevention:** run `npm ci` after a fresh checkout before invoking npm scripts.
+
 ## 2026-11-09 — CodeQL retained one allocation finding after first fix
 
 - **Symptom:** the first CodeQL review found one remaining
