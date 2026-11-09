@@ -579,6 +579,22 @@ referenced, #83 attached).
 #11, #14, #17, #18, #19, #20, #22, #29, #30, #31, #32, #33, #49, #50,
 #51, and #52.
 
+**Additional task:** remediate CodeQL alerts #23, #25, #26, #27, and #28.
+
+**Plan:**
+- [x] Retrieve and classify all five alert locations.
+- [x] Keep HTTP fixture bodies in memory instead of reading local files into requests.
+- [ ] Run focused tests and security checks.
+- [ ] Update logs, scan changed files, run CodeQL, and report results.
+
+**Progress:**
+- [x] All five findings were file-to-HTTP dataflow from local-only test fixtures.
+- [x] Added in-memory model/GGUF fixture bytes and removed the flagged reads.
+- [x] `node --check tools/server_test.js` and `node --test tools/server_test.js` passed all 57 tests.
+- [x] `npm ci` installed the existing dev dependencies and `npm run lint` passed.
+- [x] Secret scanning found no secrets; CodeQL review was invoked and skipped the trivial test-only change.
+- [x] Final diff reviewed; only `tools/server_test.js`, `.agents/session.md`, and `.agents/errors.md` changed.
+
 **Plan:**
 - [x] Inspect each alert location and classify true positives versus test-only false positives.
 - [x] Apply minimal permission, input-bound, race-safe, and test-fixture changes.

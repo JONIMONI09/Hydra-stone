@@ -320,11 +320,7 @@ test('/api/infer rejects a malformed prompt', async () => {
 });
 
 test('/api/models/upload stores a valid model and it appears in the list', async () => {
-  const modelPath = path.join(os.tmpdir(), `hydra-upload-${process.pid}.hydra`);
-  execFileSync('python3', [path.join(ROOT, 'tools', 'make_model.py'), modelPath], {
-    stdio: 'ignore',
-  });
-  const bytes = fs.readFileSync(modelPath);
+  const bytes = buildModelBytes({});
 
   const before = (await json('/api/models')).body.models.length;
   const res = await fetch(`${BASE}/api/models/upload?name=uploaded-${process.pid}.hydra`, {
@@ -345,7 +341,6 @@ test('/api/models/upload stores a valid model and it appears in the list', async
   const after = (await json('/api/models')).body.models.length;
   assert.ok(after > before, 'the uploaded model must be listed');
 
-  fs.unlinkSync(modelPath);
 });
 
 test('/api/models/upload rejects invalid bytes and stores nothing', async () => {
@@ -764,6 +759,14 @@ test('the crash dialog and the error button exist and are wired', () => {
 function writeModelFile(name, fields) {
   const dir = path.join(ROOT, 'models', 'uploaded');
   fs.mkdirSync(dir, { recursive: true });
+  const data = buildModelBytes(fields);
+  const file = path.join(dir, name);
+  fs.writeFileSync(file, data);
+  createdFiles.push(file);
+  return 'models/uploaded/' + name;
+}
+
+function buildModelBytes(fields) {
   const b = Buffer.alloc(24);
   b.writeUInt32LE(fields.magic ?? 0x48594452, 0);
   b.writeUInt16LE(fields.version ?? 1, 4);
@@ -772,10 +775,7 @@ function writeModelFile(name, fields) {
   b.writeUInt32LE(fields.layers ?? 4, 12);
   b.writeUInt32LE(fields.weightsOffset ?? 24, 16);
   b.writeUInt32LE(fields.weightsLen ?? 256, 20);
-  const file = path.join(dir, name);
-  fs.writeFileSync(file, Buffer.concat([b, Buffer.alloc(fields.pad ?? 256)]));
-  createdFiles.push(file);
-  return 'models/uploaded/' + name;
+  return Buffer.concat([b, Buffer.alloc(fields.pad ?? 256)]);
 }
 
 /** Boots an extra server with extra env, e.g. a smaller upload cap. */
@@ -838,8 +838,7 @@ test('the same upload succeeds once the cap allows it (negative control)', async
   /* If 413 were returned by an over-eager check, this is the case that
    * catches it: under a generous cap the identical body must be stored. */
   const base = await bootServer(t, { HYDRA_MAX_UPLOAD: '16MiB' });
-  const list = await (await fetch(`${base}/api/models`)).json();
-  const starter = fs.readFileSync(path.join(ROOT, list.models[0].path));
+  const starter = buildModelBytes({});
 
   const res = await fetch(`${base}/api/models/upload?name=passt.hydra`, {
     method: 'POST',
@@ -1047,7 +1046,9 @@ test('the upload refusal and the inspect report state the same reason', async ()
   const rel = writeModelFile('abweichend.hydra', {
     layers: 99999, weightsLen: 65536, pad: 65536,
   });
-  const bytes = fs.readFileSync(path.join(ROOT, rel));
+  const bytes = buildModelBytes({
+    layers: 99999, weightsLen: 65536, pad: 65536,
+  });
 
   const up = await fetch(`${BASE}/api/models/upload?name=abweichend-upload.hydra`, {
     method: 'POST',
@@ -1105,7 +1106,7 @@ function writeGguf(name, { rows = 64, cols = 32, tokens = ['a', 'b', '▁c', 'd'
 test('a GGUF upload is converted into a loadable .hydra with a full report', async () => {
   const src = writeGguf('server-fixture.gguf');
   createdFiles.push(src);
-  const bytes = fs.readFileSync(src);
+  const bytes = buildGgufBytes();
 
   const res = await fetch(`${BASE}/api/models/import?name=server-fixture.gguf`, {
     method: 'POST',
@@ -1295,7 +1296,7 @@ test('a converted model shows up in the chat model list as converted', async () 
   const up = await fetch(`${BASE}/api/models/import?name=listed.gguf`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/octet-stream' },
-    body: fs.readFileSync(src),
+    body: buildGgufBytes(),
   });
   assert.strictEqual(up.status, 200);
   createdFiles.push(path.join(ROOT, 'models', 'converted', 'listed.hydra'));
