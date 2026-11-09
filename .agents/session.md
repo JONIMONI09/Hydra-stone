@@ -566,3 +566,39 @@ state Done (the incident spanned #81/#82/this PR; all three
 referenced, #83 attached).
 
 **PR:** #83 (FACTS ONLY, per owner rule), merged `dc0675d`.
+
+## Round 18 (2026-11-09) — Code scanning alert remediation
+
+**Session start (R33):** 2026-11-09 (branch current). Read: `AGENTS.md`,
+`.agents/session.md`, `.agents/errors.md`, `.agents/rules.md`,
+`.agents/user.md`, `.agents/Environment.md`,
+`.agents/skills/session-workflow/SKILL.md`, and
+`.agents/skills/engine-ci-verify/SKILL.md`.
+
+**Task:** remediate CodeQL alerts #2, #3, #4, #5, #6, #7, #8, #9, #10,
+#11, #14, #17, #18, #19, #20, #22, #29, #30, #31, #32, #33, #49, #50,
+#51, and #52.
+
+**Plan:**
+- [x] Inspect each alert location and classify true positives versus test-only false positives.
+- [x] Apply minimal permission, input-bound, race-safe, and test-fixture changes.
+- [x] Run focused tests and relevant static/security checks.
+- [x] Update logs, scan changed files for secrets, run CodeQL, and report findings.
+
+**Progress:**
+- [x] Session protocol and alert details retrieved; affected locations grouped by rule.
+- [x] Classified alerts: #2/#3/#4/#5/#6/#7/#8/#9/#10/#11/#30/#31/#32/#33
+  are restrictive test-file creation findings; #14/#18/#19/#20 are
+  user-controlled allocation findings; #17 is a prototype-pollution risk;
+  #22 is a check/use race; #29/#49/#50/#51/#52 are test-only local uploads.
+- [x] Applied private test-file opening, bounded verification/training
+  allocations, null-prototype vocabulary storage, and descriptor-based file
+  analysis changes.
+- [x] `make test`, native `./hydra-test` (234 tests), server suite (57 tests),
+  trainer parity, JavaScript syntax, cppcheck, flawfinder, and session-start
+  checks passed. The first trainer invocation exposed a missing CLI build;
+  that error is recorded and the rerun after `make` passed.
+- [x] Secret scanning found no secrets, and the final CodeQL review found
+  zero alerts. Alerts #29, #49, #50, #51, and #52 are false positives:
+  they are test fixtures sending generated GGUF bytes to the local test
+  server, not outbound disclosure.

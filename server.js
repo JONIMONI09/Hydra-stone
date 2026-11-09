@@ -361,9 +361,9 @@ function describeMagic(magic) {
  *
  * @returns a report object; never throws for a merely invalid model.
  */
-function analyseHydraFile(absPath, sizeArg) {
-  const stat = fs.statSync(absPath);
-  const size = sizeArg === undefined ? stat.size : sizeArg;
+function analyseHydraFile(absPath) {
+  const fd = fs.openSync(absPath, 'r');
+  const size = fs.fstatSync(fd).size;
   const report = {
     path: null,
     bytes: size,
@@ -398,10 +398,10 @@ function analyseHydraFile(absPath, sizeArg) {
   if (size < HEADER_BYTES) {
     rule('size', false,
       `file is ${formatBytes(size)}, smaller than the ${HEADER_BYTES}-byte header`);
+    fs.closeSync(fd);
     return report;
   }
 
-  const fd = fs.openSync(absPath, 'r');
   let buf;
   try {
     buf = Buffer.alloc(HEADER_BYTES);
@@ -502,10 +502,10 @@ function validateHydra2Header(file, size) {
   return null;
 }
 
-function validateHydraHeader(file, size) {
+function validateHydraHeader(file) {
   let report;
   try {
-    report = analyseHydraFile(file, size);
+    report = analyseHydraFile(file);
   } catch (e) {
     return `model could not be read: ${e.message}`;
   }
@@ -1017,6 +1017,8 @@ async function handleTrain(body, requestId) {
  */
 async function verifyModelFile(file, cfg, seedToken, steps, requestId) {
   const dim = clampInt(cfg.dim, 1, MAX_VERIFY_DIM, 32);
+  const layers = clampInt(cfg.layers, 1, trainer.MAX_LAYERS, 8);
+  const vocab = clampInt(cfg.vocab, 2, trainer.MAX_VOCAB, 64);
   const buf = fs.readFileSync(file);
   const header = {
     magic: buf.readUInt32LE(0),
@@ -1025,13 +1027,13 @@ async function verifyModelFile(file, cfg, seedToken, steps, requestId) {
     dim: buf.readUInt32LE(8),
     layers: buf.readUInt32LE(12),
   };
-  const decoded = trainer.unpack(buf.subarray(24), cfg.layers, dim);
+  const decoded = trainer.unpack(buf.subarray(24), layers, dim);
 
   const state = new Array(dim).fill(0);
   const simulated = [];
   let token = seedToken;
   for (let t = 0; t < steps; t += 1) {
-    const r = trainer.step(decoded.w1, decoded.w2, cfg.layers, dim, cfg.vocab, state, token);
+    const r = trainer.step(decoded.w1, decoded.w2, layers, dim, vocab, state, token);
     simulated.push(r.out);
     token = r.out;
   }
@@ -1202,7 +1204,7 @@ const server = http.createServer(async (req, res) => {
       const isV2 = target.endsWith('.hydra2');
       const reason = isV2
         ? validateHydra2Header(tmp, size)
-        : validateHydraHeader(tmp, size);
+        : validateHydraHeader(tmp);
       if (reason !== null) {
         fs.unlinkSync(tmp);
         return sendJSON(res, 400, { error: reason, rejected: true });
@@ -1680,7 +1682,7 @@ const server = http.createServer(async (req, res) => {
       if (body === null || typeof body !== 'object' || typeof body.map !== 'object') {
         return sendJSON(res, 400, { error: 'map object is required' });
       }
-      const clean = {};
+      const clean = Object.create(null);
       for (const [k, v] of Object.entries(body.map)) {
         const id = Number(v);
         if (Number.isInteger(id) && id >= 0 && id < trainer.MAX_VOCAB) clean[k] = id;
