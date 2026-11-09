@@ -2,6 +2,35 @@
 All notable changes to this project, per change, are recorded here and in
 `.agents/session.md` (.agents/rules.md R2). Newest entries first.
 
+## 2026-11-09 (round 19) — over-sized upload 413: drain the body before closing (fixes flaky server test)
+
+`server_test.js` failed intermittently (2 of 14 runs in the round-19
+verification pass): "an over-sized upload answers 413 with a body the
+client can read" got `fetch failed` (socket reset) instead of the 413.
+
+- **Root cause:** both upload routes destroyed the request socket on
+  `res.on('finish')` after answering the 413 — before the client had
+  finished sending the body. A destroy with unread body bytes in the
+  socket buffer sends RST, not FIN, so a client mid-send sees a
+  connection reset. The pre-check path (declared Content-Length over
+  the limit) rejects before the body stream is attached, so every
+  unsent byte is unread — the race the test was hitting.
+- **Fix:** `closeAfterBodyDrained(req, res)` — resume + discard the
+  remainder of the body (never buffered), destroy the socket only
+  after BOTH the response is flushed and the client has finished
+  sending (or gone away). Used by the 413 branch of
+  `/api/models/upload` and `/api/models/import`; the 429
+  serialisation branch keeps its documented close-early design
+  decision. `streamToTmpFile` removes its data handler at the limit
+  so the drain is not re-paused.
+- **Regression test (deterministic):** raw-socket upload with 1 MiB
+  in the server's buffer, a 100 ms pause, then the rest — pre-fix
+  the server RSTs (verified 8/8 red), post-fix every byte is
+  delivered and the 413 arrives (verified 20/20 green, 58 tests).
+- The same destroy-before-drain pattern still exists in `readBody`
+  (JSON routes, `body too large` → 400) — documented, not touched
+  here (no test, different route class).
+
 ## 2026-11-01 (round 17.8) — Ubuntu 26.04 also dropped qemu-user-static: qemu probe + $QEMU_AARCH64
 
 The post-#82 main runs (41342270169 CI, 41342270201 Release)

@@ -16,6 +16,7 @@ const assert = require('node:assert');
 const { spawn, execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
+const net = require('node:net');
 const path = require('node:path');
 const { writeGgufFile, buildGgufBytes, GGML_Q8_0 } = require('./gguf_fixture');
 
@@ -831,6 +832,90 @@ test('an over-sized upload answers 413 with a body the client can read', async (
     : [];
   assert.deepStrictEqual(leftovers, [], 'a refused upload must leave no temp file');
   assert.ok(!fs.existsSync(path.join(uploaded, 'zu-gross.hydra')),
+    'a refused upload must not reach its final name');
+});
+
+test('an over-sized upload lets the client finish sending before the socket closes (drain, no reset)', async (t) => {
+  /* The first 413 fix made the server answer before destroying the
+   * request, but it still destroyed the socket as soon as the response
+   * was flushed. If the client had not finished sending the body by
+   * then, the destroy reset the connection (unread body bytes in the
+   * socket buffer) and the client saw a socket error instead of the
+   * 413 - a timing race that flaked the previous test (observed 2 of
+   * 14 runs, 2026-11-09).
+   *
+   * A raw socket makes the bad ordering deterministic: the body bytes
+   * are in the server's socket buffer and UNREAD (the pre-check
+   * rejects before the stream is even attached), so the pre-drain
+   * destroy sends RST, not FIN - and the next write below fails with
+   * ECONNRESET. After the drain fix the server reads the remainder
+   * to the end before closing, so every byte the client sends is
+   * delivered. */
+  const base = await bootServer(t, { HYDRA_MAX_UPLOAD: '1MiB' });
+  const url = new URL(base);
+  const total = 3 * 1024 * 1024;
+  const first = Buffer.alloc(1024 * 1024, 0x41);
+  const rest = Buffer.alloc(total - first.length, 0x42);
+
+  const sent = await new Promise((resolve, reject) => {
+    let settled = false;
+    const fail = (err) => { if (!settled) { settled = true; reject(err); } };
+    const done = (r) => { if (!settled) { settled = true; resolve(r); } };
+    const socket = net.connect(Number(url.port), url.hostname, () => {
+      socket.write(
+        `POST /api/models/upload?name=raw-413.hydra HTTP/1.1\r\n` +
+        `Host: ${url.host}\r\n` +
+        `Content-Type: application/octet-stream\r\n` +
+        `Content-Length: ${total}\r\n` +
+        `Connection: close\r\n\r\n`
+      );
+      socket.write(first);
+      /* Give the server time to pre-check (declared 3 MiB > 1 MiB),
+       * answer, and - without the drain fix - destroy the socket with
+       * `first` still unread in its buffer (RST). */
+      setTimeout(() => {
+        socket.write(rest, (err) => {
+          if (err) {
+            fail(new Error(
+              `the server reset the connection while the client was still ` +
+              `sending the body (first megabyte was never read): ${err.message}`));
+            return;
+          }
+          done(total);
+        });
+      }, 100);
+    });
+    let response = '';
+    socket.on('data', (d) => { response += d; });
+    socket.on('error', (err) => {
+      if (err.code === 'ECONNRESET') {
+        fail(new Error(
+          'ECONNRESET: the server destroyed the socket before the client ' +
+          'finished sending the body (the pre-drain 413 bug)'));
+      } else {
+        fail(err);
+      }
+    });
+    socket.on('close', () => {
+      /* The socket dies after all bytes were delivered: the server
+       * drained the body and closed. Verify the answer from what
+       * arrived. */
+      const match = response.match(/HTTP\/1\.1 (\d{3})/);
+      const status = match ? Number(match[1]) : 0;
+      if (status !== 413) {
+        fail(new Error(`expected a 413 from the raw upload, got status ${status}\n${response.slice(0, 400)}`));
+        return;
+      }
+      if (!/larger than the 1\.0 MiB limit/.test(response)) {
+        fail(new Error('the 413 must name the limit\n' + response.slice(0, 400)));
+        return;
+      }
+      done(total);
+    });
+  });
+
+  assert.strictEqual(sent, total, 'the client must be able to send every byte it declared');
+  assert.ok(!fs.existsSync(path.join(ROOT, 'models', 'uploaded', 'raw-413.hydra')),
     'a refused upload must not reach its final name');
 });
 
