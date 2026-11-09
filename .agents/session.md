@@ -592,6 +592,8 @@ referenced, #83 attached).
 - [x] Added in-memory model/GGUF fixture bytes and removed the flagged reads.
 - [x] `node --check tools/server_test.js` and `node --test tools/server_test.js` passed all 57 tests.
 - [x] `npm ci` installed the existing dev dependencies and `npm run lint` passed.
+- [x] Secret scanning found no secrets; CodeQL review was invoked and skipped the trivial test-only change.
+- [x] Final diff reviewed; only `tools/server_test.js`, `.agents/session.md`, and `.agents/errors.md` changed.
 
 **Plan:**
 - [x] Inspect each alert location and classify true positives versus test-only false positives.
