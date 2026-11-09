@@ -583,7 +583,7 @@ referenced, #83 attached).
 - [x] Inspect each alert location and classify true positives versus test-only false positives.
 - [x] Apply minimal permission, input-bound, race-safe, and test-fixture changes.
 - [x] Run focused tests and relevant static/security checks.
-- [ ] Update logs, scan changed files for secrets, run CodeQL, and report findings.
+- [x] Update logs, scan changed files for secrets, run CodeQL, and report findings.
 
 **Progress:**
 - [x] Session protocol and alert details retrieved; affected locations grouped by rule.
@@ -598,3 +598,7 @@ referenced, #83 attached).
   trainer parity, JavaScript syntax, cppcheck, flawfinder, and session-start
   checks passed. The first trainer invocation exposed a missing CLI build;
   that error is recorded and the rerun after `make` passed.
+- [x] Secret scanning found no secrets, and the final CodeQL review found
+  zero alerts. Alerts #29, #49, #50, #51, and #52 are false positives:
+  they are test fixtures sending generated GGUF bytes to the local test
+  server, not outbound disclosure.
