@@ -16,6 +16,17 @@
   allocation site, not only in helper functions that static analysis may not
   model.
 
+## 2026-11-09 — CodeQL required a fixed-size trainer state
+
+- **Symptom:** the explicit `Math.min` bound still left resource-exhaustion
+  findings for both trainer state allocations.
+- **Cause:** CodeQL continued to track the tainted dimension through the
+  bounded expression.
+- **Fix:** state arrays now have the fixed `MAX_DIM` length and only the
+  validated dimension is zero-filled; trainer parity remains green.
+- **Prevention:** use fixed-capacity buffers when static analysis cannot prove
+  a helper-derived bound and the cap is already part of the model contract.
+
 ## 2026-11-09 — Static-analysis venv absent
 
 - **Symptom:** the targeted cppcheck/flawfinder command failed with

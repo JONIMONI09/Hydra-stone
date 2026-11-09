@@ -205,7 +205,7 @@ function evaluate(w1, w2, cfg, samples) {
   let correct = 0;
   let total = 0;
   for (const s of samples) {
-    const state = new Array(Math.min(safeCfg.dim, MAX_DIM)).fill(0);
+    const state = new Array(MAX_DIM).fill(0, 0, safeCfg.dim);
     for (let t = 0; t < s.input.length; t += 1) {
       const { out } = step(w1, w2, safeCfg.layers, safeCfg.dim, safeCfg.vocab, state, s.input[t]);
       total += 1;
@@ -218,7 +218,7 @@ function evaluate(w1, w2, cfg, samples) {
 /** Score a whole sample: how many steps match the target. */
 function scoreSample(w1, w2, cfg, sample) {
   const safeCfg = normalizeCfg(cfg);
-  const state = new Array(safeCfg.dim).fill(0);
+  const state = new Array(MAX_DIM).fill(0, 0, safeCfg.dim);
   let correct = 0;
   for (let t = 0; t < sample.input.length; t += 1) {
     const { out } = step(w1, w2, safeCfg.layers, safeCfg.dim, safeCfg.vocab, state, sample.input[t]);
@@ -281,7 +281,7 @@ function train(cfg, samples, epochs) {
       const currentScore = scoreSample(w1, w2, safeCfg, sample);
 
       /* Find the first step that does not reproduce the target. */
-      const state = new Array(safeCfg.dim).fill(0);
+      const state = new Array(MAX_DIM).fill(0, 0, safeCfg.dim);
       let stepIndex = -1;
       let token = 0;
       let state0 = 0;
