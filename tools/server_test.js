@@ -214,6 +214,56 @@ test('/api/infer sampler: the same config is reproducible (seed default 0)', asy
     'same model + seed + config must give the same stream');
 });
 
+/* Seed pass-through (round 20): the web console must be able to PIN the
+ * RNG stream, and a web-seeded run must be byte-identical to the CLI run
+ * with the same seed - the cross-surface same-results proof (R9). The
+ * CLI is the reference: the server spawns the same hydra-run binary, so
+ * any argument-assembly typo (dropped flag, wrong name, coerced value)
+ * changes the stream and this test goes red. */
+test('/api/infer sampler: a seeded run matches the CLI with the same seed exactly', async () => {
+  const model = await firstModel();
+  const web = await postJSON('/api/infer', {
+    path: model.path, token: 11, steps: 16,
+    temperature: 1.5, minP: 0.5, repWindow: 8, seed: 42,
+  });
+  assert.strictEqual(web.status, 200);
+  const cliOut = execFileSync(path.join(ROOT, 'hydra-run'), [
+    path.join(ROOT, model.path), '11', '16',
+    '--temp', '1.5', '--min-p', '0.5', '--rep-window', '8',
+    '--seed', '42', '--json',
+  ], { cwd: ROOT, encoding: 'utf8' });
+  const cli = JSON.parse(cliOut);
+  assert.deepStrictEqual(
+    web.body.tokens,
+    cli.tokens,
+    'web (seed 42) and CLI (--seed 42) must produce the identical token stream');
+  /* A different seed on the web must follow the CLI with that seed,
+   * not just the default stream. */
+  const web2 = await postJSON('/api/infer', {
+    path: model.path, token: 11, steps: 16,
+    temperature: 1.5, minP: 0.5, repWindow: 8, seed: 7,
+  });
+  const cli2 = JSON.parse(execFileSync(path.join(ROOT, 'hydra-run'), [
+    path.join(ROOT, model.path), '11', '16',
+    '--temp', '1.5', '--min-p', '0.5', '--rep-window', '8',
+    '--seed', '7', '--json',
+  ], { cwd: ROOT, encoding: 'utf8' }));
+  assert.deepStrictEqual(web2.body.tokens, cli2.tokens,
+    'web (seed 7) and CLI (--seed 7) must produce the identical token stream');
+});
+
+test('/api/infer sampler: the seed field is validated like the other sampler fields', async () => {
+  const model = await firstModel();
+  const base = { path: model.path, token: 11, steps: 4, temperature: 1.5 };
+  for (const bad of [-1, 1.5, 4294967296, '42', null, true]) {
+    const { status, body } = await postJSON('/api/infer', { ...base, seed: bad });
+    assert.strictEqual(status, 400, `seed ${JSON.stringify(bad)} must be rejected`);
+    assert.match(body.error, /seed/, `the error must name the seed (${body.error})`);
+  }
+  const { status } = await postJSON('/api/infer', { ...base, seed: 4294967295 });
+  assert.strictEqual(status, 200, 'the 32-bit ceiling itself is valid');
+});
+
 test('/api/infer sampler: the full config (all four flags) is accepted', async () => {
   const model = await firstModel();
   const { status, body } = await postJSON('/api/infer', {
@@ -746,6 +796,11 @@ test('the crash dialog and the error button exist and are wired', () => {
   assert.match(html, /id="error-dialog"/, 'the crash dialog must exist');
   assert.match(html, /id="error-copy"/, 'the copy button must exist');
   assert.match(html, /id="errors-open"/, 'the error indicator must exist');
+  /* Every field app.js reads with $('opt-*') must exist in the HTML -
+   * a missing id is a null dereference in the console's send path. */
+  for (const id of ['opt-temp', 'opt-minp', 'opt-reppen', 'opt-repwin', 'opt-seed']) {
+    assert.match(html, new RegExp(`id="${id}"`), `the sampler field ${id} must exist`);
+  }
   assert.match(js, /addEventListener\('error'/, 'window.onerror must be handled');
   assert.match(js, /addEventListener\('unhandledrejection'/, 'promise rejections must be handled');
   assert.match(js, /clipboard/, 'the copy must use the clipboard API with a fallback');
@@ -881,7 +936,8 @@ test('an over-sized upload lets the client finish sending before the socket clos
               `sending the body (first megabyte was never read): ${err.message}`));
             return;
           }
-          done(total);
+          /* Success path: wait for the server to close - the close
+           * handler validates the 413 answer before resolving. */
         });
       }, 100);
     });
@@ -917,6 +973,76 @@ test('an over-sized upload lets the client finish sending before the socket clos
   assert.strictEqual(sent, total, 'the client must be able to send every byte it declared');
   assert.ok(!fs.existsSync(path.join(ROOT, 'models', 'uploaded', 'raw-413.hydra')),
     'a refused upload must not reach its final name');
+});
+
+test('an over-sized JSON body answers 400 while the client is still sending (readBody drain, no reset)', async (t) => {
+  /* Same bug class as the 413 upload fix (round 19): readBody used to
+   * reject AND destroy the socket the moment the limit was passed, so
+   * a client still sending its (oversized or slow) body saw a socket
+   * reset instead of the 400 the route wanted to send. The raw-socket
+   * pattern makes the bad ordering deterministic: 1 MiB sits unread in
+   * the server's buffer when the pre-fix destroy fires (RST). After
+   * the fix readBody discards the remainder and the route closes only
+   * after the client finished sending. */
+  const base = await bootServer(t, { HYDRA_MAX_TRAIN_BODY: '1MiB' });
+  const url = new URL(base);
+  const total = 2 * 1024 * 1024;
+  const first = Buffer.alloc(1024 * 1024, 0x7b); /* '{' repeated */
+  const rest = Buffer.alloc(total - first.length, 0x20);
+
+  const sent = await new Promise((resolve, reject) => {
+    let settled = false;
+    const fail = (err) => { if (!settled) { settled = true; reject(err); } };
+    const done = (r) => { if (!settled) { settled = true; resolve(r); } };
+    const socket = net.connect(Number(url.port), url.hostname, () => {
+      socket.write(
+        `POST /api/cancel HTTP/1.1\r\n` +
+        `Host: ${url.host}\r\n` +
+        `Content-Type: application/json\r\n` +
+        `Content-Length: ${total}\r\n` +
+        `Connection: close\r\n\r\n`
+      );
+      socket.write(first);
+      setTimeout(() => {
+        socket.write(rest, (err) => {
+          if (err) {
+            fail(new Error(
+              `the server reset the connection while the client was still ` +
+              `sending the JSON body (first megabyte was never read): ${err.message}`));
+            return;
+          }
+          /* Success path: wait for the server to close - the close
+           * handler validates the 400 answer before resolving. */
+        });
+      }, 100);
+    });
+    let response = '';
+    socket.on('data', (d) => { response += d; });
+    socket.on('error', (err) => {
+      if (err.code === 'ECONNRESET') {
+        fail(new Error(
+          'ECONNRESET: the server destroyed the socket before the client ' +
+          'finished sending the JSON body (the pre-drain readBody bug)'));
+      } else {
+        fail(err);
+      }
+    });
+    socket.on('close', () => {
+      const match = response.match(/HTTP\/1\.1 (\d{3})/);
+      const status = match ? Number(match[1]) : 0;
+      if (status !== 400) {
+        fail(new Error(`expected a 400 for the over-sized JSON body, got status ${status}\n${response.slice(0, 400)}`));
+        return;
+      }
+      if (!/invalid JSON body/.test(response)) {
+        fail(new Error('the 400 must carry the JSON error body\n' + response.slice(0, 400)));
+        return;
+      }
+      done(total);
+    });
+  });
+
+  assert.strictEqual(sent, total, 'the client must be able to send every byte it declared');
 });
 
 test('the same upload succeeds once the cap allows it (negative control)', async (t) => {

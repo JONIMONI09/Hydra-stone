@@ -673,9 +673,9 @@ alerts, file-backed HTTP test fixtures → in-memory), all on
   413 with a body the client can read" failed 2 of 14 runs
   (`fetch failed`), reproduced on stress run 7/10.
 
-**Bug found + fixed (this PR):** the 413 branches of both upload
-routes destroyed the request socket on response finish while the
-client was still sending the body → RST (unread bytes in the buffer)
+**Bug found + fixed — round 19a (PR #87, merged `4b9e075`):** the 413
+branches of both upload routes destroyed the request socket on
+response finish while the client was still sending the body → RST
 → client sees a socket error instead of the 413 (race: flaky).
 - Fix: `closeAfterBodyDrained(req, res)` — drain (discard) the body,
   destroy only after response flush AND client end/close; both 413
@@ -684,14 +684,192 @@ client was still sending the body → RST (unread bytes in the buffer)
   documented close-early decision.
 - Deterministic regression test (raw socket, 1 MiB guaranteed
   unread, 100 ms pause): 8/8 red pre-fix, 20/20 green post-fix
-  (58 tests/run). ESLint clean after.
-- Known, untouched, documented: `readBody` (JSON routes) has the
-  same destroy-before-drain pattern (no test); clang-tidy widening
-  at src/main.c:558 (pre-existing).
+  (58 tests/run).
 
-**Gates (local, after the edits):** eslint ok, server_test 20/20
-green, `node --check` both files ok, C code untouched (state above
-remains valid), session_start_check ok (R33 marker here),
-docs_claim_check ok.
+**Owner decision (2026-11-09, verbatim):** "Alles mergen und
+schauen!" — merge everything, then watch main. #87 was already
+merged by the owner (4b9e075, 22:11Z); main 4/4 runs success;
+release v1.0.51 auto-published (the Release workflow bumps +
+publishes on every green main push — v1.0.49/50/51 from today's
+three merges). Follow-ups (a/b/e from the brainstorming list) then
+implemented in this round (19b).
 
-**PR:** (opened after this line — FACTS ONLY, per owner rule)
+**Round 19b (this PR) — two more layers of the same bug + cast + docs:**
+- **Layer 2 — the `Connection: close` race:** after #87 the original
+  413 test still flaked. Isolated repro (3 MiB buffer body, 30×):
+  15/30 `fetch failed, cause=EPIPE`. Cause: the `Connection: close`
+  header makes **Node itself** destroy the socket on response finish
+  — before the drain completes (RST with unread bytes). Fix: drop
+  the header from both 413 branches (the header-less path lets the
+  request finish; closeAfterBodyDrained closes with an empty buffer
+  → clean FIN). Repro 15/30 → 0/30.
+- **Layer 3 — `readBody` (all four JSON routes):** on
+  `body > MAX_BODY` it rejected AND destroyed the socket (reset
+  instead of 400). Fix: readBody discards the remainder (stops
+  accumulating — no unbounded growth); the four catch blocks answer
+  400 + closeAfterBodyDrained. New deterministic raw-socket test
+  (over-sized JSON to /api/cancel): 8/8 red pre-fix, green post-fix
+  (59 tests/run now).
+- **Cast:** src/main.c:558 explicit `(size_t)` at the pointer-offset
+  use site (clang-tidy widening finding, pre-existing).
+- **Doc backfill:** CHANGELOG round-18 entry (PRs #85/#86 shipped
+  without one); errors.md round-19 entry extended to all three
+  layers.
+- **Brainstorming list status:** (a) readBody → FIXED here; (b)
+  main.c cast → FIXED here; (c) yamllint 18 pre-existing → left
+  (not CI-enforced, owner's call); (d) release → automatic (v1.0.52
+  publishes with this merge); (e) #85/#86 docs → CHANGELOG here +
+  Linear task created this round; (f) code-scanning alert states →
+  403 from the sandbox token, checkable only in the GitHub UI.
+
+**Gates (local, after the edits):** eslint ok; full suite stress
+0/25 red (59 tests/run); repro 0/30; cppcheck (exact CI command) 0
+findings; ASan+UBSan+LSan 5/5 clean; test count 234 = baseline;
+session_start_check ok (R33 marker here); docs_claim_check ok;
+llama pin check 5/5 (fresh clone: `git submodule update --init`
+first — the check reads the submodule's LICENSE file).
+
+**PR #89** opened from this commit — CI: **16 pass / 4 skipping
+(platform-specific) / 0 fail**.
+
+**Main watch (owner directive "Alles mergen und schauen!"):**
+main `4b9e075e` (post-#87) — 4/4 runs success; release v1.0.51
+auto-published (the Release workflow bumps + publishes on every green
+main push: v1.0.49/50/51 from the three merges of 2026-11-09).
+Follow-up list status: (a) FIXED, (b) FIXED, (c) yamllint-18 left
+(owner's call), (d) automatic with the merge, (e) DONE (CHANGELOG
+here + Linear PRO-64/PRO-65, PRs attached), (f) owner UI check
+(sandbox token gets 403 on the alerts API).
+
+## Round 20 (2026-10-25) — external feature request: does it exist? verify + info.md + full test
+
+**Session start (R33):** 2026-10-25 (branch `arena/18c6ce18-bestai`,
+base main `4b9e075e`). Read: AGENTS.md, .agents/session.md (current
+round 19), .agents/errors.md (top entries), .agents/rules.md (R1–R33),
+.agents/user.md, .agents/Environment.md (Arena section),
+.agents/skills/{session-workflow,engine-ci-verify,ci-triage}/SKILL.md,
+tools/session_start_check.sh (marker format: "(R33)" is the RULE
+number that mandates the marker, not a round number — round 19
+carried the same R33 marker).
+
+**Task (owner):** a user sent a feature request for "a small C based AI
+inference tool that loads a `.hydra` model, generates tokens from a
+seed, CLI `./hydra-run my_model.hydra 123`, prompt as token-ID list,
+sampling options (temperature, nucleus, repetition penalty, repeat
+window, seed), greedy when sampling off, lightweight engine, fixed
+memory, no heap for weights (map the model file), web console + mobile
+app with the same sampling behavior/results, plain text or JSON CLI
+output, clean build+tests". Owner: check whether it ALREADY EXISTS or
+has ERRORS (think, don't guess, no simulations), write a concise
+English `info.md` (what it is, what it does now, with 2026 explainer
+video links from the web), test everything (CLI, web app, Linux,
+Android as far as this sandbox allows) without breaking anything, use
+Linear properly, update all docs, create NEW files to keep things
+compact, report CI status in this chat.
+
+**CI-workflow tool check (owner: "sollte über diesen Chat angezeigt
+werden, wenn nicht normal fortfahren"):** `list_connector_tools
+github` → **unsupported** (no GitHub connector in this Arena
+environment). → Continued normally: `gh` CLI + runs/channels reported
+in chat.
+
+**Plan (acceptance = every row proven by execution, R5/R7):**
+1. Feature-request → code mapping, line-by-line, each claim with
+   file:line evidence (main.c CLI surface, engine mmap/fixed-memory,
+   sampler options, JSON/plain output, server.js + android parity).
+2. Execute: build; `./hydra-run <model> <seed>`; prompt-tokens mode;
+   every sampling flag; greedy default; `--json`; determinism
+   (same seed twice = same output; different seed = different).
+3. Web app: server up, /api/predict (or the real route) with the same
+   seed+params → byte-identical tokens as the CLI (parity, R9).
+4. Android: local evidence possible in this sandbox (JNI javac
+   compile, header/signature/crash checks, and an APK build IF the
+   toolchain is present — no simulation; otherwise state exactly what
+   only CI covers and run the PR CI as proof).
+5. Full local gate (engine-ci-verify, CI-identical order).
+6. New file `info.md` (root): concise English explainer + 2026 video
+   links (web search, real URLs only — no invented video ids).
+7. Linear: PRO-66 (this verification round), substructure if useful,
+   PR attached, state managed.
+8. Docs: session.md (this, updated per step), errors.md (every error
+   immediately), CHANGELOG only if code changed, README/docs only if a
+   claim proved stale.
+9. PR (FACTS ONLY) + CI watch + report in chat.
+
+**Progress (round 20):**
+
+1. ✅ **Feature-request → code mapping** (all proven by execution,
+   file:line evidence):
+   - `./hydra-run <modell.hydra> 123` → src/main.c usage (L54+),
+     executed: 16 tokens from start token 123.
+   - `--prompt t1,t2,...` (token-ID list) → executed: prefill +
+     generation, [Prompt] echoed.
+   - Sampling flags: `--temp` (0=greedy default; >0 activates),
+     `--min-p` (the project's nucleus-style filter — the request's
+     "nucleus filter"; min-p is the deliberate design, documented),
+     `--rep-penalty`, `--rep-window`, `--seed` → all executed.
+   - Greedy default: temp 0 → native step, bit-identical (pinned by
+     test_engine.c "min_p=1 (greedy guard) bit-identisch" + executed).
+   - Determinism: same seed twice → identical (executed); different
+     seed → different stream (executed on a zero-weight model with a
+     flat distribution: seed 42/43/99 → three different streams).
+   - min-p filter effect: starter model temp 0.8 seed 42
+     [1,1,1,0,509,505,497,481] vs min-p 0.9 → [1,1,1,1,1,1,1,1]
+     (executed). Temperature effect: t0.8 vs t1.5 → different
+     streams (executed).
+   - mmap, no weight heap: src/hydra_engine.c L342 (mmap), L928
+     ("blocks are read straight from the mmap, no copies"); the only
+     mallocs are per-step scratch (score array n ≤ ring cap,
+     k/v dim ≤ 64) + KV ring (fixed capacity).
+   - Plain + JSON output: both executed; v1 JSON has tokens/state/
+     dim/vocab/layers/start/steps/timing/load/weights/prompt.
+   - Web + mobile on the same engine: server.js spawns hydra-run
+     itself (L674-677 sampler args); Android = same C engine via JNI
+     (hydra_jni.c, jint seed); tools/sampler_contract_check.sh pins
+     the contract.
+2. ✅ **The one real gap found: web seed.** /api/infer + the UI had
+   no seed field (CLI + Android had it). Fixed: SAMPLER_SEED_MAX
+   2^32-1 (= the Android jint range), validation like the other
+   fields, `--seed` pass-through, UI field, contract-gate checks
+   (39 total), server_test parity test (web seed 42/7 == CLI --seed
+   42/7, token-identical) + 400 tests (6 bad values), UI field
+   assertion. Also fixed a stale UI help sentence (sampling needs
+   only temperature > 0; min-p default 0 already satisfies min-p < 1).
+3. ✅ **Web app tested live:** server on :8931, /api/infer seed 42 →
+   [1,1,1,1,1,1,1,1] == CLI --seed 42 → [1,1,1,1,1,1,1,1]; invalid
+   seed → 400; UI HTML serves the new field. Full suite 61/61.
+4. ✅ **Linux/CLI:** exact request example + all flags executed (see
+   1). Build clean (gcc -O3 -Wall -Wextra, -mavx2).
+5. ✅ **Android (as far as this sandbox allows, no simulation):**
+   device-free gates green (jni_signature, android_header,
+   android_crash, android_autostart); JNI bridge code-read (jint seed
+   → step_ctx.cfg.rng_seed, L349/L498); the APK build + javac bridge
+   + emulator run are covered by the PR CI (no Android SDK in the
+   sandbox — recorded). Android UI keeps its documented fixed seed
+   (Kotlin comment: "no UI surface for a per-run seed yet") — pre-
+   existing state, reported, not changed.
+6. ✅ **Full local gate:** gcc strict ok; clang strict NOT runnable
+   here (apt index fetch blocked by egress allowlist, LLVM GitHub
+   releases carry no binaries — recorded in Environment.md; CI job
+   covers it); cppcheck 0 findings; make+test-run rc=0 (234/152/216 +
+   gguf/jni/large-model suites); ASan+UBSan+LSan 5/5 clean;
+   fanalyzer 0; test count 234 = baseline; eslint clean;
+   sampler contract 39 + negative control red as designed;
+   server suite 61/61.
+7. ✅ **info.md** (root, English, concise): what it is, how it works,
+   what it does today (verified date), 4 verified explainer videos
+   (3B1B LLM intro 2024; Gentle Intro to Sampling 2026; Secret
+   Controls 2026 incl. min-p; Karpathy Deep Dive 2025) + min-p-vs-
+   nucleus note. URLs only from web search results (no invented ids).
+8. ✅ Linear PRO-66: In Review, PR #89 attached (result summary in the
+   task); PRO-64/PRO-65 from round 19b remain Done.
+9. ✅ PR #89 carries both rounds (the session branch cannot be split
+   per R18 without a new branch, which this session is not allowed to
+   create) — title + body sectioned per round, FACTS ONLY. CI on
+   2c393d8: 16 pass / 4 skipping / 0 fail; mergeable=MERGEABLE.
+   Reported in chat.
+
+**Errors this round (errors.md):** (none blocking — the clang gap is a
+documented environment constraint, not an error; the red
+llama_pin_check on the fresh clone = missing submodule checkout,
+fixed by `git submodule update --init`, recorded in Environment.md).

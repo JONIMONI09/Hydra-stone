@@ -3,38 +3,60 @@
 > Every error gets an entry immediately, with symptom, cause, fix and
 > prevention. Newest entries at the top.
 
-## 2026-11-09 (round 19) — over-sized upload 413 resets the socket while the client is still sending (flaky server test)
+## 2026-11-09 (round 19) — early rejection reset the socket while the client was still sending (413 upload, 400 readBody) — three layers of the same bug
 
-- **Symptom:** `node tools/server_test.js` failed intermittently
-  (2 of 14 runs during the round-19 verification pass) in
+- **Symptom (layer 1):** `node tools/server_test.js` failed
+  intermittently (2 of 14 runs in the round-19 verification pass) in
   "an over-sized upload answers 413 with a body the client can read":
-  `TypeError: fetch failed` (socket error) instead of the 413
-  response.
-- **Cause:** both upload routes (`/api/models/upload`,
-  `/api/models/import`) answered the 413 and then destroyed the
-  request socket on `res.on('finish')` — without waiting for the
-  client to finish sending the body. Destroying a socket that still
-  has unread body bytes in its buffer sends RST instead of FIN, so a
-  client mid-send sees a connection reset instead of the 413.
-  Whether that happens is a race between the client's body stream and
-  the server's response+destroy sequence — hence flaky, not always
-  red. The pre-check path (declared Content-Length over the limit)
-  makes it more likely: the server rejects before the body stream is
-  even attached, so every unsent byte is "unread".
-- **Fix:** `closeAfterBodyDrained(req, res)` in server.js — the rest
-  of the body is resumed and discarded (never buffered), and the
-  socket is destroyed only after BOTH the response is flushed and the
-  client has finished sending (or gone away). Used by both 413
-  branches. `streamToTmpFile` now removes its `data` handler at the
-  limit so the drain is not re-paused by that listener. Deterministic
-  regression test (raw socket: 1 MiB in the buffer, 100 ms pause,
-  then the rest — the pre-fix server fails it with ECONNRESET;
-  verified 8/8 red before the fix, 20/20 green after).
-- **Prevention:** a server that rejects a request early must not
-  close the connection before the client finished sending — answer,
-  drain, close. And a flaky test that reproduces a race is worth a
-  deterministic sibling test that pins the race ordering (raw socket
-  + guaranteed unread bytes), not just a higher run count.
+  `TypeError: fetch failed` instead of the 413.
+- **Cause (layer 1):** both upload routes (`/api/models/upload`,
+  `/api/models/import`) answered the 413 and destroyed the request
+  socket on `res.on('finish')` — before the client finished sending
+  the body. A destroy with unread body bytes in the socket buffer
+  sends RST, not FIN, so a client mid-send sees a connection reset.
+  The pre-check path (declared Content-Length over the limit) makes
+  it likely: the server rejects before the body stream is attached,
+  so every unsent byte is "unread".
+- **Fix (layer 1, PR #87, merged 4b9e075):**
+  `closeAfterBodyDrained(req, res)` — resume + discard the remainder
+  (never buffered), destroy only after BOTH the response is flushed
+  and the client has finished sending (or gone away); both 413
+  branches use it; `streamToTmpFile` removes its data handler at the
+  limit so the drain is not re-paused. Deterministic raw-socket
+  regression test (1 MiB guaranteed unread, 100 ms pause): 8/8 red
+  pre-fix, green post-fix.
+- **Symptom (layer 2):** after layer 1, the ORIGINAL 413 test still
+  flaked — isolated repro: 15 of 30 runs `fetch failed, cause=EPIPE`
+  on the fast 3 MiB buffer body.
+- **Cause (layer 2):** the `Connection: close` header the 413 branches
+  set makes **Node itself** destroy the socket when the response
+  finishes — before the drain completes. Same RST mechanism, different
+  destroy owner (the runtime, not our handler).
+- **Fix (layer 2, this PR):** drop the header from both 413 branches.
+  Without it, Node leaves the socket alone, the request finishes
+  (drained), and `closeAfterBodyDrained` closes it with an empty
+  buffer (clean FIN). Repro: 15/30 → 0/30; full-suite stress 0/25.
+- **Symptom (layer 3):** the same bug class in `readBody` (all four
+  JSON routes): on `body > MAX_BODY` it rejected AND destroyed the
+  socket — a client still sending its JSON body got a reset instead
+  of the 400.
+- **Fix (layer 3, this PR):** readBody discards the remainder instead
+  of destroying (no unbounded growth: it stops accumulating); the
+  four route catch blocks answer the 400 and call
+  `closeAfterBodyDrained`. Deterministic raw-socket regression test
+  (same 1 MiB/100 ms pattern against `/api/cancel`): 8/8 red pre-fix,
+  green post-fix.
+- **Also fixed (this PR):** clang-tidy
+  `bugprone-implicit-widening-of-multiplication-result` at
+  `src/main.c:558` — explicit `(size_t)` at the pointer-offset use
+  site (i <= 7, offset <= 14, hex[17]).
+- **Prevention:** a server that rejects a request early must let the
+  client finish sending — answer, drain, close. AND: `Connection:
+  close` on such a response hands the destroy decision to Node, which
+  destroys on response finish, not on request completion — do not use
+  it on a path that still has to drain. And: a flaky race is worth a
+  deterministic sibling test (raw socket + guaranteed unread bytes),
+  not just a higher run count.
 
 ## 2026-11-09 — ESLint binary missing
 
