@@ -725,6 +725,18 @@ implemented in this round (19b).
 **Gates (local, after the edits):** eslint ok; full suite stress
 0/25 red (59 tests/run); repro 0/30; cppcheck (exact CI command) 0
 findings; ASan+UBSan+LSan 5/5 clean; test count 234 = baseline;
-session_start_check ok (R33 marker here); docs_claim_check ok.
+session_start_check ok (R33 marker here); docs_claim_check ok;
+llama pin check 5/5 (fresh clone: `git submodule update --init`
+first — the check reads the submodule's LICENSE file).
 
-**PR:** (opened after this line — FACTS ONLY, per owner rule)
+**PR #89** opened from this commit — CI: **16 pass / 4 skipping
+(platform-specific) / 0 fail**.
+
+**Main watch (owner directive "Alles mergen und schauen!"):**
+main `4b9e075e` (post-#87) — 4/4 runs success; release v1.0.51
+auto-published (the Release workflow bumps + publishes on every green
+main push: v1.0.49/50/51 from the three merges of 2026-11-09).
+Follow-up list status: (a) FIXED, (b) FIXED, (c) yamllint-18 left
+(owner's call), (d) automatic with the merge, (e) DONE (CHANGELOG
+here + Linear PRO-64/PRO-65, PRs attached), (f) owner UI check
+(sandbox token gets 403 on the alerts API).
