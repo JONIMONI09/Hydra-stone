@@ -438,6 +438,11 @@
     if (Number.isFinite(repPenalty) && repPenalty !== 1) s.repetitionPenalty = repPenalty;
     const repWindow = Number($('opt-repwin').value);
     if (Number.isInteger(repWindow) && repWindow !== 64) s.repWindow = repWindow;
+    /* Seed 0 is the engine's fixed default stream (the same as omitting
+     * the flag), so only a positive seed is sent — a run left at the
+     * default stays bit-identical to a legacy request. */
+    const seed = Number($('opt-seed').value);
+    if (Number.isInteger(seed) && seed > 0) s.seed = seed;
     return s;
   }
 

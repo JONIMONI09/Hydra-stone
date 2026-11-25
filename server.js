@@ -132,13 +132,18 @@ const IMPORT_MODE_DEFAULT = envEnum('HYDRA_IMPORT_MODE', 'auto', ['auto', 'v1', 
  * used by hydra_jni.c runInferenceSampled) and are pinned by
  * tools/sampler_contract_check.sh: temperature in [0, 20] (0 = greedy),
  * min-p in [0, 1] (1 = greedy), repetition penalty >= 1 (1 = off),
- * penalty window an integer in [0, 4096]. A request without any of the
- * fields emits NO sampler flag, so a legacy client keeps the bit-
- * identical greedy run. */
+ * penalty window an integer in [0, 4096], seed an integer in
+ * [0, 2^32-1] (the Android bridge's seed is a jint, so capping here at
+ * the same 32-bit range keeps every web-seeded run reproducible on
+ * EVERY surface, CLI and Android included). A request without any of
+ * the fields emits NO sampler flag, so a legacy client keeps the bit-
+ * identical greedy run (seed 0 and no seed are the same: the engine
+ * maps 0 to its fixed non-zero start constant). */
 const SAMPLER_TEMP_MAX = 20;
 const SAMPLER_MINP_MAX = 1;
 const SAMPLER_REP_MIN = 1;
 const SAMPLER_REP_WINDOW_MAX = 4096;
+const SAMPLER_SEED_MAX = 4294967295;
 
 /* The console talks to a local engine and can run arbitrary uploaded code
  * paths, so binding it to every interface must be an explicit decision.
@@ -675,6 +680,7 @@ function runInference(modelPath, token, steps, prompt, requestId, sampler) {
   if (sampler && sampler.minP !== undefined) args.push('--min-p', String(sampler.minP));
   if (sampler && sampler.repetitionPenalty !== undefined) args.push('--rep-penalty', String(sampler.repetitionPenalty));
   if (sampler && sampler.repWindow !== undefined) args.push('--rep-window', String(sampler.repWindow));
+  if (sampler && sampler.seed !== undefined) args.push('--seed', String(sampler.seed));
   return engineJson(args, requestId);
 }
 
@@ -1639,6 +1645,13 @@ const server = http.createServer(async (req, res) => {
           return sendJSON(res, 400, { error: `repWindow must be an integer in [0, ${SAMPLER_REP_WINDOW_MAX}]` });
         }
         sampler.repWindow = v;
+      }
+      if (body.seed !== undefined) {
+        const v = body.seed;
+        if (typeof v !== 'number' || !Number.isInteger(v) || v < 0 || v > SAMPLER_SEED_MAX) {
+          return sendJSON(res, 400, { error: `seed must be an integer in [0, ${SAMPLER_SEED_MAX}]` });
+        }
+        sampler.seed = v;
       }
 
       /* An explicitly requested but forbidden path must not silently fall

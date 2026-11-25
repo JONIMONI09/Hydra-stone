@@ -241,7 +241,7 @@ Architecture: `server.js` (Node, **zero npm dependencies**) → `hydra-run --jso
 | `/api/models/upload?name=` | POST | Store a `.hydra` or `.hydra2` (`HYDRA_MAX_UPLOAD`, 64 MiB default) |
 | `/api/models/import?name=` | POST | Convert a **`.gguf`**: `?mode=auto\|v1\|v2` (auto = the v1 projection, the existing behaviour; v2 = the full-fidelity `.hydra2` MoE container, t4 size-optimal by default with `&t4=auto\|force\|none` and `&max_experts=1..8` overrides) |
 | `/api/config` | GET | The whole configuration surface: every knob with its effective value, default, source (default/env) and override |
-| `/api/infer` | POST | `{token, steps}` → JSON with tokens, state, timing |
+| `/api/infer` | POST | `{token, steps, prompt[], temperature, minP, repetitionPenalty, repWindow, seed, path}` → JSON with tokens, state, timing. Sampler fields are optional — omitted fields send no flag, so a legacy request stays the bit-identical greedy run; ranges are pinned across CLI/web/Android by `tools/sampler_contract_check.sh` |
 | `/api/cancel` | POST | Abort the running inference (409 `cancelled`) |
 | `/api/axiom?h=0.5` | GET | Axiom gate simulation |
 

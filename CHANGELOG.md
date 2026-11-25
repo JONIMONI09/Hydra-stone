@@ -2,6 +2,43 @@
 All notable changes to this project, per change, are recorded here and in
 `.agents/session.md` (.agents/rules.md R2). Newest entries first.
 
+## 2026-10-25 (round 20, this PR) — web console can now pin the sampler seed; full surface parity verified + info.md
+
+An external feature request asked for exactly what this repository
+already is (C inference tool, `.hydra` load, seed + token-ID prompt,
+temperature / min-p / repetition penalty / window / seed, greedy by
+default, mmap of weights with no weight heap, web console + mobile
+app on the same engine, plain or JSON output). The one real gap found
+by executing every claim: **the web surface could not pin the RNG
+seed** — the CLI (`--seed`) and the Android bridge (`jint seed`)
+could, but `/api/infer` had no seed field, so a web sampling run could
+not be requested at a specific seed.
+
+- **Fix:** `/api/infer` accepts `seed` (integer in [0, 2^32-1] — the
+  Android bridge's 32-bit range, so a web-seeded run stays reproducible
+  on every surface), passes it through as `--seed` to the same
+  `hydra-run` binary. The console UI gains a seed field; a seed left at
+  0 is not sent, so legacy requests stay bit-identical.
+- **Contract:** `tools/sampler_contract_check.sh` now pins the seed
+  ceiling (2^32-1) and the pass-through on both surfaces (39 checks).
+- **Regression test:** `server_test.js` asserts a web run with
+  seed 42 and seed 7 is token-identical to the CLI run with the same
+  `--seed` (the cross-surface same-results proof), and that every bad
+  seed value is rejected with a 400 that names the field.
+- **Docs:** new root `info.md` — a concise English explainer of what
+  the project is, how it works, what it does today, and four verified
+  explainer videos (sampling, decoding, min-p, the LLM core). The
+  web-UI sampler help text is corrected (only temperature must leave
+  its default for sampling to activate; min-p's default 0 already
+  satisfies the engine's `min-p < 1` half of the rule).
+- **Verification:** full local gate green — gcc strict, cppcheck 0,
+  234/152/216 (+ the gguf/jni/large-model suites) 0 failures,
+  ASan+UBSan+LSan clean, `--fanalyzer` 0, server suite 61/61,
+  sampler contract 39 checks + negative control, live web↔CLI parity
+  confirmed by execution. clang strict and the Android APK build run
+  in CI (this sandbox cannot install clang — apt index fetch is
+  blocked by the egress allowlist — recorded in `.agents/Environment.md`).
+
 ## 2026-11-09 (round 19b, this PR) — the same socket-reset bug, three layers: Connection: close race, readBody, main.c cast
 
 PR #87 (round 19a, merged `4b9e075`) fixed the 413 upload branches

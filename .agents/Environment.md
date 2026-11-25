@@ -595,3 +595,41 @@ Debian 12 container):
 5. **/tmp is wiped between sandbox segments** (again): rebuild
    `/tmp/lintenv` (pyyaml et al.) at the start of each segment; the
    `workflow_yaml_check.sh` gate needs `PATH=/tmp/lintenv/bin:$PATH`.
+
+## 2026-11-25 (round 20) — fresh segment: apt/clang blocked by the egress allowlist, submodules, sudo
+
+Measured in this sandbox segment (Debian 12 container, E2B-style):
+
+1. **`/tmp` wiped again + `node_modules` gone** (fresh segment):
+   rebuilt with `npm ci` (78 packages, eslint 10.x) and
+   `/tmp/lintenv` (cppcheck, clang-tidy, yamllint, shellcheck-py,
+   flawfinder, pyflakes, bandit, cpplint). Same recipe as the
+   2026-11-01 note.
+2. **The clang COMPILER cannot be installed here** (measured,
+   2026-11-25): plain `apt-get` has no root (permission denied on
+   /var/lib/dpkg); `sudo` works passwordless, but `sudo apt-get
+   update` fails with "Failed to fetch
+   http://deb.debian.org/debian-security/..." — deb.debian.org is not
+   on the sandbox egress allowlist (allowed: github.com,
+   codeload.github.com, api.github.com, registry.npmjs.org, pypi.org,
+   files.pythonhosted.org). The LLVM GitHub releases carry no binary
+   assets (checked via the API: `llvmorg-*` tags, empty asset lists),
+   and releases.llvm.org is not allowed either. Consequence:
+   **CI gate 1b (clang strict syntax) cannot be executed in this
+   sandbox and is proven by the PR's "C lint & static analysis" job
+   instead.** Every other gate (gcc strict, cppcheck, fanalyzer,
+   sanitizers, all test suites, eslint, python gates, server suite,
+   contract gates) runs locally. `clang-tidy` IS available (pip
+   package in /tmp/lintenv) — only the compiler frontend is missing.
+3. **Fresh clones need `git submodule update --init`** before
+   `tools/llama_pin_check.sh` passes: the check reads the pinned
+   llama.cpp submodule's LICENSE file; without the checkout it reports
+   "MIT licence missing" (2 of 5 checks red) although the gitlink pin
+   itself is correct.
+4. **`sudo -n true` succeeds** (passwordless root) — usable for
+   system installs where the network allows it.
+5. **GitHub connector is NOT available in this Arena environment**
+   (`list_connector_tools github` → unsupported): CI status is
+   reported in chat via `gh` CLI + the runs API, as the owner directed
+   ("if not, continue normally"). Linear IS connected and used for
+   task management.

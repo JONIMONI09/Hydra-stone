@@ -214,6 +214,56 @@ test('/api/infer sampler: the same config is reproducible (seed default 0)', asy
     'same model + seed + config must give the same stream');
 });
 
+/* Seed pass-through (round 20): the web console must be able to PIN the
+ * RNG stream, and a web-seeded run must be byte-identical to the CLI run
+ * with the same seed - the cross-surface same-results proof (R9). The
+ * CLI is the reference: the server spawns the same hydra-run binary, so
+ * any argument-assembly typo (dropped flag, wrong name, coerced value)
+ * changes the stream and this test goes red. */
+test('/api/infer sampler: a seeded run matches the CLI with the same seed exactly', async () => {
+  const model = await firstModel();
+  const web = await postJSON('/api/infer', {
+    path: model.path, token: 11, steps: 16,
+    temperature: 1.5, minP: 0.5, repWindow: 8, seed: 42,
+  });
+  assert.strictEqual(web.status, 200);
+  const cliOut = execFileSync(path.join(ROOT, 'hydra-run'), [
+    path.join(ROOT, model.path), '11', '16',
+    '--temp', '1.5', '--min-p', '0.5', '--rep-window', '8',
+    '--seed', '42', '--json',
+  ], { cwd: ROOT, encoding: 'utf8' });
+  const cli = JSON.parse(cliOut);
+  assert.deepStrictEqual(
+    web.body.tokens,
+    cli.tokens,
+    'web (seed 42) and CLI (--seed 42) must produce the identical token stream');
+  /* A different seed on the web must follow the CLI with that seed,
+   * not just the default stream. */
+  const web2 = await postJSON('/api/infer', {
+    path: model.path, token: 11, steps: 16,
+    temperature: 1.5, minP: 0.5, repWindow: 8, seed: 7,
+  });
+  const cli2 = JSON.parse(execFileSync(path.join(ROOT, 'hydra-run'), [
+    path.join(ROOT, model.path), '11', '16',
+    '--temp', '1.5', '--min-p', '0.5', '--rep-window', '8',
+    '--seed', '7', '--json',
+  ], { cwd: ROOT, encoding: 'utf8' }));
+  assert.deepStrictEqual(web2.body.tokens, cli2.tokens,
+    'web (seed 7) and CLI (--seed 7) must produce the identical token stream');
+});
+
+test('/api/infer sampler: the seed field is validated like the other sampler fields', async () => {
+  const model = await firstModel();
+  const base = { path: model.path, token: 11, steps: 4, temperature: 1.5 };
+  for (const bad of [-1, 1.5, 4294967296, '42', null, true]) {
+    const { status, body } = await postJSON('/api/infer', { ...base, seed: bad });
+    assert.strictEqual(status, 400, `seed ${JSON.stringify(bad)} must be rejected`);
+    assert.match(body.error, /seed/, `the error must name the seed (${body.error})`);
+  }
+  const { status } = await postJSON('/api/infer', { ...base, seed: 4294967295 });
+  assert.strictEqual(status, 200, 'the 32-bit ceiling itself is valid');
+});
+
 test('/api/infer sampler: the full config (all four flags) is accepted', async () => {
   const model = await firstModel();
   const { status, body } = await postJSON('/api/infer', {
@@ -746,6 +796,11 @@ test('the crash dialog and the error button exist and are wired', () => {
   assert.match(html, /id="error-dialog"/, 'the crash dialog must exist');
   assert.match(html, /id="error-copy"/, 'the copy button must exist');
   assert.match(html, /id="errors-open"/, 'the error indicator must exist');
+  /* Every field app.js reads with $('opt-*') must exist in the HTML -
+   * a missing id is a null dereference in the console's send path. */
+  for (const id of ['opt-temp', 'opt-minp', 'opt-reppen', 'opt-repwin', 'opt-seed']) {
+    assert.match(html, new RegExp(`id="${id}"`), `the sampler field ${id} must exist`);
+  }
   assert.match(js, /addEventListener\('error'/, 'window.onerror must be handled');
   assert.match(js, /addEventListener\('unhandledrejection'/, 'promise rejections must be handled');
   assert.match(js, /clipboard/, 'the copy must use the clipboard API with a fallback');
