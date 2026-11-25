@@ -881,7 +881,8 @@ test('an over-sized upload lets the client finish sending before the socket clos
               `sending the body (first megabyte was never read): ${err.message}`));
             return;
           }
-          done(total);
+          /* Success path: wait for the server to close - the close
+           * handler validates the 413 answer before resolving. */
         });
       }, 100);
     });
@@ -917,6 +918,76 @@ test('an over-sized upload lets the client finish sending before the socket clos
   assert.strictEqual(sent, total, 'the client must be able to send every byte it declared');
   assert.ok(!fs.existsSync(path.join(ROOT, 'models', 'uploaded', 'raw-413.hydra')),
     'a refused upload must not reach its final name');
+});
+
+test('an over-sized JSON body answers 400 while the client is still sending (readBody drain, no reset)', async (t) => {
+  /* Same bug class as the 413 upload fix (round 19): readBody used to
+   * reject AND destroy the socket the moment the limit was passed, so
+   * a client still sending its (oversized or slow) body saw a socket
+   * reset instead of the 400 the route wanted to send. The raw-socket
+   * pattern makes the bad ordering deterministic: 1 MiB sits unread in
+   * the server's buffer when the pre-fix destroy fires (RST). After
+   * the fix readBody discards the remainder and the route closes only
+   * after the client finished sending. */
+  const base = await bootServer(t, { HYDRA_MAX_TRAIN_BODY: '1MiB' });
+  const url = new URL(base);
+  const total = 2 * 1024 * 1024;
+  const first = Buffer.alloc(1024 * 1024, 0x7b); /* '{' repeated */
+  const rest = Buffer.alloc(total - first.length, 0x20);
+
+  const sent = await new Promise((resolve, reject) => {
+    let settled = false;
+    const fail = (err) => { if (!settled) { settled = true; reject(err); } };
+    const done = (r) => { if (!settled) { settled = true; resolve(r); } };
+    const socket = net.connect(Number(url.port), url.hostname, () => {
+      socket.write(
+        `POST /api/cancel HTTP/1.1\r\n` +
+        `Host: ${url.host}\r\n` +
+        `Content-Type: application/json\r\n` +
+        `Content-Length: ${total}\r\n` +
+        `Connection: close\r\n\r\n`
+      );
+      socket.write(first);
+      setTimeout(() => {
+        socket.write(rest, (err) => {
+          if (err) {
+            fail(new Error(
+              `the server reset the connection while the client was still ` +
+              `sending the JSON body (first megabyte was never read): ${err.message}`));
+            return;
+          }
+          /* Success path: wait for the server to close - the close
+           * handler validates the 400 answer before resolving. */
+        });
+      }, 100);
+    });
+    let response = '';
+    socket.on('data', (d) => { response += d; });
+    socket.on('error', (err) => {
+      if (err.code === 'ECONNRESET') {
+        fail(new Error(
+          'ECONNRESET: the server destroyed the socket before the client ' +
+          'finished sending the JSON body (the pre-drain readBody bug)'));
+      } else {
+        fail(err);
+      }
+    });
+    socket.on('close', () => {
+      const match = response.match(/HTTP\/1\.1 (\d{3})/);
+      const status = match ? Number(match[1]) : 0;
+      if (status !== 400) {
+        fail(new Error(`expected a 400 for the over-sized JSON body, got status ${status}\n${response.slice(0, 400)}`));
+        return;
+      }
+      if (!/invalid JSON body/.test(response)) {
+        fail(new Error('the 400 must carry the JSON error body\n' + response.slice(0, 400)));
+        return;
+      }
+      done(total);
+    });
+  });
+
+  assert.strictEqual(sent, total, 'the client must be able to send every byte it declared');
 });
 
 test('the same upload succeeds once the cap allows it (negative control)', async (t) => {

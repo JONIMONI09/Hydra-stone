@@ -2,34 +2,56 @@
 All notable changes to this project, per change, are recorded here and in
 `.agents/session.md` (.agents/rules.md R2). Newest entries first.
 
-## 2026-11-09 (round 19) — over-sized upload 413: drain the body before closing (fixes flaky server test)
+## 2026-11-09 (round 19b, this PR) — the same socket-reset bug, three layers: Connection: close race, readBody, main.c cast
 
-`server_test.js` failed intermittently (2 of 14 runs in the round-19
-verification pass): "an over-sized upload answers 413 with a body the
-client can read" got `fetch failed` (socket reset) instead of the 413.
+PR #87 (round 19a, merged `4b9e075`) fixed the 413 upload branches
+(`closeAfterBodyDrained`: drain the body, close only after the
+client finished sending + deterministic raw-socket regression
+test). This PR finishes the job — two more layers of the same bug
+class plus one static-analysis finding:
 
-- **Root cause:** both upload routes destroyed the request socket on
-  `res.on('finish')` after answering the 413 — before the client had
-  finished sending the body. A destroy with unread body bytes in the
-  socket buffer sends RST, not FIN, so a client mid-send sees a
-  connection reset. The pre-check path (declared Content-Length over
-  the limit) rejects before the body stream is attached, so every
-  unsent byte is unread — the race the test was hitting.
-- **Fix:** `closeAfterBodyDrained(req, res)` — resume + discard the
-  remainder of the body (never buffered), destroy the socket only
-  after BOTH the response is flushed and the client has finished
-  sending (or gone away). Used by the 413 branch of
-  `/api/models/upload` and `/api/models/import`; the 429
-  serialisation branch keeps its documented close-early design
-  decision. `streamToTmpFile` removes its data handler at the limit
-  so the drain is not re-paused.
-- **Regression test (deterministic):** raw-socket upload with 1 MiB
-  in the server's buffer, a 100 ms pause, then the rest — pre-fix
-  the server RSTs (verified 8/8 red), post-fix every byte is
-  delivered and the 413 arrives (verified 20/20 green, 58 tests).
-- The same destroy-before-drain pattern still exists in `readBody`
-  (JSON routes, `body too large` → 400) — documented, not touched
-  here (no test, different route class).
+- **Layer 2 (the `Connection: close` race):** after #87 the original
+  413 test still flaked — isolated repro: 15 of 30 runs
+  `fetch failed, cause=EPIPE`. Cause: the `Connection: close` header
+  makes **Node itself** destroy the socket on response finish,
+  before the drain completes (RST with unread body bytes → EPIPE).
+  Fix: drop the header from both 413 branches; the header-less path
+  lets the request finish, `closeAfterBodyDrained` closes with an
+  empty buffer (clean FIN). Repro 15/30 → 0/30.
+- **Layer 3 (`readBody`, all four JSON routes):** on
+  `body > MAX_BODY` it rejected AND destroyed the socket — a client
+  still sending its JSON body got a reset instead of the 400. Fix:
+  readBody discards the remainder (stops accumulating), the four
+  route catch blocks answer 400 + `closeAfterBodyDrained`.
+- **`src/main.c:558`:** clang-tidy
+  `bugprone-implicit-widening-of-multiplication-result` — explicit
+  `(size_t)` at the pointer-offset use site.
+- **Regression test:** second deterministic raw-socket test
+  (over-sized JSON body against `/api/cancel`, 1 MiB guaranteed
+  unread, 100 ms pause): 8/8 red against the pre-fix server, green
+  after.
+- **Verification:** full suite (59 tests) stress 0/25 red; repro
+  0/30; eslint clean; cppcheck (exact CI command) 0 findings;
+  ASan+UBSan+LSan 5/5 clean; test count 234 = baseline.
+- **Doc backfill (round 18):** the 2026-11-09 agentic-autofix work
+  (PRs #85/#86) had no CHANGELOG entry; added below.
+
+## 2026-11-09 (round 18, entry written late — PRs #85/#86 shipped without one) — CodeQL + code-scanning alert remediation (agentic-autofix)
+
+- **PR #85** (merged `fdf7607`): CodeQL security alerts —
+  `server.js` (TOCTOU: fstat-on-fd in `analyseHydraFile`; clamped
+  layers/vocab in `verifyModelFile`; `Object.create(null)` in the
+  vocab-map endpoint), `tools/hydra_train.js` (fixed-capacity
+  `MAX_DIM` state buffers + consistent `safeCfg` in `train()`),
+  `tests/test_engine.c` (hardened temp-file opens: O_NOFOLLOW +
+  0600, 10 sites).
+- **PR #86** (merged `fc5996e`): code-scanning alerts —
+  `tools/server_test.js` file-backed HTTP test fixtures replaced by
+  in-memory `buildModelBytes()`/`buildGgufBytes()` (no temp files,
+  no `python3 make_model.py` subprocess in the upload test).
+- Both carry their own records in `.agents/errors.md` (five
+  2026-11-09 entries) and `.agents/session.md` (round 18); main CI
+  green on both merges (3/3 runs on `fc5996e`).
 
 ## 2026-11-01 (round 17.8) — Ubuntu 26.04 also dropped qemu-user-static: qemu probe + $QEMU_AARCH64
 

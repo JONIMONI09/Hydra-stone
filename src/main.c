@@ -555,7 +555,10 @@ static int inspect_file(const char *path)
         return inspect_hydra_v1(path, stdout, file_bytes);
     char hex[17];
     for (int i = 0; i < 8; ++i)
-        snprintf(hex + 2 * i, 3, "%02x", head[i]);
+        /* (size_t) at the use site: the int product is a pointer offset
+         * (clang-tidy bugprone-implicit-widening-of-multiplication-result);
+         * i <= 7, so 2*i <= 14 fits far inside hex[17]. */
+        snprintf(hex + (size_t)(2 * i), 3, "%02x", head[i]);
     printf("{\"format\":\"unknown\",\"file_bytes\":%zu,"
            "\"magic_hex\":\"%s\",\"error\":\"not a .hydra or .hydra2 "
            "file\"}\n", file_bytes, hex);

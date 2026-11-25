@@ -673,9 +673,9 @@ alerts, file-backed HTTP test fixtures → in-memory), all on
   413 with a body the client can read" failed 2 of 14 runs
   (`fetch failed`), reproduced on stress run 7/10.
 
-**Bug found + fixed (this PR):** the 413 branches of both upload
-routes destroyed the request socket on response finish while the
-client was still sending the body → RST (unread bytes in the buffer)
+**Bug found + fixed — round 19a (PR #87, merged `4b9e075`):** the 413
+branches of both upload routes destroyed the request socket on
+response finish while the client was still sending the body → RST
 → client sees a socket error instead of the 413 (race: flaky).
 - Fix: `closeAfterBodyDrained(req, res)` — drain (discard) the body,
   destroy only after response flush AND client end/close; both 413
@@ -684,14 +684,47 @@ client was still sending the body → RST (unread bytes in the buffer)
   documented close-early decision.
 - Deterministic regression test (raw socket, 1 MiB guaranteed
   unread, 100 ms pause): 8/8 red pre-fix, 20/20 green post-fix
-  (58 tests/run). ESLint clean after.
-- Known, untouched, documented: `readBody` (JSON routes) has the
-  same destroy-before-drain pattern (no test); clang-tidy widening
-  at src/main.c:558 (pre-existing).
+  (58 tests/run).
 
-**Gates (local, after the edits):** eslint ok, server_test 20/20
-green, `node --check` both files ok, C code untouched (state above
-remains valid), session_start_check ok (R33 marker here),
-docs_claim_check ok.
+**Owner decision (2026-11-09, verbatim):** "Alles mergen und
+schauen!" — merge everything, then watch main. #87 was already
+merged by the owner (4b9e075, 22:11Z); main 4/4 runs success;
+release v1.0.51 auto-published (the Release workflow bumps +
+publishes on every green main push — v1.0.49/50/51 from today's
+three merges). Follow-ups (a/b/e from the brainstorming list) then
+implemented in this round (19b).
+
+**Round 19b (this PR) — two more layers of the same bug + cast + docs:**
+- **Layer 2 — the `Connection: close` race:** after #87 the original
+  413 test still flaked. Isolated repro (3 MiB buffer body, 30×):
+  15/30 `fetch failed, cause=EPIPE`. Cause: the `Connection: close`
+  header makes **Node itself** destroy the socket on response finish
+  — before the drain completes (RST with unread bytes). Fix: drop
+  the header from both 413 branches (the header-less path lets the
+  request finish; closeAfterBodyDrained closes with an empty buffer
+  → clean FIN). Repro 15/30 → 0/30.
+- **Layer 3 — `readBody` (all four JSON routes):** on
+  `body > MAX_BODY` it rejected AND destroyed the socket (reset
+  instead of 400). Fix: readBody discards the remainder (stops
+  accumulating — no unbounded growth); the four catch blocks answer
+  400 + closeAfterBodyDrained. New deterministic raw-socket test
+  (over-sized JSON to /api/cancel): 8/8 red pre-fix, green post-fix
+  (59 tests/run now).
+- **Cast:** src/main.c:558 explicit `(size_t)` at the pointer-offset
+  use site (clang-tidy widening finding, pre-existing).
+- **Doc backfill:** CHANGELOG round-18 entry (PRs #85/#86 shipped
+  without one); errors.md round-19 entry extended to all three
+  layers.
+- **Brainstorming list status:** (a) readBody → FIXED here; (b)
+  main.c cast → FIXED here; (c) yamllint 18 pre-existing → left
+  (not CI-enforced, owner's call); (d) release → automatic (v1.0.52
+  publishes with this merge); (e) #85/#86 docs → CHANGELOG here +
+  Linear task created this round; (f) code-scanning alert states →
+  403 from the sandbox token, checkable only in the GitHub UI.
+
+**Gates (local, after the edits):** eslint ok; full suite stress
+0/25 red (59 tests/run); repro 0/30; cppcheck (exact CI command) 0
+findings; ASan+UBSan+LSan 5/5 clean; test count 234 = baseline;
+session_start_check ok (R33 marker here); docs_claim_check ok.
 
 **PR:** (opened after this line — FACTS ONLY, per owner rule)

@@ -193,11 +193,18 @@ function sendJSON(res, code, obj) {
 function readBody(req) {
   return new Promise((resolve, reject) => {
     let data = '';
+    let overflowed = false;
     req.on('data', (c) => {
+      /* After the limit: discard, do NOT destroy. The route answers the
+       * 400 and closeAfterBodyDrained decides when the socket dies;
+       * destroying here reset the connection while the client was still
+       * sending (the same bug class as the 413 upload path, round 19). */
+      if (overflowed) return;
       data += c;
       if (data.length > MAX_BODY) {
+        overflowed = true;
+        data = '';
         reject(new Error('body too large'));
-        req.destroy();
       }
     });
     req.on('end', () => resolve(data));
@@ -1220,7 +1227,13 @@ const server = http.createServer(async (req, res) => {
            * destroying the socket mid-body-send resets the connection and
            * the client sees a socket error instead of the 413. The old
            * req.destroy()-on-finish lost that race under load. */
-          res.setHeader('Connection', 'close');
+          /* No 'Connection: close' here: that header makes Node itself
+           * destroy the socket when the response finishes - before the
+           * body drain below completes - and a destroy with unread body
+           * bytes still in the buffer is an RST, not a FIN (client saw
+           * EPIPE on 15 of 30 runs). The header-less path lets the
+           * request finish; closeAfterBodyDrained closes the socket
+           * afterwards (clean FIN, buffer empty). */
           sendJSON(res, e.status, {
             error: e.message,
             rejected: true,
@@ -1321,11 +1334,10 @@ const server = http.createServer(async (req, res) => {
           await streamToTmpFile(req, tmp, MAX_UPLOAD);
         } catch (e) {
           if (e.tooLarge) {
-            /* Same close ordering as the .hydra upload route: the client
-             * must be able to finish sending the body and still receive
-             * the 413 - destroying the socket mid-body-send resets the
-             * connection (see closeAfterBodyDrained). */
-            res.setHeader('Connection', 'close');
+            /* Same close ordering as the .hydra upload route (no
+             * 'Connection: close' header - it makes Node destroy the
+             * socket on response finish, before the drain completes;
+             * see closeAfterBodyDrained). */
             sendJSON(res, e.status, {
               error: e.message,
               rejected: true,
@@ -1546,7 +1558,12 @@ const server = http.createServer(async (req, res) => {
       try {
         body = JSON.parse((await readBody(req)) || '{}');
       } catch {
-        return sendJSON(res, 400, { error: 'invalid JSON body' });
+        /* The body may still be arriving (oversized or slow): drain it
+         * before the socket closes, or the client sees a reset instead
+         * of this 400 (round 19, same class as the 413 upload fix). */
+        sendJSON(res, 400, { error: 'invalid JSON body' });
+        closeAfterBodyDrained(req, res);
+        return;
       }
       if (body === null || typeof body !== 'object' || Array.isArray(body)) {
         return sendJSON(res, 400, { error: 'body must be a JSON object' });
@@ -1680,7 +1697,12 @@ const server = http.createServer(async (req, res) => {
       try {
         body = JSON.parse((await readBody(req)) || '{}');
       } catch {
-        return sendJSON(res, 400, { error: 'invalid JSON body' });
+        /* The body may still be arriving (oversized or slow): drain it
+         * before the socket closes, or the client sees a reset instead
+         * of this 400 (round 19, same class as the 413 upload fix). */
+        sendJSON(res, 400, { error: 'invalid JSON body' });
+        closeAfterBodyDrained(req, res);
+        return;
       }
       if (body === null || typeof body !== 'object' || Array.isArray(body)) {
         return sendJSON(res, 400, { error: 'body must be a JSON object' });
@@ -1713,7 +1735,12 @@ const server = http.createServer(async (req, res) => {
       try {
         body = JSON.parse((await readBody(req)) || '{}');
       } catch {
-        return sendJSON(res, 400, { error: 'invalid JSON body' });
+        /* The body may still be arriving (oversized or slow): drain it
+         * before the socket closes, or the client sees a reset instead
+         * of this 400 (round 19, same class as the 413 upload fix). */
+        sendJSON(res, 400, { error: 'invalid JSON body' });
+        closeAfterBodyDrained(req, res);
+        return;
       }
       if (body === null || typeof body !== 'object' || typeof body.map !== 'object') {
         return sendJSON(res, 400, { error: 'map object is required' });
@@ -1739,7 +1766,12 @@ const server = http.createServer(async (req, res) => {
       try {
         body = JSON.parse((await readBody(req)) || '{}');
       } catch {
-        return sendJSON(res, 400, { error: 'invalid JSON body' });
+        /* The body may still be arriving (oversized or slow): drain it
+         * before the socket closes, or the client sees a reset instead
+         * of this 400 (round 19, same class as the 413 upload fix). */
+        sendJSON(res, 400, { error: 'invalid JSON body' });
+        closeAfterBodyDrained(req, res);
+        return;
       }
       const id = String(body.id || '');
       if (!runningEngines.has(id)) {
