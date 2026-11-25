@@ -861,8 +861,13 @@ in chat.
    (3B1B LLM intro 2024; Gentle Intro to Sampling 2026; Secret
    Controls 2026 incl. min-p; Karpathy Deep Dive 2025) + min-p-vs-
    nucleus note. URLs only from web search results (no invented ids).
-8. ⏳ Linear PRO-66: created (Backlog) — PR link + state after push.
-9. ⏳ PR + CI watch + chat report.
+8. ✅ Linear PRO-66: In Review, PR #89 attached (result summary in the
+   task); PRO-64/PRO-65 from round 19b remain Done.
+9. ✅ PR #89 carries both rounds (the session branch cannot be split
+   per R18 without a new branch, which this session is not allowed to
+   create) — title + body sectioned per round, FACTS ONLY. CI on
+   2c393d8: 16 pass / 4 skipping / 0 fail; mergeable=MERGEABLE.
+   Reported in chat.
 
 **Errors this round (errors.md):** (none blocking — the clang gap is a
 documented environment constraint, not an error; the red
