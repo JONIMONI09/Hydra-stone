@@ -38,6 +38,8 @@ from array import array
 from itertools import repeat
 from operator import mul
 
+import bf16  # shared BF16 decoder (CA-1: one conversion rule, not two)
+
 GGUF_MAGIC = 0x46554747  # b"GGUF"
 GGUF_VERSION_MIN = 2
 GGUF_VERSION_MAX = 3
@@ -574,30 +576,14 @@ def _decode_raw(gtype, raw, n):
 
 
 def _decode_bf16(raw, n):
-    """BF16 is the top 16 bits of an F32, so widen it with bit ops.
+    """Decode BF16 through the shared helper in `tools/bf16.py`.
 
-    Done with slice assignment rather than a Python loop: a 4096x4096
-    tensor is 16.7 M values, and a list comprehension over those takes
-    seconds where this takes milliseconds.
+    The implementation used to live here and, as a second copy, in
+    `tools/safetensors_to_hydra.py` (CA-1). Both agreed on all 65536 BF16
+    patterns in an R9 comparison (2026-10-29) before they were merged, so this
+    delegation does not change a single output bit.
     """
-    halves = array('H')
-    halves.frombytes(raw)
-    if not _LITTLE:
-        halves.byteswap()
-    wide = bytearray(4 * n)
-    view = memoryview(wide)
-    low = halves.tobytes()
-    view[0::4] = bytes(n)
-    view[1::4] = bytes(n)
-    view[2::4] = low[0::2]
-    view[3::4] = low[1::2]
-    view.release()
-    del view
-    out = array('f')
-    out.frombytes(wide)
-    if not _LITTLE:
-        out.byteswap()
-    return out
+    return bf16.decode_bf16(raw, n)
 
 
 def load(path):

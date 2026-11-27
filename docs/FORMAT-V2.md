@@ -322,6 +322,13 @@ Trunk tensors live inside the **resident** region. A reader maps
 | 36 | 4 | `crc32` | CRC-32 (IEEE, reflected, poly `0xEDB88320`) of exactly the `length` payload bytes |
 | 40 | 8 | `reserved` | `= 0` |
 
+**Known-answer values (normative self-check).** The CRC is the standard
+reflected IEEE CRC-32: `crc32("123456789") = 0xCBF43926` and
+`crc32("") = 0x00000000` — the same pair `include/hydra_v2_container.h:227-230`
+pins in the public API's comment. A writer that cannot reproduce both values has
+the wrong polynomial, the wrong reflection or the wrong initial/final XOR, and
+`hydra2_read_expert()` will refuse its payloads. **[SPEC]**
+
 **Ordering is normative.** Entries are sorted ascending by
 `(layer, expert_id)`, and payload offsets are assigned in that same order, so
 `expert[i].offset == sum(length[j] for j < i)`. A reader may therefore binary-

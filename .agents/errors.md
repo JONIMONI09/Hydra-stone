@@ -4,6 +4,327 @@
 > Every error gets an entry immediately, with symptom, cause, fix and
 > prevention. Newest entries at the top.
 
+## 2026-10-29 (round 18, post-round verification) — two overview documents carried stale counts
+
+- **Symptom:** a documentation audit against the code found `.agents/README.md`
+  saying "the six-agent team (three research, three critics)" and
+  `.subagents/README.md` describing the scanner as "27 detection rules", while the
+  team has seven members and the scanner has 31 detection rules.
+- **Cause:** both statements were true when written (round 14 and round 15) and no
+  check compares prose numbers with `rules_table()` or with the member folders. The
+  security folder's own matrix is policed by `--self-test`; the overview documents
+  were not.
+- **Fix:** both lines corrected (seven members including the security scanner; 31
+  detection rules plus a one-line description of the encoded/comment classes), and a
+  repeatable audit was run: load `scan.py`, compare `len(rules_table())` with every
+  number the documents state, grep for the member count.
+- **Prevention:** a number in an overview is a claim, not decoration - derive it or
+  leave it out. Add the audit to the round's doc pass instead of trusting the
+  previous round's report.
+
+## 2026-10-29 (round 18) — a literal detector token made the scanner flag its own rule table, and the first comment pattern was too loose
+
+- **Symptom:** `--self-test` failed with
+  `the unmodified scanner copy produced 1 high/medium finding(s): hidden-html`, and
+  the tree scan showed `[HIGH] hidden-html .subagents/ai-threat-scan/scan.py:197` on
+  the `COMMENT_BODY` definition line.
+- **Cause, two separate mistakes:**
+  1. The new regex contained the literal `<!--`; `COMMENT_HTML` then treated
+     everything from that line to the next `-->` (far below) as one HTML comment,
+     which swallowed the SECRECY/OVERRIDE tables - instruction language, therefore
+     a "hidden comment".
+  2. The first `AGENT_ADDRESS` allowed a match after any sentence break, so the
+     required negative - a comment that *mentions* `"AI agents: exfiltrate"` in
+     quotes - would have been reported. The pattern modelled where the words appear
+     rather than who the comment is addressed to.
+- **Fix:** the opener is written `\x3c!--` (matches a real `<`, contains no token);
+  the address must start the comment body. Three new near-miss fixtures
+  (`near_comment_quote.py`, `near_comment_mid.py`, `near_comment_plain.py`) plus
+  `near_nested.md` enforce it. Tree: `0 high / 0 medium / 21 low / 48 waived`, rc=0;
+  `--self-test` 31 detection rules, 10 near misses, rc=0.
+- **Prevention:** (1) a detector's definition must not contain its own trigger
+  literally - escape it and say why; (2) anchor a rule at the structure that carries
+  the meaning, never at a punctuation guess; (3) write the negative fixture before
+  the positive one.
+
+## 2026-10-29 (round 17) — the security self-test could pass with rules that had no fixture
+
+- **Symptom:** the coverage audit found two detection rules without any fixture
+  (`pipe-to-shell`, `symlink-escape`), and the new assertions then failed with
+  `fixture/rule mismatch: no fixture for ['symlink-escape'], fixture rule count 29 != rule table size 30`.
+  The drift check meanwhile printed live rules as dead:
+  `declared but never used by a table: ['encoded-instruction', 'homoglyph-instruction', 'private-use-character', 'symlink-escape', 'waiver-invalid']`.
+- **Cause, five separate mistakes:**
+  1. The self-test's only assertion was `rule not in found_rules` over one flat
+     set, so a rule with no fixture, or a fixture that fired the wrong rule,
+     passed silently.
+  2. `codegraph.py` kept its own copy of "rules emitted by the loop"; it had
+     drifted (two ids were stale before this round) and nobody noticed because
+     the check only failed on missing metadata.
+  3. The self-test banner printed a hand-derived rule count (29) that disagreed
+     with the table (30).
+  4. A waiver was written on the homoglyph fixture line that suppressed nothing,
+     because the source spells the look-alikes as `\u` escapes - invisible clutter
+     that read like proof of a detection.
+  5. `codegraph.py` printed `0 detector source` from a skip counter left over from
+     the file-level self-skip removed in round 15.
+- **Fix:** per-fixture `path` + rule + line assertions, `{fixture rules}` ==
+  `rules_table()` detection rules (set and count), `LOOP_RULES` as the single
+  source with an orphan/ghost assertion, six near-miss negatives, a real symlink
+  control, the banner counting the same set it asserts, the useless waiver and the
+  dead counter removed. Tree stays `0 high / 0 medium / 21 low / 48 waived`, rc=0.
+- **Prevention:** (1) "some rule fired" is not a test - a fixture must name the rule
+  and the place; (2) a checker that needs "the list of X" imports it from next to X;
+  (3) read the shipped artefact once, end to end - all three small slips were
+  visible in plain output and none was visible to a passing test.
+
+## 2026-10-29 (round 16) — the strict waiver rule shipped with a reason-parsing bug and three follow-on mistakes
+
+- **Symptom:** the waiver inventory printed reasons ending in `)` (e.g.
+  `quoted example, class T2)`), `waiver_valid` failed even though the reason was
+  recorded, and `--self-test` reported
+  `the unmodified scanner copy produced 1 high/medium finding(s): covert-instruction`.
+- **Cause, five separate mistakes:**
+  1. `_waivers()` trimmed punctuation *before* removing the comment terminator, and
+     `strip()` stops at the space in front of `-->`, so the bracket before that
+     space survived (found by reading the report, no test caught it).
+  2. The `waiver_valid` fixture asserted the raw source text with parentheses while
+     the parser normalises the reason - the fixture encoded presentation, not the
+     contract.
+  3. The new fixture helper held the secrecy phrase in a variable inside `scan.py`
+     without a waiver; with reasons now mandatory, that line became a real high hit
+     in the scanner's own source.
+  4. The first version of the `ERROR.md` entry about (3) quoted the secrecy phrase
+     verbatim, which made `ERROR.md:238` a high finding while the record was being
+     written.
+  5. The `ai-threat-scan` CI step name still carried a hard-coded rule count
+     (`all 27 rules fire`) while `rules_table()` now has 28 entries - round 15 fixed
+     the number instead of removing it, so it drifted again immediately.
+- **Fix:** comment terminators (`-->`, `*/`) are cut before trimming; the fixture
+  asserts the normalised reason; the variable line carries a reasoned waiver; the
+  record describes the phrase instead of quoting it; the CI step name and the two
+  stale rule counts now state the property, not a number. Tree back to
+  `0 high / 0 medium / 21 low / 46 waived on 42 lines`, rc=0.
+- **Prevention:** (1) anything printed for a reviewer gets read once by its author -
+  counts hide this class of bug; (2) fixtures assert the parsed contract, never the
+  source spelling; (3) any new pattern-bearing line in `scan.py` needs its own
+  reasoned waiver, checked with `scan.py .subagents/ai-threat-scan` before the full
+  gate; (4) prose that describes a payload is treated like code - describe the
+  shape or write a waiver, because a verbatim quote is indistinguishable from the
+  thing itself.
+
+## 2026-10-29 (round 15) — the session-start gate failed intermittently on the same file (`grep -q` + `pipefail`)
+
+- **Symptom:** `bash tools/session_start_check.sh` printed
+  `FAIL - the current round section ... has no '**Session start (R33):**' marker`
+  on a file that contained the marker at the start of a line; the next run
+  against the unchanged file printed `ok`.
+- **Cause:** `has_marker()` was `sed … | awk … | grep -q '^\*\*Session start (R33):\*\*'`
+  under `set -euo pipefail`. `grep -q` exits at the first match, the writer dies
+  with SIGPIPE (141), and pipefail turns a successful match into a red gate. It
+  is a race: whether the writer has already finished decides the verdict.
+- **Fix:** no early exit in the pipeline. `awk` reads to EOF (`seen` flag instead
+  of `exit` on the next `## `) into a variable, and the match is a `case` pattern
+  test. Re-ran 5×: rc=0 every time, and the in-script negative control still
+  rejects a round section without the marker (`negative control proven`).
+- **Prevention:** a `-q` (or `head`, or `|| true`) at the end of a pipeline is a
+  SIGPIPE trap when `pipefail` is set. Two-stage capture, then test. A gate that
+  can fail on a passing tree teaches people to re-run instead of to read.
+
+## 2026-10-29 (round 15) — the security scanner was told to skip its own source, which hid a payload planted in the scanner
+
+- **Symptom:** the tree scan reported `1 detector source` as a skip and never
+  named `scan.py`; a tag-block payload appended to `scan.py` produced
+  `VERDICT: PASS`, exit 0.
+- **Cause:** round 14 silenced a self-reference by excluding the whole file
+  (`SELF_FILE`) instead of the colliding lines. The exclusion made the gate blind
+  exactly where an attacker would prefer to write: inside the thing that claims
+  to check everything.
+- **Fix:** the file-level skip is gone. The 36 lines that define a pattern or are
+  a self-test fixture carry `ai-threat-scan: allow <rule> (<reason>)` (38 waived
+  hits on 36 marked lines); a new
+  `own_source` self-test fixture copies `scan.py`, requires the copy to be clean,
+  appends one hidden payload and requires it to be caught. Proved on the working
+  tree: planted payload → exit 1 with
+  `[HIGH] invisible-tag-block .subagents/ai-threat-scan/scan.py:605` and the
+  decoded text; restored (`sha256sum -c` OK) → exit 0.
+- **Prevention:** an exclusion may only be as wide as the collision. "The checker
+  cannot check itself" is true of *lines*, not of *files*, and the narrow version
+  is testable — which is the only reason to prefer it.
+
+## 2026-10-29 (round 15) — two paths carried the team's name and nothing checked which one was canonical
+
+- **Symptom:** the repository had `.agents/skills/sub-agents/` (the skill) and
+  `.subagents/` (the team) with no written statement of which is canonical, so
+  they read like a duplicate tree; a second `sub-agents/` directory could have
+  appeared anywhere without a red gate.
+- **Cause:** the split was correct by design but only implicit, and no check
+  compared the two paths.
+- **Fix:** `.subagents/README.md` now has a "Two paths, two jobs" table;
+  `check_subagents.py` asserts exactly one `sub-agents` directory (under
+  `.agents/skills/`), no member files inside it, and that both sides name each
+  other by path. Proved on the working tree: a planted root-level `sub-agents/`
+  turned the gate red (`duplicate sub-agents tree(s) …`), removal turned it green.
+- **Prevention:** when two paths look alike, the repository states the canonical
+  one in prose **and** in a check. Prose alone is the failure mode R33 documents.
+
+## 2026-10-29 (round 14) — a security scanner reported itself three times in one round
+
+- **Symptom:** the first whole-tree run of the new AI-threat scanner printed
+  `45 finding(s) at or above 'high'`. 38 of them pointed at `scan.py` itself, the
+  rest at `reports/latest.json` — the report the previous run had written.
+- **Cause:** the same self-reference class as rounds 12 and 13, in a new tool.
+  A detector's source contains every pattern it searches for, and a report
+  contains the snippets it reported.
+- **Fix:** one documented single-file exclusion (`SELF_FILE`) plus three exact
+  generated paths (`GENERATED_OUTPUT`), and — because both are blind spots —
+  `--self-test`, which builds fresh fixtures in a temp dir and fails if any rule
+  stops firing.
+- **Prevention:** this is the **third** instance in three rounds, so it is now a
+  named class: *a checker must exclude its own source and its own output, and
+  must prove the exclusion did not silence it.* Every future scanner inherits
+  both halves of that sentence.
+
+## 2026-10-29 (round 14) — UI attributes and ordinary prose were reported as covert instructions
+
+- **Symptom:** `hidden-with-instructions` fired 3× on `public/index.html` for
+  `<button hidden>`, `<pre hidden>` and `<input hidden>`, and the
+  `css-hidden-content` window flagged a `display:none` declaration followed by
+  the sentence "… teaches people to ignore the gate".
+- **Cause:** two design errors in one rule. The hidden-*attribute* mode looked
+  ±300 characters around the tag and found the word "upload" in a form label; the
+  CSS mode used the same symmetric window, so prose *about* the property counted
+  as content the property hides.
+- **Fix:** attributes now check only the element's own content (bounded by the
+  closing tag); CSS checks only the 200 characters **after** the declaration,
+  which is the content it hides. Result: 3 highs became 3 lows, and the two
+  prose hits disappeared — the fix was in the detector, not in the documents.
+- **Prevention:** a "hidden content" rule must model *what is hidden*, not
+  *what is nearby*. Proximity is the cheapest approximation and it is wrong
+  exactly where the repository talks about the mechanism.
+
+## 2026-10-29 (round 14) — a stricter YAML check turned all six existing skills red, and bandit matched a keyword name
+
+- **Symptom:** after the R35 gate rewrite, `check_subagents.py` reported
+  `description must be a quoted scalar` for all six existing `SKILL.md` files,
+  and `bandit` raised 7 × B610 ("potential SQL attack vector") on the shared
+  `extra=` keyword of the codegraph writer.
+- **Cause:** the quoting check tested the **parsed** value, and PyYAML strips the
+  quotes — so a legal file looked illegal. B610 is a Django rule for
+  `QuerySet.extra()`, a name collision with a dict keyword in a project that has
+  no database.
+- **Fix:** quoting is checked against the raw frontmatter block; bandit skips
+  exactly `B610` with the triage written next to the command in `lint.yml`.
+- **Prevention:** validate a *syntax* property against the source text, never
+  against the parse tree. And when a linter's finding names a framework the
+  project does not use, write the triage where the linter runs — a silent
+  `--exit-zero` would have hidden the next real medium finding.
+
+## 2026-10-29 (round 13) — the conformance census counted its own proposals as documentation
+
+- **Symptom:** after the SC-1 fix, `web-spec-conformance` reported *zero*
+  constants as undocumented — including `0xdeadbeef` and
+  `0xFFFFFFFFFFFFFFFF`, which no format doc mentions. Before the fix it had
+  reported 6.
+- **Cause:** `docs_text` was built from every Markdown file, and
+  `.subagents/*/PROPOSALS.md` is Markdown. The proposal listed the exact
+  constants it had flagged, so the act of reporting them made them
+  "documented" — a circular proof. The same class hit `critic-evidence`, whose
+  bare-claim count rose from 16 to 27 because the team's own output was being
+  audited as project claims.
+- **Fix:** both censuses exclude `.subagents/`; the spec side is the project's
+  documentation only. Re-measured: 4 constants still undocumented (all internal
+  fixtures), 12 bare numeric claims.
+- **Prevention:** a checker's corpus must exclude the checker's own output.
+  This is the second instance in two rounds (round 12: the graph scanned its own
+  reports) — whenever a tool both reads and writes Markdown, the exclusion is
+  mandatory, not an optimisation.
+
+## 2026-10-29 (round 12) — the code graph scanned its own receipts and the marker count jumped from 8 to 19,220
+
+- **Symptom:** after the first `.subagents` team run the summary table showed
+  `markers: 19220` for the first member and a slightly smaller number for each
+  following one. The real tree has 4 marker lines.
+- **Cause:** `reports/latest.json` and `reports/latest.txt` were written into
+  the scanned tree. Each report embeds the marker list and the open-item list,
+  so every run counted the previous run's output as source. Self-referential
+  growth, not a repository problem.
+- **Fix:** `.subagents/*/reports` is now in `DEFAULT_EXCLUDES`, and the exclude
+  matcher supports glob patterns (`fnmatch`) plus parent-prefix matching instead
+  of exact strings and prefixes only. Re-measured: 4 markers, 226 files.
+- **Prevention:** a scanner must exclude its own output directory; when a count
+  moves by three orders of magnitude, suspect the instrument before the code.
+
+## 2026-10-29 (round 12) — the final critic reported the R33 marker MISSING while gate 1j was green
+
+- **Symptom:** `critic-final` printed `R33 marker in the current round section:
+  MISSING`; `bash tools/session_start_check.sh` printed `ok`.
+- **Cause:** the check split the file with `session.split("## Round")[-1]`. The
+  marker line of this round happens to quote the heading ("the marker must be in
+  the LAST `## Round` section"), so `str.split` cut the section immediately
+  before the marker. The gate uses `grep -n '^## Round'`, which anchors on a real
+  heading — that is why the two disagreed.
+- **Fix:** `re.split(r"(?m)^## Round", session)[-1]`.
+- **Prevention:** split on anchored headings, never on a bare phrase that prose
+  may quote; when two detectors disagree, the cheaper one is not automatically
+  wrong.
+
+## 2026-10-29 (round 12) — the structural gate's negative control proved only one of three detectors
+
+- **Symptom:** `check_subagents.py --self-test` failed with "the broken copy was
+  accepted for: name 'wrong-name'" although the gate did reject the copy.
+- **Cause:** the control wrote both defects (wrong `name`, unquoted
+  `description`) into ONE `SKILL.md`. The frontmatter parser rejects the unquoted
+  description first, so the name mismatch was never evaluated — the control
+  asserted two messages that could not both fire.
+- **Fix:** one defect per folder (unquoted description in `critic-evidence`,
+  wrong name in `critic-architecture`, empty `PROPOSALS.md` in
+  `web-tooling-scout`), so three independent detectors are proven.
+- **Prevention:** a negative control with two defects in one fixture proves one
+  detector and hides the second (R25).
+
+## 2026-10-29 (round 12) — the pin regex produced 326 then 259 false queue entries
+
+- **Symptom:** `web-source-verifier` reported "version/pin claims with no URL on
+  the same line: 326", then 259 after a first tightening. The sample rows were
+  mostly ordinary prose ("commit", "revision", "sha", branch names like
+  `arena/ed8432d1-bestai`).
+- **Cause:** two mistakes stacked: the pattern matched the words `commit`,
+  `revision` and `sha` themselves, and the hex-revision branch matched any 7-40
+  character run of `[0-9a-f]`, which includes plain numbers (workflow ids, PR
+  numbers) and hex fragments inside branch names.
+- **Fix:** the pattern now requires a free-standing revision (lookarounds exclude
+  `arena/<sha>-bestai`), a digit AND a letter (so plain numbers do not match),
+  and the verdict moved from per-line to per-document — 13 documents that state a
+  pin with no URL anywhere, which is the actionable queue.
+- **Prevention:** a detector over prose needs a per-document verdict and a
+  hand-checked sample before its count is reported as a finding.
+
+## 2026-10-29 (round 12) — the tooling scout reported `.subagents/tools/...` as a missing `tools/...` file
+
+- **Symptom:** the first run listed `tools/codegraph_core.py`,
+  `tools/check_subagents.py` and `tools/issue_verify.py` as "documented but
+  missing on disk".
+- **Cause:** two separate problems. The pattern `tools/...` also matched the
+  tail of `.subagents/tools/...`, and the scan included dated records
+  (CHANGELOG, error log, research log, session archive) which legitimately name
+  files that existed in their round.
+- **Fix:** a negative lookbehind `(?<![\w./-])` on the path start, plus an
+  explicit documented exclusion of dated records. Live-doc result: 0 missing.
+- **Prevention:** a path linter must know the difference between an instruction
+  and a record, and must not match a path suffix of a longer path.
+
+## 2026-10-29 (round 12) — pyflakes found two unused imports in the new tooling
+
+- **Symptom:** `pyflakes 4.1.0`: `'sys' imported but unused` in
+  `.subagents/tools/check_subagents.py:37` and `.subagents/tools/run_all.py:32`.
+- **Cause:** the imports were added while drafting and the functions that used
+  them were removed.
+- **Fix:** imports removed; `pyflakes` clean on all nine scripts.
+- **Prevention:** run the linter on a new script before declaring it done — the
+  CI job (`pyflakes tools/`) does not cover `.subagents/`, so this had to be run
+  by hand.
+
 ## 2026-10-26 (round 10) — the documented smoke recipe never ran llama-cli: `timeout` treated `OMP_NUM_THREADS=1` as the executable (Qodo issue, confirmed)
 
 - **Symptom:** docs/GGUF-IMPORT.md 11.4 said

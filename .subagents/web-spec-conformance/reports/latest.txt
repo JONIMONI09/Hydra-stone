@@ -1,0 +1,490 @@
+# web-spec-conformance - codegraph run
+# attempts: [(1, 0)]
+# exit code: 0
+
+------------------------------------------------------------------------------
+==============================================================================
+CODE GRAPH — 6daeacda62104e261f2b28ce
+generated   2026-11-20 21:54:10
+inventory   253 files (234 text, 19 binary), 2.9 MiB
+excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dist, llama.cpp, android/app/src/main/cpp/llama, .subagents/*/reports
+==============================================================================
+
+-- areas (11) --------------------------------------------------
+  (root)                         13 files    2 code   4 md  newest 2026-10-29 23:31  AGENTS.md
+  .agents                        25 files    0 code  25 md  newest 2026-11-20 21:53  .agents/README.md
+  .github                         5 files    0 code   0 md  newest 2026-10-29 23:48  .github/workflows/lint.yml
+  .subagents                     67 files   11 code  45 md  newest 2026-11-20 21:53  .subagents/README.md
+  android                        36 files   17 code   1 md  newest 2026-10-29 22:48  android/.gitignore
+  docs                            4 files    0 code   4 md  newest 2026-10-29 23:04  docs/FORMAT-V2.md
+  include                         2 files    2 code   0 md  newest 2026-10-29 22:48  include/hydra_model.h
+  public                          3 files    1 code   0 md  newest 2026-10-29 22:48  public/app.js
+  src                             5 files    5 code   0 md  newest 2026-10-29 22:48  src/hydra_engine.c
+  tests                           8 files    8 code   0 md  newest 2026-10-29 22:48  tests/test_engine.c
+  tools                          85 files   78 code   2 md  newest 2026-10-29 23:48  tools/__pycache__/bf16.cpython-312.pyc
+
+-- Markdown inventory (81) ----------------------------------------
+  2026-11-20 21:53:54      6089     105 lines  .subagents/README.md
+  2026-11-20 21:53:51      5058      74 lines  .agents/README.md
+  2026-11-20 21:53:13     97099     981 lines  .agents/session.md
+  2026-10-30 00:17:12     25920     394 lines  .subagents/critic-final/REVIEW.md
+  2026-10-30 00:15:50    163135    2739 lines  .agents/errors.md
+  2026-10-30 00:15:50     20130     402 lines  .subagents/ai-threat-scan/ERROR.md
+  2026-10-30 00:15:31      6052      69 lines  .subagents/ai-threat-scan/PROPOSALS.md
+  2026-10-30 00:15:14      3777      69 lines  .subagents/TODO.md
+  2026-10-30 00:14:58     17599     287 lines  .agents/docs/AI-THREAT-MODEL.md
+  2026-10-30 00:14:19     11899     164 lines  .subagents/ai-threat-scan/AGENTS.md
+  2026-10-29 23:49:41      5922     112 lines  .subagents/ai-threat-scan/REQUESTS.md
+  2026-10-29 23:31:09     25788     404 lines  AGENTS.md
+  2026-10-29 23:31:09     46886     489 lines  README.md
+  2026-10-29 23:24:49     11842     193 lines  .agents/user.md
+  2026-10-29 23:24:49    104696    1722 lines  CHANGELOG.md
+  2026-10-29 23:24:05      5545     100 lines  .subagents/ai-threat-scan/SKILL.md
+  2026-10-29 23:22:34      6820     122 lines  .agents/skills/sub-agents/SKILL.md
+  2026-10-29 23:21:46      2443      50 lines  .subagents/critic-architecture/SKILL.md
+  2026-10-29 23:21:46      2090      49 lines  .subagents/critic-evidence/SKILL.md
+  2026-10-29 23:21:46      2164      48 lines  .subagents/critic-final/SKILL.md
+  2026-10-29 23:21:46      2640      59 lines  .subagents/web-source-verifier/SKILL.md
+  2026-10-29 23:21:46      2502      53 lines  .subagents/web-spec-conformance/SKILL.md
+  2026-10-29 23:21:46      2296      52 lines  .subagents/web-tooling-scout/SKILL.md
+  2026-10-29 23:21:43      4373     114 lines  .agents/skills/session-workflow/SKILL.md
+  2026-10-29 23:21:36      1075      26 lines  .subagents/critic-architecture/ERROR.md
+  2026-10-29 23:21:36      1078      23 lines  .subagents/critic-architecture/REQUESTS.md
+  2026-10-29 23:21:36      1289      30 lines  .subagents/critic-evidence/ERROR.md
+  2026-10-29 23:21:36      1181      27 lines  .subagents/critic-evidence/REQUESTS.md
+  2026-10-29 23:21:36      1431      33 lines  .subagents/critic-final/ERROR.md
+  2026-10-29 23:21:36      1142      25 lines  .subagents/critic-final/REQUESTS.md
+  2026-10-29 23:21:24      1394      34 lines  .subagents/web-source-verifier/ERROR.md
+  2026-10-29 23:21:24       963      22 lines  .subagents/web-source-verifier/REQUESTS.md
+  2026-10-29 23:21:24      1097      26 lines  .subagents/web-spec-conformance/ERROR.md
+  2026-10-29 23:21:24      1241      28 lines  .subagents/web-spec-conformance/REQUESTS.md
+  2026-10-29 23:21:24      1287      33 lines  .subagents/web-tooling-scout/ERROR.md
+  2026-10-29 23:21:24      1110      27 lines  .subagents/web-tooling-scout/REQUESTS.md
+  2026-10-29 23:18:53      3230      57 lines  .subagents/ai-threat-scan/ORIGINAL.md
+  2026-10-29 23:18:30     13055     223 lines  .agents/rules.md
+  2026-10-29 23:07:15      2612      42 lines  .subagents/critic-architecture/PROPOSALS.md
+  2026-10-29 23:07:15      2420      40 lines  .subagents/critic-evidence/PROPOSALS.md
+  2026-10-29 23:07:15      2736      46 lines  .subagents/web-source-verifier/PROPOSALS.md
+  2026-10-29 23:07:15      2573      43 lines  .subagents/web-spec-conformance/PROPOSALS.md
+  2026-10-29 23:07:15      2623      43 lines  .subagents/web-tooling-scout/PROPOSALS.md
+  2026-10-29 23:04:48     26605     516 lines  docs/FORMAT-V2.md
+  2026-10-29 22:59:49      1124      32 lines  .subagents/critic-final/PROPOSALS.md
+  2026-10-29 22:57:29      2913      74 lines  .subagents/critic-final/AGENTS.md
+  2026-10-29 22:57:29      2787      58 lines  .subagents/critic-final/ORIGINAL.md
+  2026-10-29 22:57:03      2479      58 lines  .subagents/critic-architecture/AGENTS.md
+  2026-10-29 22:57:03      1940      46 lines  .subagents/critic-architecture/ORIGINAL.md
+  2026-10-29 22:56:23      2615      61 lines  .subagents/critic-evidence/AGENTS.md
+  2026-10-29 22:56:23      1863      45 lines  .subagents/critic-evidence/ORIGINAL.md
+  2026-10-29 22:55:37      2684      63 lines  .subagents/web-tooling-scout/AGENTS.md
+  2026-10-29 22:55:37      2052      48 lines  .subagents/web-tooling-scout/ORIGINAL.md
+  2026-10-29 22:55:09      2866      65 lines  .subagents/web-spec-conformance/AGENTS.md
+  2026-10-29 22:55:09      2085      49 lines  .subagents/web-spec-conformance/ORIGINAL.md
+  2026-10-29 22:54:05      2947      66 lines  .subagents/web-source-verifier/AGENTS.md
+  2026-10-29 22:54:05      2038      47 lines  .subagents/web-source-verifier/ORIGINAL.md
+  2026-10-29 22:48:02      1150      23 lines  .agents/CLAUDE.md
+  2026-10-29 22:48:02     30329     505 lines  .agents/Environment.md
+  2026-10-29 22:48:02     27970     455 lines  .agents/docs/ANDROID-AUDIT.md
+  2026-10-29 22:48:02     12432     271 lines  .agents/docs/ANDROID_SKILL.md
+  2026-10-29 22:48:02     22271     419 lines  .agents/docs/HYDRA2-RESEARCH.md
+  2026-10-29 22:48:02     23487     387 lines  .agents/docs/RESEARCH-LOG.md
+  2026-10-29 22:48:02      5514     110 lines  .agents/docs/RESEARCH.md
+  2026-10-29 22:48:02    132904    2188 lines  .agents/docs/SESSION-ARCHIVE.md
+  2026-10-29 22:48:02     14601     262 lines  .agents/docs/TECHNICAL-AUDIT.md
+  2026-10-29 22:48:02      9273     195 lines  .agents/docs/gpu-feasibility.md
+  2026-10-29 22:48:02      4585      82 lines  .agents/docs/pr-gpu-feasibility.md
+  2026-10-29 22:48:02      3521      63 lines  .agents/skills/android-lint-gate/SKILL.md
+  2026-10-29 22:48:02      5972     147 lines  .agents/skills/android-ndk-build/SKILL.md
+  2026-10-29 22:48:02      4287      86 lines  .agents/skills/ci-triage/SKILL.md
+  2026-10-29 22:48:02      7279     155 lines  .agents/skills/engine-ci-verify/SKILL.md
+  2026-10-29 22:48:02      3485      80 lines  .agents/skills/kotlin-stub-check/SKILL.md
+  2026-10-29 22:48:02      3355      79 lines  .agents/skills/repo-docs-audit/SKILL.md
+  2026-10-29 22:48:02       651      15 lines  CLAUDE.md
+  2026-10-29 22:48:02     11523     224 lines  android/README.md
+  2026-10-29 22:48:02     26043     357 lines  docs/ARCHITECTURE.md
+  2026-10-29 22:48:02     22495     402 lines  docs/FORMAT.md
+  2026-10-29 22:48:02     28109     608 lines  docs/GGUF-IMPORT.md
+  2026-10-29 22:48:02      3758      83 lines  tools/gpu_bench/README.md
+  2026-10-29 22:48:02      2744      66 lines  tools/kotlin_stub_check/README.md
+
+-- code files newest first (124) --------------------------------
+  2026-10-30 00:11:11     57785  .subagents/ai-threat-scan/scan.py
+  2026-10-30 00:01:17      7529  .subagents/ai-threat-scan/codegraph.py
+  2026-10-29 23:33:29      3147  tools/session_start_check.sh
+  2026-10-29 23:30:46     21504  .subagents/tools/check_subagents.py
+  2026-10-29 23:23:04      6066  .subagents/critic-final/codegraph.py
+  2026-10-29 23:22:22      5266  .subagents/tools/run_all.py
+  2026-10-29 23:06:49      4751  .subagents/critic-evidence/codegraph.py
+  2026-10-29 23:06:47      4631  .subagents/web-spec-conformance/codegraph.py
+  2026-10-29 23:05:32     29743  tools/safetensors_to_hydra.py
+  2026-10-29 23:05:30     22072  tools/gguf_reader.py
+  2026-10-29 23:05:18      2296  tools/bf16.py
+  2026-10-29 22:58:39     24866  .subagents/tools/codegraph_core.py
+  2026-10-29 22:57:28      4252  .subagents/critic-architecture/codegraph.py
+  2026-10-29 22:56:22      5161  .subagents/web-tooling-scout/codegraph.py
+  2026-10-29 22:54:54      6593  .subagents/web-source-verifier/codegraph.py
+  2026-10-29 22:48:02      8448  android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  2026-10-29 22:48:02     13627  android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt
+  2026-10-29 22:48:02      4342  android/app/src/main/cpp/hydra_batch.h
+  2026-10-29 22:48:02     30623  android/app/src/main/cpp/hydra_jni.c
+  2026-10-29 22:48:02      3912  android/app/src/main/cpp/hydra_sample_cfg.h
+
+-- internal dependency edges (124) ---------------------------------
+  .agents/Environment.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
+  .agents/Environment.md  ->  tools/session_start_check.sh   [shell]
+  .agents/Environment.md  ->  tools/workflow_lint_check.sh   [shell]
+  .agents/Environment.md  ->  tools/workflow_yaml_check.sh   [shell]
+  .agents/docs/ANDROID-AUDIT.md  ->  tools/android_header_check.sh   [shell]
+  .agents/docs/ANDROID-AUDIT.md  ->  tools/docs_claim_check.sh   [shell]
+  .agents/docs/ANDROID-AUDIT.md  ->  tools/jni_signature_check.sh   [shell]
+  .agents/docs/ANDROID-AUDIT.md  ->  tools/test_count_check.sh   [shell]
+  .agents/docs/RESEARCH-LOG.md  ->  tools/compose_scroll_check.sh   [shell]
+  .agents/errors.md  ->  tools/session_start_check.sh   [shell]
+  .agents/errors.md  ->  tools/session_start_check.sh   [shell]
+  .agents/errors.md  ->  tools/test_count_check.sh   [shell]
+  .agents/session.md  ->  tools/docs_claim_check.sh   [shell]
+  .agents/session.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
+  .agents/session.md  ->  tools/workflow_lint_check.sh   [shell]
+  .agents/session.md  ->  tools/workflow_yaml_check.sh   [shell]
+  .agents/skills/android-lint-gate/SKILL.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
+  .agents/skills/ci-triage/SKILL.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
+  .agents/skills/ci-triage/SKILL.md  ->  tools/workflow_lint_check.sh   [shell]
+  .agents/skills/ci-triage/SKILL.md  ->  tools/workflow_yaml_check.sh   [shell]
+  .agents/skills/kotlin-stub-check/SKILL.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
+  .agents/skills/repo-docs-audit/SKILL.md  ->  tools/docs_claim_check.sh   [shell]
+  .agents/skills/repo-docs-audit/SKILL.md  ->  tools/workflow_lint_check.sh   [shell]
+  .agents/skills/repo-docs-audit/SKILL.md  ->  tools/workflow_yaml_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/android_autostart_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/android_autostart_negative_test.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/android_crash_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/android_header_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/apple_portability_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/ci_syntax_mirror_test.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/compose_scroll_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/docs_claim_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/jni_signature_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/jni_signature_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/jni_signature_negative_test.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/llama_pin_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/llama_pin_negative_test.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/sampler_contract_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/session_start_check.sh   [shell]
+  .github/workflows/ci.yml  ->  tools/string_format_negative_test.sh   [shell]
+  ... 84 more (use --json for the full set)
+
+-- unresolved (external) references (394) ------------------------
+  __future__                               [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  argparse                                 [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  codegraph_core                           [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  contextlib                               [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  datetime                                 [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  importlib.util                           [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  io                                       [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  json                                     [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  pathlib                                  [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  sys                                      [python] first seen in .subagents/ai-threat-scan/codegraph.py
+  base64                                   [python] first seen in .subagents/ai-threat-scan/scan.py
+  codecs                                   [python] first seen in .subagents/ai-threat-scan/scan.py
+  fnmatch                                  [python] first seen in .subagents/ai-threat-scan/scan.py
+  os                                       [python] first seen in .subagents/ai-threat-scan/scan.py
+  re                                       [python] first seen in .subagents/ai-threat-scan/scan.py
+  tempfile                                 [python] first seen in .subagents/ai-threat-scan/scan.py
+  unicodedata                              [python] first seen in .subagents/ai-threat-scan/scan.py
+  urllib.parse                             [python] first seen in .subagents/ai-threat-scan/scan.py
+  shutil                                   [python] first seen in .subagents/tools/check_subagents.py
+  yaml                                     [python] first seen in .subagents/tools/check_subagents.py
+  dataclasses                              [python] first seen in .subagents/tools/codegraph_core.py
+  collections                              [python] first seen in .subagents/web-source-verifier/codegraph.py
+  androidx.test.ext.junit.runners.AndroidJUnit4 [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  androidx.test.platform.app.InstrumentationRegistry [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  org.junit.Assert.assertEquals            [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  org.junit.Assert.assertFalse             [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  org.junit.Assert.assertNotNull           [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  org.junit.Assert.assertNull              [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  org.junit.Assert.assertTrue              [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  org.junit.Before                         [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  org.junit.Test                           [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  org.junit.runner.RunWith                 [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
+  android.util.Log                         [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt
+  org.json.JSONObject                      [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt
+  org.junit.After                          [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt
+  org.junit.Assume.assumeTrue              [kotlin] first seen in android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt
+  llama.h                                  [include] first seen in android/app/src/main/cpp/llama_jni.cpp
+  android.app.Activity                     [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashActivity.kt
+  android.os.Bundle                        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashActivity.kt
+  android.view.Gravity                     [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashActivity.kt
+  android.widget.Button                    [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashActivity.kt
+  android.widget.LinearLayout              [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashActivity.kt
+  android.widget.ScrollView                [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashActivity.kt
+  android.widget.TextView                  [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashActivity.kt
+  android.content.ClipData                 [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashHandler.kt
+  android.content.ClipboardManager         [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashHandler.kt
+  android.content.Context                  [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashHandler.kt
+  android.os.Build                         [kotlin] first seen in android/app/src/main/java/dev/hydrastone/CrashHandler.kt
+  kotlinx.coroutines.flow.MutableStateFlow [kotlin] first seen in android/app/src/main/java/dev/hydrastone/EngineInterface.kt
+  kotlinx.coroutines.flow.StateFlow        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/EngineInterface.kt
+  kotlinx.coroutines.flow.asStateFlow      [kotlin] first seen in android/app/src/main/java/dev/hydrastone/EngineInterface.kt
+  android.net.Uri                          [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  android.os.SystemClock                   [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  android.provider.OpenableColumns         [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  android.view.inputmethod.InputMethodManager [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  androidx.activity.ComponentActivity      [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  androidx.activity.compose.setContent     [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  androidx.activity.enableEdgeToEdge       [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  androidx.activity.result.contract.ActivityResultContracts [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  androidx.compose.runtime.LaunchedEffect  [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  androidx.compose.runtime.collectAsState  [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  androidx.compose.runtime.getValue        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  dev.hydrastone.ui.MainActions            [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  dev.hydrastone.ui.MainUiState            [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  dev.hydrastone.ui.RunStats               [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  dev.hydrastone.ui.Tab                    [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  dev.hydrastone.ui.theme.HydraTheme       [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  kotlinx.coroutines.flow.update           [kotlin] first seen in android/app/src/main/java/dev/hydrastone/MainActivity.kt
+  androidx.annotation.StringRes            [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.Arrangement [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.Box   [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.BoxWithConstraints [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.Column [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.PaddingValues [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.Row   [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.Spacer [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.fillMaxSize [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.fillMaxWidth [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.height [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.heightIn [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.imePadding [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.navigationBarsPadding [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.padding [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.layout.widthIn [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.lazy.LazyColumn [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.lazy.items   [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.lazy.rememberLazyListState [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.rememberScrollState [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.verticalScroll [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material.icons.Icons    [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material.icons.automirrored.filled.List [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material.icons.automirrored.filled.Send [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material.icons.filled.Settings [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material.icons.filled.Star [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.AssistChip    [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.Button        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.Card          [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.CardDefaults  [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.CircularProgressIndicator [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.ExperimentalMaterial3Api [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.FilledTonalButton [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.FilterChip    [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.HorizontalDivider [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.Icon          [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.MaterialTheme [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.NavigationBar [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.NavigationBarItem [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.OutlinedTextField [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.Scaffold      [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.Slider        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.Switch        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.Text          [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.TextButton    [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.material3.TopAppBar     [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.runtime.Composable      [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.runtime.mutableFloatStateOf [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.runtime.mutableStateOf  [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.runtime.remember        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.runtime.setValue        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.Alignment            [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.Modifier             [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.graphics.vector.ImageVector [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.platform.LocalContext [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.res.stringResource   [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.text.font.FontFamily [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.text.font.FontWeight [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.unit.Dp              [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.ui.unit.dp              [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  dev.hydrastone.ChatMessage               [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  dev.hydrastone.ChatState                 [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  dev.hydrastone.GenerationSettings        [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  dev.hydrastone.R                         [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  dev.hydrastone.Role                      [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt
+  androidx.compose.foundation.isSystemInDarkTheme [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt
+  androidx.compose.material3.darkColorScheme [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt
+  androidx.compose.material3.dynamicDarkColorScheme [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt
+  androidx.compose.material3.dynamicLightColorScheme [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt
+  androidx.compose.material3.lightColorScheme [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt
+  androidx.compose.ui.graphics.Color       [kotlin] first seen in android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt
+  @eslint/js                               [js] first seen in eslint.config.mjs
+  ./tools/hydra_train                      [js] first seen in server.js
+  child_process                            [js] first seen in server.js
+  fs                                       [js] first seen in server.js
+  http                                     [js] first seen in server.js
+  node:crypto                              [js] first seen in server.js
+  not
+       * allowed                     [js] first seen in server.js
+  path                                     [js] first seen in server.js
+  androidx.compose.foundation.layout.weight [kotlin] first seen in tests/fixtures/compose/scroll_lambda_bad.kt
+  androidx.compose.foundation.horizontalScroll [kotlin] first seen in tests/fixtures/compose/scroll_nested_bad.kt
+  androidx.compose.foundation.lazy.LazyRow [kotlin] first seen in tests/fixtures/compose/scroll_nested_bad.kt
+  ../android/app/src/main/cpp/hydra_batch.h [include] first seen in tests/test_engine.c
+  ../src/hydra_neon.h                      [include] first seen in tests/test_engine.c
+  ../src/hydra_simd.h                      [include] first seen in tests/test_engine.c
+  ../android/app/src/main/cpp/hydra_sample_cfg.h [include] first seen in tests/test_jni_batch.c
+  array                                    [python] first seen in tools/bf16.py
+  ./hydra_train                            [js] first seen in tools/console_train_test.js
+  os                                       [js] first seen in tools/console_train_test.js
+  node:fs                                  [js] first seen in tools/contrast_check.js
+  node:path                                [js] first seen in tools/contrast_check.js
+  struct                                   [python] first seen in tools/gguf_minimal_llama.py
+  itertools                                [python] first seen in tools/gguf_reader.py
+  mmap                                     [python] first seen in tools/gguf_reader.py
+  operator                                 [python] first seen in tools/gguf_reader.py
+  time                                     [python] first seen in tools/gguf_speed.py
+  math                                     [python] first seen in tools/gguf_test.py
+  subprocess                               [python] first seen in tools/gguf_test.py
+  androidx.compose.ui.text.TextStyle       [kotlin] first seen in tools/kotlin_stub_check/stubs/C_m3.kt
+  kotlin.reflect.KProperty                 [kotlin] first seen in tools/kotlin_stub_check/stubs/C_runtime.kt
+  zlib                                     [python] first seen in tools/make_model.py
+  ./gguf_fixture                           [js] first seen in tools/server_test.js
+  node:assert                              [js] first seen in tools/server_test.js
+  node:child_process                       [js] first seen in tools/server_test.js
+  node:http                                [js] first seen in tools/server_test.js
+  node:os                                  [js] first seen in tools/server_test.js
+  node:stream                              [js] first seen in tools/server_test.js
+  node:test                                [js] first seen in tools/server_test.js
+  node:vm                                  [js] first seen in tools/server_test.js
+  ▁c                                       [js] first seen in tools/server_test.js
+
+-- what still needs changing (measured signals) ----------------------------
+  open checkboxes (written-down work): 36
+    [open]   README.md:482  MoE inference on the `.hydra2` container — the expert cache + slot leasing (spec §6.2), the reading strategy (spec §6.4) and the first measured `B_eff`/throughput numbers (spec §6 is currently a worke
+    [open]   .agents/session.md:372  All-.md audit (28 files listed in Workspace): stale paths, dead refs (deleted code-scanning workflow, old PR states), banned claims, R31 language.
+    [open]   .agents/session.md:373  errors.md entry (skipped-reads → R33 + this round's findings); user.md entry for the 4 directives.
+    [open]   .agents/session.md:374  Close PR #62 (superseded by merged #64; #62 CI red = the stage-2 error #64 fixed).
+    [open]   .agents/session.md:375  Gates green (incl. new 1j), commit, push, PR (facts-only; owner merges).
+    [open]   .agents/docs/SESSION-ARCHIVE.md:303  **V Verification.** make clean && make && make test; all
+    [open]   .agents/docs/SESSION-ARCHIVE.md:1531  PR + merge — **user approval needed** (R14)
+    [open]   .agents/docs/SESSION-ARCHIVE.md:1565  PR + merge — **user approval needed** (R14). After the merge the
+    [open]   .agents/docs/SESSION-ARCHIVE.md:1627  PR + merge — **user approval needed** (R14).
+    [open]   .agents/skills/session-workflow/SKILL.md:89  step 1
+    [open]   .agents/skills/session-workflow/SKILL.md:90  step 2
+    [open]   .subagents/TODO.md:9  the member's folder exists with `ORIGINAL.md`, `AGENTS.md`, `SKILL.md`,
+    [open]   .subagents/TODO.md:11  `ORIGINAL.md` quotes the owner assignment verbatim and states the
+    [open]   .subagents/TODO.md:13  `ORIGINAL.md` records the creation date and the repository state it was
+    [open]   .subagents/TODO.md:18  `python3 .subagents/tools/run_all.py` exits 0 (all seven, no retries needed)
+    [open]   .subagents/TODO.md:19  `reports/latest.txt` and `reports/latest.json` exist for every member
+    [open]   .subagents/TODO.md:20  `PROPOSALS.md` of every member was written from that report, not from memory
+    [open]   .subagents/TODO.md:21  every proposal row carries a `file:line`, a command output or a URL
+    [open]   .subagents/TODO.md:22  no member modified anything outside its own folder
+    [open]   .subagents/TODO.md:23  `python3 .subagents/tools/check_subagents.py` is green
+    ... 16 more
+  marker comments (TODO/FIXME/...): 4
+    [TODO       ] .github/workflows/vibeworks-check.yml:3  # Hadolint, actionlint und fallow (JS/TS) sowie offene Stellen (TODO/FIXME).
+    [TODO       ] .github/workflows/vibeworks-check.yml:53  - name: Offene Stellen (TODO/FIXME)
+    [TODO       ] .github/workflows/vibeworks-check.yml:55  # Only comments (// # /* * -- <!--) — not every word "TODO" in the code
+    [TODO       ] .github/workflows/vibeworks-check.yml:57  git grep -n -I -E '(//|#|/\*|\*|--|<!--)[[:space:]]*(TODO|FIXME|HACK|XXX)\b' -- ':!*.lock' ':!package-lock.json' ':!.github/workflows/vibeworks-check.yml' > .vw
+  docs older than their area's newest source: 18
+    [doc-lag] .subagents/web-source-verifier/AGENTS.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/web-source-verifier/ORIGINAL.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/web-spec-conformance/AGENTS.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/web-spec-conformance/ORIGINAL.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/web-tooling-scout/AGENTS.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/web-tooling-scout/ORIGINAL.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-evidence/AGENTS.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-evidence/ORIGINAL.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-architecture/AGENTS.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-architecture/ORIGINAL.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-final/AGENTS.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-final/ORIGINAL.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-final/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-architecture/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/critic-evidence/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/web-source-verifier/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/web-spec-conformance/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    [doc-lag] .subagents/web-tooling-scout/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+
+-- focus (21 files) -------------------------------------------
+  include/*.h                           2 files
+      2026-10-29 22:48:02     20677  include/hydra_model.h
+      2026-10-29 22:48:02     11262  include/hydra_v2_container.h
+  src/*.c                               3 files
+      2026-10-29 22:48:02     75853  src/hydra_engine.c
+      2026-10-29 22:48:02     52003  src/hydra_v2_container.c
+      2026-10-29 22:48:02     29786  src/main.c
+  src/*.h                               2 files
+      2026-10-29 22:48:02     16979  src/hydra_neon.h
+      2026-10-29 22:48:02     14543  src/hydra_simd.h
+  android/app/src/main/cpp/*.c          1 files
+      2026-10-29 22:48:02     30623  android/app/src/main/cpp/hydra_jni.c
+  android/app/src/main/cpp/*.h          2 files
+      2026-10-29 22:48:02      4342  android/app/src/main/cpp/hydra_batch.h
+      2026-10-29 22:48:02      3912  android/app/src/main/cpp/hydra_sample_cfg.h
+  tools/gguf_*.py                       6 files
+      2026-10-29 23:05:30     22072  tools/gguf_reader.py
+      2026-10-29 22:48:02      5216  tools/gguf_inspect.py
+      2026-10-29 22:48:02     11675  tools/gguf_minimal_llama.py
+      2026-10-29 22:48:02      4611  tools/gguf_speed.py
+      2026-10-29 22:48:02     62382  tools/gguf_test.py
+      2026-10-29 22:48:02     34332  tools/gguf_to_hydra.py
+  tools/make_model.py                   1 files
+      2026-10-29 22:48:02     13390  tools/make_model.py
+  docs/FORMAT*.md                       2 files
+      2026-10-29 23:04:48     26605  docs/FORMAT-V2.md
+      2026-10-29 22:48:02     22495  docs/FORMAT.md
+  docs/GGUF-IMPORT.md                   1 files
+      2026-10-29 22:48:02     28109  docs/GGUF-IMPORT.md
+  docs/ARCHITECTURE.md                  1 files
+      2026-10-29 22:48:02     26043  docs/ARCHITECTURE.md
+
+-- spec cross-check: constants, pins, version literals ---------------
+  hex constants of 6+ digits in implementation files: 33 lines
+    0x484E4459   android/app/src/main/cpp/llama_jni.cpp:104  NOT in any .md - classify (wire value or internal detail)
+    0xEDB88320   include/hydra_v2_container.h:118  documented
+    0xEDB88320   include/hydra_v2_container.h:227  documented
+    0xCBF43926   include/hydra_v2_container.h:230  documented
+    0x00000000   include/hydra_v2_container.h:230  documented
+    0xEDB88320   src/hydra_v2_container.c:91  documented
+    0xCBF43926   src/hydra_v2_container.c:93  documented
+    0x48594452   src/hydra_v2_container.c:478  documented
+    0x46554747   src/hydra_v2_container.c:490  documented
+    0x46554747   tools/gguf_fixture.js:17  documented
+    0x7fffff     tools/gguf_fixture.js:103  documented
+    0x800000     tools/gguf_fixture.js:116  NOT in any .md - classify (wire value or internal detail)
+    0x46554747   tools/gguf_minimal_llama.py:53  documented
+    0x46554747   tools/gguf_reader.py:43  documented
+    0x48594452   tools/gguf_test.py:54  documented
+    0x7FFFFFFF   tools/gguf_test.py:186  documented
+    0x48594452   tools/gguf_test.py:494  documented
+    0xFFFFFFFFFFFFFFFF tools/gguf_test.py:855  documented
+    0x48594452   tools/gguf_to_hydra.py:61  documented
+    0x48594452   tools/hydra_train.js:33  documented
+    0x48594452   tools/make_model.py:43  documented
+    0x7FFFFFFF   tools/make_model.py:54  documented
+    0xFFFFFFFF   tools/make_model.py:118  documented
+    0x48594452   tools/safetensors_to_hydra.py:86  documented
+    0xdeadbeef   tools/server_test.js:358  documented
+    ... 9 more lines
+  
+  pinned 40-hex revisions: 4 distinct value(s)
+    11d5960a3267...  mentioned 1x
+        .github/workflows/vibeworks-check.yml:27
+    7fe450e19305...  mentioned 16x
+        AGENTS.md:73
+        CHANGELOG.md:257
+        .agents/Environment.md:423
+        .agents/Environment.md:458
+        .agents/session.md:478
+        .agents/docs/ANDROID-AUDIT.md:165
+        ... 10 more
+    a21dac85c6da...  mentioned 1x
+        .agents/docs/ANDROID-AUDIT.md:11
+    ea165f8d65b6...  mentioned 1x
+        .github/workflows/vibeworks-check.yml:201
+  
+  version literals in implementation: 7
+    tools/gguf_test.py:70  def build_gguf(path, tensors, metadata=None, version=3, alignment=32,
+    tools/gguf_test.py:542  _convert_fails(out, build_gguf(os.path.join(tmp, 'v9.gguf'), tensors, version=9)))
+    tools/gguf_to_hydra.py:62  VERSION = 1
+    tools/hydra_train.js:34  const VERSION = 1;
+    tools/make_model.py:44  VERSION = 1
+    tools/safetensors_to_hydra.py:87  VERSION = 2
+    tools/server_test.js:965  const rel = writeModelFile('llama.hydra', { magic: 0x46554747, version: 3 });
+
+report written: /workspace/chats/6daeacda62104e261f2b28ce/.subagents/web-spec-conformance/reports/latest.json

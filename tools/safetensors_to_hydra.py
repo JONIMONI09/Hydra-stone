@@ -79,6 +79,8 @@ import os
 import struct
 import sys
 
+import bf16  # shared BF16 decoder (CA-1: one conversion rule, not two)
+
 # The format constants. Mirrored from include/hydra_model.h; the
 # test gate checks they agree with gguf_to_hydra and the engine.
 MAGIC = 0x48594452
@@ -227,14 +229,16 @@ def _decode_f16(raw, n):
 
 
 def _decode_bf16(raw, n):
+    """Decode BF16 through the shared helper in `tools/bf16.py`.
+
+    The local loop (and its copy in `tools/gguf_reader.py`, CA-1) was replaced
+    after both agreed on all 65536 BF16 patterns in an R9 comparison
+    (2026-10-29). The list return type is preserved because `_DECODERS`
+    callers expect a plain sequence of Python floats.
+    """
     if len(raw) != 2 * n:
         raise SafetensorsError('BF16 payload is %d bytes, expected %d' % (len(raw), 2 * n))
-    # BF16 is the top 16 bits of an F32: widen by shifting into the high
-    # half of a 32-bit word, then read it as F32.
-    out = [0.0] * n
-    for i, (h,) in enumerate(struct.iter_unpack('<H', raw)):
-        out[i] = struct.unpack('<f', struct.pack('<I', h << 16))[0]
-    return out
+    return list(bf16.decode_bf16(raw, n))
 
 
 _DECODERS = {'F32': _decode_f32, 'F16': _decode_f16, 'BF16': _decode_bf16}

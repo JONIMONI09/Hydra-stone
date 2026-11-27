@@ -28,11 +28,19 @@ fi
 
 # has_marker <file> -> 0 if the LAST '## Round' section carries the R33 marker.
 has_marker() {
-  local f="$1" line
+  local f="$1" line section
   line=$(grep -n '^## Round' "$f" | tail -1 | cut -d: -f1) || return 1
-  sed -n "${line},\$p" "$f" \
-    | awk 'NR==1{next} /^## /{exit} {print}' \
-    | grep -q '^\*\*Session start (R33):\*\*'
+  # No early exit anywhere in this pipeline. `sed ... | awk ... | grep -q` fails
+  # intermittently under `set -o pipefail`: grep -q closes the pipe on the first
+  # match, awk dies with SIGPIPE (141) and the whole function returns red while
+  # the marker is present. Observed 2026-10-29, round 15: the same file passed
+  # one run and failed the next. awk now reads to EOF (no exit on '## ') and the
+  # match is a shell pattern test on the captured text.
+  section=$(awk -v start="$line" 'NR<=start{next} /^## /{seen=1} !seen{print}' "$f") || return 1
+  case "$section" in
+    *'**Session start (R33):**'*) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 # --- Gate: the real session.md must carry the marker in its current round ---

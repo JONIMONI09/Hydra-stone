@@ -375,6 +375,54 @@ annotations are the source of truth for any remaining findings.
 - [ ] Gates green (incl. new 1j), commit, push, PR (facts-only; owner merges).
 
 **Progress:**
+- [x] F1 — the pin is sourced (page read 2026-10-29) and the enforcing gate is
+      named; probe: `grep -c "releases/tag/v0.5.0" AGENTS.md` → 1.
+- [x] F2 — CRC known-answer pair in `docs/FORMAT-V2.md`; the conformance check
+      no longer lists `0xCBF43926` (4 internal constants remain, as documented).
+- [x] F3 — `kotlin_stub_check.sh` is a stated manual gate in `AGENTS.md` §3 with
+      the Gradle evidence for why CI does not need it; the wiring check keeps
+      printing CHECK, which is the fact, now documented.
+- [x] F4 — no hard-coded counts left: probe over the four old values returns 0.
+- [x] F5 — R9 first (65536 patterns, 0 mismatches, 254 NaN payloads excluded),
+      then `tools/bf16.py` as the single conversion rule; `gguf_test` 101/0.
+- [x] V — gguf_test 101/0, pyflakes clean, docs_claim green, session gate green,
+      run_all 6/6. Two team-instrument bugs found on the way (self-reference in
+      the conformance and evidence censuses) and fixed in the same round.
+- [x] C — re-graded; see the round-13 re-review appended to
+      `.subagents/critic-final/REVIEW.md`.
+
+**Progress:**
+- [x] T1 — `.subagents/` created: `README.md`, `TODO.md`, and `ORIGINAL.md` in all
+      six member folders before their first run (each quotes the owner
+      assignment verbatim and records the creation date and repo state).
+- [x] T2 — `tools/codegraph_core.py`: 226 files, 61 `.md`, mtimes, 106+ internal
+      edges, open checkboxes and source markers; stdlib only, no subprocess, no
+      network, no git. Two instrument bugs found and fixed (self-scan of its own
+      reports: markers 8 -> 19,220; doc-lag noise from identical checkout mtimes).
+- [x] T3 — six members with `AGENTS.md`, `SKILL.md`, `codegraph.py` (own `SUB`,
+      own focus, own extra check) and `reports/`; a runner with one retry; a
+      structural gate with an in-gate negative control.
+- [x] T4 — `.agents/skills/sub-agents/SKILL.md` (frontmatter valid, discovered via
+      the `.claude/skills` symlink), based on the documented ADK patterns
+      (sub_agents / AgentTool / Sequential / Parallel / Loop-with-critic).
+- [x] T5 — `run_all.py`: 6/6 rc=0, first attempt each, receipts in
+      `.subagents/*/reports/latest.{txt,json}`.
+- [x] T6 — `check_subagents.py`: 20 checks, 0 failures; `--self-test` proves three
+      independent detectors can fail (after fixing the control itself).
+- [x] T7 — `critic-final/REVIEW.md`: **9/10 PASS** (threshold 7) with a
+      per-criterion table; the one withheld point is the independence gap (no
+      separate reviewer model is spawnable here — only the web-research agent),
+      recorded as finding 1 rather than hidden.
+- [x] T8 — records updated (this section, `errors.md` 6 entries, `user.md`
+      directives 31-32, `.agents/README.md` index, `CHANGELOG.md` round 12);
+      gates: `session_start_check` ok, `docs_claim_check` ok, pyflakes 4.1.0 clean
+      on all nine new scripts, `py_compile` ok.
+
+**Findings handed to the owner (proposals only, no code touched):** SV-1
+(`AGENTS.md:66-67` pin without a source URL), SC-1 (`0xCBF43926` KAT missing from
+`docs/FORMAT-V2.md`), TS-1 (`kotlin_stub_check.sh` in no workflow), CE-1
+(`AGENTS.md:198/202/232` hard-coded counts vs. R21), CA-1 (`_decode_bf16`
+implemented twice: `tools/gguf_reader.py:576`, `tools/safetensors_to_hydra.py:229`).
 - [x] Session start: AGENTS.md + .agents/{rules,session,errors,user}.md read; 28 .md files listed; 2026 web research done (AGENTS.md budgets/dilution; enforcement-over-prose; Agent Skills spec) — findings recorded in R33 + errors.md + the ci-triage/repo-docs-audit skills.
 - [x] R33 + gate 1j (tools/session_start_check.sh, wired into ci.yml after 1i; local run: ok, negative control proven).
 - [x] `.agents/skills/`: 3 moved (session-workflow, engine-ci-verify, android-ndk-build) + 4 new (ci-triage, kotlin-stub-check, android-lint-gate, repo-docs-audit); `.claude/skills` = symlink.
@@ -719,3 +767,262 @@ can and cannot prove.
   (Rezepte Environment.md); pyyaml via pip --break-system-packages;
   llama.cpp-Submodule per `git submodule update --init` auf den Pin
   ausgecheckt (sonst pin-check "working tree"-Meldung).
+
+## Round 2026-10-29 (round 12: the `.subagents` team — 3 web-research + 3 critic agents, per-agent skill + codegraph, graded review)
+
+**Session start (R33):** 2026-10-29 (branch `freebuff/6daeacda62104e261f2b28ce`, base `94f8e08` = merge of PR #70). Read before the first edit: AGENTS.md (full) -> .agents/session.md (rounds 6-11 incl. the R11 results block) -> .agents/errors.md (top entries: the `timeout`/`env` recipe bug, the LFS dead ends) -> .agents/rules.md (R1-R33, §8 conflict order) -> .agents/user.md (30 dated directives) -> .agents/skills/session-workflow/SKILL.md + .agents/skills/repo-docs-audit/SKILL.md -> tools/session_start_check.sh (gate 1j: the marker must be in the LAST `## Round` section) -> tools/docs_claim_check.sh (its audited FILES array, incl. `.agents/skills/*/SKILL.md`) -> .github/workflows/{ci,lint,vibeworks-check}.yml (pyflakes/bandit scope, `git ls-files '*.py'` in vibeworks) -> .gitignore (NOT touched) -> `.claude/skills` (symlink to `../.agents/skills`). Web research before designing: Google ADK sub-agent patterns (adk.dev/workflows/patterns/, adk.dev/agents/workflow-agents/{sequential,parallel,loop}-agents/, adk.dev/sessions/state/, adk.dev/tools-custom/function-tools/) — findings recorded in the new `sub-agents` skill.
+
+**Owner directive (verbatim intent, German):** "starte bitte 6 Agenten ... 3 die im Websuchen koennen und 3 die kritisieren muessen ... unsre Subs muessen in einem Ordner zusammen arbeiten der .subagents heisst! bevor jeder Anfaengt muss eine Original.MD erstellt werden ... fuer den Erstellst du einen Skill und eine eigene Agents.md ... fuer dich ein Skill namens 'Sub-Agents' ... IMMER Todo Liste nutzen?!! Am Ende IMMER einen criticer starten der deine Arbeit kritisieren muss ... Criticer soll auch in den andren Sub Agents schauen ... jeder soll ein py Script haben im eigenen Ordner der Codegraph nutzt ... NIEMALS FAKE NIEMALS STUBS ... keine Subs duerfen Code Aenderungen machen nur Vorschlagen ... KEIN RATEN". Artefacts stay English (R31), the conversation stays German.
+
+**Plan (this is the todo list for the round; updated after every step — R2):**
+- [x] T1 Create `.subagents/` with `README.md`, `TODO.md` (the reusable pipeline checklist) and `ORIGINAL.md` per sub-agent (created BEFORE its first run).
+- [x] T2 One real shared code-graph engine (`.subagents/tools/codegraph_core.py`): all files, mtimes, every `.md`, include/import edges, TODO markers, open checkboxes ("what still needs changing").
+- [x] T3 Six sub-agent folders, each with `AGENTS.md` (contract), `SKILL.md` (Agent Skills format, R29/R30), `codegraph.py` (own focus profile + own extra check) and `reports/`.
+- [x] T4 `.agents/skills/sub-agents/SKILL.md` — the parent skill, based on the documented Google ADK patterns (sub_agents / AgentTool / Parallel / Loop-with-critic).
+- [x] T5 Run every `codegraph.py` for real, capture the outputs as evidence, and store the receipts in each `reports/`.
+- [x] T6 `.subagents/tools/check_subagents.py` — structural gate + in-gate negative control (R25), then run it.
+- [x] T7 Final critic (`critic-final`) reviews the parent work AND the other five sub folders, scores 1-10; below 7 means rework until the findings are closed.
+- [x] T8 Docs: user.md directive, `.agents/README.md` index pointer, CHANGELOG, this section; gates green (session-start, docs-claim, py_compile/pyflakes).
+
+**Progress:**
+
+## Round 2026-10-29 (round 13: closing the five team findings — pin source, CRC known answer, unwired Kotlin gate, hard-coded counts, duplicated bf16 decoder)
+
+**Session start (R33):** 2026-10-29 (branch `freebuff/6daeacda62104e261f2b28ce`, base `94f8e08` + the uncommitted round-12 work). Read before the first edit: AGENTS.md (§2.2 the llama pin box, §3 the gate list, the `jni-batch-test` / `sampler_contract_check` / `server_test` / `contrast_check` lines), .agents/session.md (round 12 + its findings), .agents/errors.md (round-12 entries), .agents/rules.md (R5-R12, R21, R25, R26, R31, R32), .agents/user.md (directives 31-32), all six `.subagents/*/PROPOSALS.md` (the five findings), `docs/FORMAT-V2.md` (CRC rows 290/322 and rules 389-392), `tools/gguf_reader.py` + `tools/safetensors_to_hydra.py` (both `_decode_bf16` bodies and their call sites), `tools/gguf_test.py` (`run_safetensors` gate, line 661), `tools/llama_pin_check.sh` (`PIN_TAG`/`PIN_COMMIT`, lines 23-24), `.github/workflows/{ci,lint}.yml` (Gradle `assembleDebug` at ci.yml:739 and lint.yml:548).
+
+**Plan (todo list for the round):**
+- [x] F1 (SV-1) `AGENTS.md`: cite the primary source next to the llama.cpp pin instead of leaving it a bare claim.
+- [x] F2 (SC-1) `docs/FORMAT-V2.md`: document the CRC-32 known-answer values the C API already pins, so a third-party writer can self-check.
+- [x] F3 (TS-1) `AGENTS.md` §3: close the unwired-gate finding explicitly — either wire `kotlin_stub_check.sh` into CI or state it as a manual-only gate with the reason.
+- [x] F4 (CE-1) `AGENTS.md`: replace the hard-coded counts (109/34/43/17) with parse instructions, as R21 requires of the same file.
+- [x] F5 (CA-1) `tools/`: prove the two `_decode_bf16` implementations agree (R9, all 65536 patterns), then single-source them.
+- [x] V Re-run the affected gates (gguf_test, pyflakes, docs_claim, session gate, team run).
+- [x] C Re-run `critic-final` and re-grade.
+
+**Progress:**
+
+## Round 2026-10-29 (round 14: the threat-scan agent — AI instruction malware detection, security rules, CI gate, per-sub error/request files)
+
+**Session start (R33):** 2026-10-29 (branch `freebuff/6daeacda62104e261f2b28ce`, base `94f8e08` + rounds 12-13 uncommitted). Read before the first edit: AGENTS.md (full, incl. the round-13 pin-source block), .agents/session.md (rounds 12-13), .agents/errors.md (round-12/13 self-reference entries), .agents/rules.md (R1-R33 + §8 conflict order), .agents/user.md (directives 1-32), `.subagents/README.md` + `TODO.md` + all six `PROPOSALS.md`, `.subagents/tools/{codegraph_core,run_all,check_subagents}.py`, `.agents/skills/sub-agents/SKILL.md`, `.github/workflows/{lint,ci,vibeworks-check}.yml` (job layout, pyflakes/bandit scope), `tools/docs_claim_check.sh` (audited FILES), `tools/workflow_yaml_check.sh` + `tools/workflow_lint_check.sh` (what a new workflow must survive). Web research in parallel: 2025-2026 prompt-injection/invisible-Unicode/threat-detector landscape, and the AGENTS.md / Agent Skills / skill-security conventions.
+
+**Owner directive (verbatim intent, German):** "achte auf Lesbarkeit und Wertbarkeit also skills mit richtigen YML ... schaue deine Docs und die von heutigen Agenten Coding Tools ... einen Sub Agenten der nach Schadcode und nach Schadanweisung für KI erkennt ... darf ein py selber schreiben um Sachen zu scannen ... suche nach unsichtbaren Zeichen Instruktionen die bösen Willen haben 'Nicht User sagen' ... mache Sicherheitsregeln ... baue es dann in die CI ein ... Arbeite Findings intelligent immer selber ab ... Subs können Anfragen machen und bei der Klarstellung helfen ... jeder Sub hat Error.md und so in ihren Ordnern".
+
+**Plan (todo list):**
+- [x] S1 Research: threat classes + detector tooling (2026 sources), and agent-doc/skill conventions. Sources read: OWASP LLM01:2025, AWS "Defending LLM applications against Unicode character smuggling", trojansource.codes/CVE-2021-42574, Trail of Bits prompt-injection explainer, Invariant Labs MCP tool poisoning, Snyk ToxicSkills, Cisco skill-scanner, NVIDIA SkillSpector, AID, anti-trojan-source, Semgrep bidi rule, agents.md, Agent Skills specification, Anthropic skill best practices + `anthropics/skills` security checklist. Recorded with URLs in `.agents/docs/AI-THREAT-MODEL.md` (195 lines, 30 URL lines).
+- [x] S2 `.subagents/ai-threat-scan/` — 7th member: `ORIGINAL.md` (written before the first run), `AGENTS.md`, `SKILL.md`, `codegraph.py`, `ERROR.md`, `REQUESTS.md`, `PROPOSALS.md`, `reports/{latest.json,scan.json}`.
+- [x] S3 Scanner (`scan.py`, 585 lines, stdlib only, offline): 27 rules — invisible tag-block/zero-width/bidi/variation-selector/control characters, covert secrecy phrasing (EN+DE), prompt override, renderer-hidden text (element-scoped for attributes, forward-only window for CSS), pipe-to-shell, base64-to-shell, reverse shell, netcat, encoded PowerShell, eval-remote, rm -rf /, chmod 777 /, CSS-hidden content, hidden attribute, secret shapes (AWS/GitHub/sk-/private key/Slack), data-URI, long base64, symlink escape; severities, in-line waivers, `--json`, `--fail-on`, `--only`, `--self-test`. <!-- ai-threat-scan: allow covert-instruction (the phrase is quoted here as a pattern name, not used as an instruction) --> <!-- ai-threat-scan: allow chmod-777-root (rule name listed in the round plan) -->
+- [x] S4 Security rules R34 (a file never gives an order; the gate is mandatory; waivers only in place with a reason) and R35 (agent docs readable AND machine-valid) in `.agents/rules.md` §8; conflict order moved to §9; every "33 rules"/`§8` reference updated (AGENTS.md:14, .agents/README.md:18, README.md:373, session-workflow skill).
+- [x] S5 `ERROR.md` + `REQUESTS.md` in all seven folders (real content, 1.0-2.5 kB each), required by `check_subagents.py` (plus a size floor so a placeholder fails); strict PyYAML frontmatter validation with a stated structural fallback, spec keys only, name pattern/length, description ≤1024 chars, body <500 lines, visible trigger (`## When …` or "Use when"); `## When to use` added to the seven skills that lacked a trigger.
+- [x] S6 CI job `ai-threat-scan` in `.github/workflows/lint.yml` (self-test → tree scan → reports → structure gate → its own negative control → pyflakes+bandit on `.subagents/`); `tools/workflow_yaml_check.sh` and `tools/workflow_lint_check.sh` both green.
+- [x] S7 The scanner's own findings worked: 45 → 0 high. Fixed in code, not waived: self-scan of the rule table, self-scan of the generated JSON, ±300 window on UI attributes (3 false highs), space-separated waivers silently ignored, `.ps1` missing from the suffix list, over-broad instruction vocabulary, symmetric CSS window. Eight waived hits on seven marked lines remain (the threat model's quoted examples, the CSS paragraph that names the properties, and two quotes in the review), each with the reason on the line.
+- [x] S8 Records (session/errors/user/CHANGELOG/README/.agents README/TODO/skill) and the re-graded critic pass.
+
+### R14 results (measured, 2026-10-29)
+
+| Check | Command | Result |
+|---|---|---|
+| rule proof | `scan.py --self-test` | ok — 27 fixtures fire, clean file + clean tree stay green, single and multi-rule waiver both honoured |
+| gate under attack | probe file in the tree, then removed | 5 high + 1 medium, exit 1, tag payload decoded (`IGNORE`); after removal exit 0 |
+| tree scan | `scan.py .` | 0 high, 0 medium, 21 low, 8 waived hits on 7 marked lines, over 232 text files (24 binary skipped) |
+| structure gate | `check_subagents.py` | 7 folders, 24 checks, 0 failures (strict PyYAML) |
+| gate control | `check_subagents.py --self-test` | ok — 7 deliberate defects, one per file, each rejected by its own detector |
+| team run | `run_all.py` | 7/7 members rc=0 on the first attempt, reports written |
+| workflows | `workflow_yaml_check.sh`, `workflow_lint_check.sh` | ok (5 files parsed / 4 linted, negative controls proven) |
+| python | `pyflakes .subagents/`, `bandit -r .subagents -s B610` | clean; B610 triaged as Django's `QuerySet.extra()` vs. the shared `extra=` keyword (comment in the job) |
+| protocol | `session_start_check.sh`, `docs_claim_check.sh` | ok / all banned claims absent |
+
+**Progress:**
+- Built the 7th member (`ai-threat-scan`) with a 27-rule stdlib scanner, worked its own 45 findings down to 0 high in code, added R34/R35, the threat model with sources, `ERROR.md`+`REQUESTS.md` in all seven folders (gate-enforced), strict Agent Skills YAML validation, and the CI job `ai-threat-scan`. End-to-end control: a probe file in the real tree gave 5 high + 1 medium, exit 1, decoded payload; after removal exit 0. `critic-final`: **9/10 PASS** (the withheld point is that no runner has executed the new job yet; this round does not push).
+
+## Round 2026-10-29 (round 15: close the self-scan blind spot, resolve the two paths, re-prove the gate)
+
+**Session start (R33):** 2026-10-29 (branch `freebuff/6daeacda62104e261f2b28ce`, base `94f8e08` + rounds 12-14 uncommitted). Read before the first edit: `AGENTS.md` (protocol + §2.3 Python pipeline + §3 gate list), `.agents/rules.md` (R1-R35, §8/§9), `.agents/session.md` (rounds 13-14 + the R14 results table), `.agents/errors.md` (round-14 entries), `.agents/user.md` (directive 33), `.subagents/ai-threat-scan/{scan.py,AGENTS.md,SKILL.md,ERROR.md,REQUESTS.md,PROPOSALS.md,ORIGINAL.md}`, `.subagents/tools/{check_subagents.py,run_all.py}`, `.subagents/README.md`, `.subagents/critic-final/REVIEW.md`, `.agents/docs/AI-THREAT-MODEL.md`, `.github/workflows/lint.yml` (job `ai-threat-scan`).
+
+**Owner directive (verbatim intent, German):** "bitte achte auf Lesbarkeit und Wertbarkeit ... jeder Sub hat Error.md und so in ihren Ordnern ... Arbeite Findings intelligent immer selber ab ... aus Fehlern lernen" + the round-15 scope: close the self-scan hole, resolve `sub-agents/` vs `.subagents/` and the unexplained `tools/bf16.py`, re-prove every gate, log every real mistake.
+
+**Plan (todo list):**
+- [x] T1 Remove the whole-file self-exclusion in `scan.py`; quarantine only the colliding lines with in-line waivers and a reason each.
+- [x] T2 Add the `own_source` self-test fixture (copy of `scan.py` must scan clean; the same copy plus one hidden payload must be caught).
+- [x] T3 Plant → detect → remove a payload inside `scan.py` on the working tree (exit 1, then exit 0, byte-identical restore).
+- [x] T4 Resolve the paths: state which `sub-agents` path is canonical, gate against a duplicate tree, and confirm `tools/bf16.py` is referenced (not junk).
+- [x] T5 Re-prove every gate, first attempt; write the real mistakes into `ai-threat-scan/ERROR.md`, `ai-threat-scan/REQUESTS.md` and `.agents/errors.md`.
+
+### R15 results (measured, 2026-10-29)
+
+| Check | Command | Result |
+|---|---|---|
+| rule proof | `scan.py --self-test` | ok — 27 fixtures, clean file/tree green, waiver honoured, **payload in the scanner's own source caught** (`own_source`) |
+| tree scan | `scan.py .` | **233** text files (incl. `scan.py`), 13 binary skipped, **0 high / 0 medium / 21 low**, 46 waived hits on 42 marked lines |
+| own-source negative control | payload appended to `scan.py`, then restored | exit **1**, `[HIGH] invisible-tag-block .subagents/ai-threat-scan/scan.py:605`, `5 tag characters, decodes to 'STEAL'`; `sha256sum -c` OK; exit **0** |
+| structure gate | `check_subagents.py` | 25 checks, 0 failures (7 folders, strict PyYAML), incl. `layout: exactly one sub-agents directory` |
+| gate control | `check_subagents.py --self-test` | ok — **8** deliberate defects rejected (7 member-file defects + the duplicate-tree control) |
+| duplicate-tree control | planted `sub-agents/SKILL.md` at the repo root | gate **FAIL** `duplicate sub-agents tree(s) outside .agents/skills/sub-agents` (rc=1); removed → green |
+| team run | `run_all.py` | **7/7 rc=0 on the first attempt**, reports written |
+| CI job | parsed `lint.yml` with PyYAML | job `ai-threat-scan` parses; step order self-test (3) → tree scan (4) → reports (5) → gate (6) → gate control (7); scan step carries `--fail-on high` |
+| workflows | `workflow_yaml_check.sh`, `workflow_lint_check.sh` | ok (5 parsed / 4 linted, negative controls proven) |
+| protocol | `session_start_check.sh`, `docs_claim_check.sh` | ok / all banned claims absent |
+| session gate stability | `session_start_check.sh` x 5 | rc=0 five times in a row (the gate used to fail intermittently on `grep -q` + `pipefail`; fixed, see `.agents/errors.md` round 15) |
+| python | `pyflakes .subagents/`, `bandit -r .subagents --severity-level medium -s B610`, `py_compile` | clean / clean / ok |
+
+**Paths resolved:** `.agents/skills/sub-agents/` is the canonical **procedure** (one `SKILL.md`, discovered via the `.claude/skills` symlink); `.subagents/` is the canonical **team** (contracts, tooling, receipts). Neither is a copy; the split is now written down (`.subagents/README.md` "Two paths, two jobs") and checked (layout gate + no member files inside the skill + bidirectional pointers). `tools/bf16.py` stays: `tools/gguf_reader.py:41` and `tools/safetensors_to_hydra.py:82` both `import bf16`, and it is documented in `README.md:358` and `AGENTS.md` §2.3.
+
+**Progress:** done — every gate green on the first attempt; nothing committed (delivery not authorized).
+
+## Round 2026-10-29 (round 16: waivers that cannot become a blind spot)
+
+**Session start (R33):** 2026-10-29 (branch `freebuff/6daeacda62104e261f2b28ce`, base `94f8e08` + rounds 12-15 uncommitted). Read before the first edit: `AGENTS.md` (protocol, §1 rules table, §3 gates), `.agents/rules.md` (R21, R25, R34), `.agents/session.md` (round 15 + its R15 results table), `.agents/errors.md` (round-15 entries), `.subagents/ai-threat-scan/{scan.py,AGENTS.md,SKILL.md,REQUESTS.md,ERROR.md,PROPOSALS.md}`, `.agents/docs/AI-THREAT-MODEL.md` (§3 detector, §4 blind spots), `.subagents/tools/{check_subagents.py,run_all.py}`, `.github/workflows/lint.yml` (job `ai-threat-scan`).
+
+**Owner directive (verbatim intent, German):** "Arbeite Findings intelligent immer selber ab ... aus Fehlern lernen ... jeder Sub hat Error.md ... Englisch alles" + the round-16 scope: a waiver may only hide the finding it names, never an unrelated one, and never without a reason.
+
+**Plan (todo list):**
+- [x] W1 Strict waiver grammar in `scan.py`: a waiver suppresses only when it names that exact rule id and carries a reason of meaningful length; unknown ids, missing/short/placeholder reasons suppress nothing.
+- [x] W2 Non-suppressing waivers surface as `waiver-invalid` **low**, and the underlying finding stays. Decision changed mid-round from "high" to "low": the payload is already reported at its own severity, so escalating the diagnostic would double-count one defect; the note adds the reason the marker did nothing. It cannot be waived (appended directly, never through `_add`).
+- [x] W3 Waiver inventory in the report and the JSON: file:line, rule, and the reason that justified each suppression.
+- [x] W4 `--self-test` fixtures `waiver_valid`, `waiver_other_rule`, `waiver_no_reason`, `waiver_placeholder`, multi-rule; each fails loudly on regression.
+- [x] W5 Real-tree proof: payload in `scan.py` under a mismatched waiver, then under an unreasoned one → exit 1; byte-identical restore (`sha256sum -c`) → exit 0.
+- [x] W6 Docs (`AGENTS.md`, threat model), `REQUESTS.md` R-6 closed honestly, records + full gate re-run.
+
+**Results (all observed, first attempt unless noted):**
+
+| Gate | Command | Observed |
+|---|---|---|
+| scanner self-test | `scan.py --self-test` | `SELF-TEST ok`, rc=0 (27 rule fixtures, clean file/tree, 6 waiver fixtures, own source) |
+| tree scan | `scan.py . --fail-on high` | 233 text files, **0 high / 0 medium / 21 low / 46 waived on 42 lines**, `VERDICT: PASS`, rc=0 |
+| waiver inventory | `--json` parse | 46 entries, all with a reason, shortest reason 24 chars; 38 entries in `scan.py` on 36 lines |
+| mutation: reasons ignored | copy of `scan.py`, reason check forced true | `SELF-TEST FAIL` rc=2, 4 failures (no-reason and placeholder cases) |
+| mutation: ids widened | copy of `scan.py`, ids widened to every rule | `SELF-TEST FAIL` rc=2 (`waiver_other_rule`) |
+| plant A, mismatched id | tag payload plus a waiver naming another rule, inside `scan.py` | rc=1, `[HIGH] invisible-tag-block scan.py:716`, decoded payload printed; `sha256sum -c` OK after restore, rc=0 |
+| plant B, no reason | tag payload plus the correct id and no reason, inside `scan.py` | rc=1, high finding **plus** `[LOW] waiver-invalid scan.py:716`; rc=0 after restore |
+| plant C, ordinary file | `docs/waiver-probe.md` carrying a copied waiver for another rule | rc=1 naming `docs/waiver-probe.md:3`; removed, rc=0 |
+| structure gate | `check_subagents.py`, `--self-test` | 25 checks 0 errors / 8 defects rejected |
+| team run | `run_all.py` | 7/7 member rc=0 |
+| workflow | PyYAML parse + order assert | `ai-threat-scan` parses, self-test step before the tree scan |
+| session/docs | `session_start_check.sh`, `docs_claim_check.sh` | ok / no forbidden claims |
+| python | `pyflakes`, `bandit`, `py_compile` | clean / clean / ok |
+
+**Progress:** done — the waiver rule is implemented, documented and proven on the real tree; every gate green on the first attempt after the fixes recorded in `.agents/errors.md` and `.subagents/ai-threat-scan/ERROR.md`. Nothing committed, nothing pushed.
+
+## Round 2026-10-29 (round 17: coverage audit — three hidden-instruction classes were not detected)
+
+**Session start (R33):** 2026-10-29 (branch `freebuff/6daeacda62104e261f2b28ce`, base `94f8e08` + rounds 12-16 uncommitted). Read before the first edit: `AGENTS.md`, `.agents/rules.md` (R21/R25/R34), `.agents/session.md` (round 16 results), `.agents/errors.md`, `.subagents/ai-threat-scan/{scan.py,AGENTS.md,codegraph.py,REQUESTS.md,ERROR.md,PROPOSALS.md}`, `.agents/docs/AI-THREAT-MODEL.md`, `.github/workflows/lint.yml`.
+
+**Owner directive (intent, German):** close the hidden/encoded instruction gaps the mission names, decide from evidence, prove every detector, no fake and no stub, learn from mistakes, English artefacts.
+
+**Audit before coding (measured, not assumed).** Existing detectors in `scan.py`: tag block, zero-width/`Cf`, bidi controls, variation selectors, raw controls, `covert-instruction`, `prompt-override`, `hidden-html`, `hidden-with-instructions`, `html-hidden-attr`, `css-hidden-content`, shell/secret/encoded shapes. Gaps found by reading the rule table against the mission's class list: **no detector decodes anything** (base64/hex/percent/ROT13 that *becomes* an instruction is invisible today), **no detector handles look-alike letters** (Cyrillic/Greek homoglyphs spelling an instruction), **no detector reports private-use-area characters**. Two existing rules also had no self-test fixture at all (`pipe-to-shell`, `symlink-escape`) - the self-test only asked "did some rule fire somewhere", never "does every rule have a fixture".
+
+**Plan (todo list):**
+- [x] C1 Coverage matrix (class -> rule id + fixture / NOT covered) into `.subagents/ai-threat-scan/AGENTS.md`, with the NOT-covered rows as backlog.
+- [x] C2 `encoded-instruction` (high): base64/hex/percent/ROT13 candidates are decoded and the result must match instruction language; near-miss encodings must stay clean.
+- [x] C3 `homoglyph-instruction` (high): Cyrillic/Greek look-alikes de-confused; fires only when de-confusing *creates* an instruction match (documented FP limit: bare mixed-script tokens are not flagged - this tree has 25 legitimate Greek math tokens).
+- [x] C4 `private-use-character` (low): PUA ranges reported as informational (0 occurrences in the tree today, so no noise; 23 binary files are skipped anyway).
+- [x] C5 Self-test: one fixture per detection rule asserted mechanically (`fixture_rules == detection_rules`, counts equal), per-fixture `path` + `line` assertion, near-miss negatives, plus fixtures for the two rules that had none.
+- [x] C6 Mutation control per new detector on a copy: weakened copy must make `--self-test` exit non-zero.
+- [x] C7 Real-tree probes (one file per new class), `scan.py .` exit 1 naming each probe with its rule id, delete, byte-identical baseline (`sha256sum -c`), exit 0, same file count.
+- [x] C8 `codegraph.py` rule-drift set extended, docs (AGENTS.md matrix, threat model), records, full gate.
+
+**Results (all observed; first attempt unless the row says otherwise):**
+
+| Gate | Command | Observed |
+|---|---|---|
+| scanner self-test | `scan.py --self-test` | `SELF-TEST ok`, rc=0: **30 detection rules, one fixture each with path+line assertion, 6 near misses clean**, waiver grammar, own source |
+| tree scan | `scan.py . --fail-on high` | 233 text files, **0 high / 0 medium / 21 low / 48 waived on 44 lines** (40 in `scan.py` on 38), `VERDICT: PASS`, rc=0 |
+| rule drift | `ai-threat-scan/codegraph.py` | `declared 31`, `missing metadata: none`, `declared but never used: none`, `verdict: PASS` |
+| mutation: decoding off | copy of `scan.py`, decoder loop emptied | `SELF-TEST FAIL` rc=2 (`encoded_b64/hex/pct.md` did not fire) |
+| mutation: de-confusion off | copy of `scan.py`, `if False` | `SELF-TEST FAIL` rc=2 (`homoglyph.md`) |
+| mutation: PUA off | copy of `scan.py`, `elif False` | `SELF-TEST FAIL` rc=2 (`pua.md`) |
+| probe plant, high rules | 3 probe files in `docs/`, `scan.py . --fail-on high` | rc=1: `[HIGH] encoded-instruction docs/_scan_probe_encoded.txt:1`, `[HIGH] homoglyph-instruction docs/_scan_probe_homoglyph.txt:1` |
+| probe plant, low rule | same tree, `--fail-on low` | rc=1 and also `[LOW] private-use-character docs/_scan_probe_private_use.txt:1` |
+| probe cleanup | delete 3 files, `sha256sum -c /tmp/baseline.sha256` | rc=0, **242/242 `OK`**, scan rc=0, 233 text files (same as before the plant), 0 probe paths left |
+| structure gate | `check_subagents.py` / `--self-test` | 25 checks 0 failures, rc=0 / 8 defects rejected, rc=0 |
+| team run | `run_all.py` | 7/7 `rc=0`, first attempt each |
+| workflow | `workflow_yaml_check.sh`, `workflow_lint_check.sh` | 5 files parsed / 4 linted, negative controls proven |
+| session/docs | `session_start_check.sh`, `docs_claim_check.sh` | ok / no banned claims |
+| python | `pyflakes`, `bandit`, `py_compile` | rc=0 / rc=0 (0 issues) / rc=0 |
+| CI job | PyYAML parse + order assert | `ai-threat-scan` parses, 10 steps, `--self-test` at step 4 **before** tree scan at step 5 |
+
+**Progress:** done — three missing classes detected and proven end to end, the self-test now forces a fixture per rule, the coverage matrix and its backlog are written down. Nothing committed, nothing pushed.
+
+## Round 2026-10-29 (round 18: nested encodings and comment-form instructions)
+
+**Session start (R33):** 2026-10-29 (branch `freebuff/6daeacda62104e261f2b28ce`, rounds 12-17 uncommitted). Re-read before editing: `AGENTS.md`, `.agents/rules.md`, `.agents/session.md` (round 17), `.agents/errors.md`, `.subagents/ai-threat-scan/{scan.py,AGENTS.md,codegraph.py,ERROR.md,PROPOSALS.md,REQUESTS.md}`, `.agents/docs/AI-THREAT-MODEL.md`, `.github/workflows/lint.yml`.
+
+**Re-verification of the previous round's claims (STEP 0, observed):** `--self-test` ok with **30 detection rules**; tree scan **233 text files, 0 high / 0 medium / 21 low / 48 waived**, rc=0; `rules_table()` has **31 entries (30 detection + `waiver-invalid`)**; `AGENTS.md` carries the coverage matrix with a `NOT covered` table. Every claim from the previous round holds - no correction entry needed.
+
+**Plan before edit (rows chosen, rows refused):**
+
+- [x] N1 **Close: nested / multi-layer encodings.** Decode iteratively, `MAX_DECODE_DEPTH = 3`, with a decoded-length cap and a `seen` set for loop detection, so `base64(rot13(instruction))` is found. **Rule id stays `encoded-instruction`**: same class, same severity, same fixture family; the provenance is recorded in the finding detail as the chain (`base64->rot13, depth 2`). A second id would split the waiver/fixture story for no detection benefit - stated here as the justification.
+- [x] N2 **Close: instruction in a visible code comment.** New rule `comment-instruction`, severity **low**, narrow form only: a comment body that *addresses* an agent (`AI:`, `agents:`, `assistant:`, `model:`, `note to the AI:`) **and** then carries an action verb. Measured before coding: the broad shape (any agent word + any imperative in a comment) hits **54 legitimate lines** in this tree (README bullets, `server.js` route docs, `CHANGELOG` prose) - rejected as noise; the narrow addressed form hits **0**. FP limit accepted: an addressed comment without an action verb is not reported, and a plain imperative comment (`# run this before merging`) is not reported at all - the channel is visible to a human reader, so this stays informational.
+- [x] N3 **Refuse, keep as backlog with a concrete next step:** (b) full UTS #39 confusable coverage (needs the data file + a size budget) and (c) payloads in binary/image/PDF files (needs an extraction job). Both stay in the matrix as NOT-covered; the report already prints the binary skip count, so the residual risk is stated rather than hidden.
+- [x] N4 Self-test: one positive fixture per new/changed class asserting rule id + line, near-miss negatives (nested-but-harmless encodings, quoted/negated trigger wording, a plain imperative comment), fixture-set equality with the rule table preserved.
+- [x] N5 Mutation controls on copies: depth forced to 1 (nested fixture must fail), comment matcher neutered (comment fixture must fail).
+- [x] N6 Real tree: baseline manifest, one probe per newly covered class, `scan.py .` exit 1 naming each probe with its rule id, delete, `sha256sum -c`, exit 0, same file count.
+- [x] N7 Docs (`AGENTS.md` matrix delta + backlog rows, threat model rules/sources), records, full gate in one pass.
+
+**Results (all observed, one pass unless a row says otherwise):**
+
+| Gate | Command | Observed |
+|---|---|---|
+| scanner self-test | `scan.py --self-test` | `SELF-TEST ok`, rc=0: **31 detection rules, one fixture each with rule id + line 1, 10 near misses clean**, waiver grammar, own source |
+| tree scan | `scan.py . --fail-on high` | 233 text files, **0 high / 0 medium / 21 low / 48 waived on 44 lines** (40 in `scan.py` on 38), `VERDICT: PASS`, rc=0 |
+| nested proof | temp file with `base64(rot13(phrase))` | rc=1, `[HIGH] encoded-instruction probe.md:1`, detail `base64->rot13 payload decodes to instruction text at depth 2: '<the decoded instruction phrase>'` |
+| mutation: depth → 1 | copy of `scan.py`, `range(1, 2)` | `SELF-TEST FAIL` rc=2: `rule encoded-instruction did not fire on nested_encoded.md` |
+| mutation: comment check off | copy of `scan.py`, `if False:` | `SELF-TEST FAIL` rc=2: `rule comment-instruction did not fire on comment_ai.py` |
+| probe plant (high) | 2 probes in `docs/`, `scan.py . --fail-on high` | rc=1: `[HIGH] encoded-instruction docs/_scan_probe_nested.txt:1` (+ depth detail), `[LOW] comment-instruction docs/_scan_probe_comment.txt:1` |
+| probe plant (low) | same tree, `--fail-on low` | rc=1, both probes named with their rule ids |
+| probe cleanup | delete 2 probes, `sha256sum -c /tmp/base18.sha256` | rc=0, **242/242 `OK`**, 0 probe paths left, scan rc=0, 233 text files (pre-plant count) |
+| rule drift | `ai-threat-scan/codegraph.py` | declared 32, missing metadata none, declared-but-unused **none**, `verdict: PASS` |
+| structure gate | `check_subagents.py` / `--self-test` | 25 checks 0 failures / 8 defects rejected, both rc=0 |
+| team run | `run_all.py` | 7/7 `rc=0`, first attempt each |
+| workflow | `workflow_yaml_check.sh`, `workflow_lint_check.sh` | 5 parsed / 4 linted, negative controls proven |
+| session/docs | `session_start_check.sh`, `docs_claim_check.sh` | ok / no banned claims |
+| python | `pyflakes`, `bandit`, `py_compile` | rc=0 / rc=0 (0 issues) / rc=0 |
+| CI job | PyYAML parse + order assert | `ai-threat-scan` parses, 10 steps, `--self-test` step 4 **before** tree scan step 5 - no workflow change needed, the new invariants are asserted inside `--self-test` |
+
+**Progress:** done — nested encodings (depth 3) and addressed comment instructions are detected and proven; two design mistakes found and fixed with fixtures; backlog reduced to the rows that genuinely need a decision. Nothing committed, nothing pushed.
+
+**Post-round verification (owner request: fetch + check whether the docs are right):**
+
+- `cloud_git fetch` ran: `main -> FETCH_HEAD`, remote head `4b9e075` (2026-11-09),
+  local `94f8e08` (2026-10-27) - **0 commits ahead locally, 48 behind**, 18 paths
+  uncommitted (rounds 12-18), `.gitignore` untouched. No merge/rebase performed:
+  resolving that divergence needs the owner.
+- Doc audit against the code: `rules_table()` = 32 (31 detection + `waiver-invalid`),
+  every detection rule appears in the `AGENTS.md` matrix, threat model / PROPOSALS /
+  gate row all say 31. Two stale claims found and fixed: `.agents/README.md`
+  ("six-agent team") and `.subagents/README.md` ("27 detection rules"). Both recorded
+  in `.agents/errors.md` and this folder's `ERROR.md`.
+- Re-ran the gate after the doc edits: tree 233 files, 0 high / 0 medium / 21 low /
+  48 waived, rc=0; self-test 31 rules / 10 near misses, rc=0; `check_subagents.py`
+  25 checks 0 failures + 8 defects rejected; `run_all.py` 7/7 rc=0; workflow YAML 5
+  parsed / lint 4, negative controls proven; session/docs checks ok; `pyflakes`,
+  `bandit` (0 issues) and `py_compile` rc=0 after reinstalling the tools into
+  `/tmp/qa` (the sandbox had dropped them; the first run reported rc=1 because the
+  module was missing - that is a reinstalled tool, not a code change).
+
+## Round 2026-11-27 (round 19: remote divergence analysis — how bad is it?)
+
+**Session start (R33):** 2026-11-27 (branch `freebuff/6daeacda62104e261f2b28ce`, 18 paths uncommitted from rounds 12-18). Read: `AGENTS.md`, `.agents/rules.md`, `.agents/user.md`, `.agents/session.md` (round 18), `.agents/errors.md` (top 3). Owner request: analyse what the 48 fetched remote commits changed and how severe the collision with the uncommitted work is. Analysis only - no merge, no checkout (R17/R20).
+
+**Plan (before measuring):** compare `HEAD` with `FETCH_HEAD` per path, classify every dirty path as *colliding* or *free*, and measure the real conflict size with `git merge-file` on temporary copies (the worktree is not touched) instead of guessing from `git status`.
+
+**Observed:**
+
+| Question | Measurement |
+|---|---|
+| Remote head / local head | `4b9e075` (2026-11-09, merge of PR #87) vs `94f8e08` (2026-10-27); **0 ahead, 48 behind** |
+| Commit-level merge | `HEAD` is an ancestor of `FETCH_HEAD`; `git merge-tree` rc=0 - a fast-forward is possible, no commit conflicts |
+| Remote changes in our paths | 12 files under `.agents`/`.github` (2639+/689-); `.subagents/` **0 files**, `.agents/docs/AI-THREAT-MODEL.md` **0**, `tools/bf16.py` **0**, `git grep -i "ai-threat\|subagents"` on `FETCH_HEAD` **empty** |
+| Remote `lint.yml` | 10 jobs, **no `ai-threat-scan`**; its 10 changed lines only add `src/hydra_moe.c` / `tests/test_hydra_moe.c` to gcc/clang/clang-tidy/asan |
+| Our `lint.yml` | 11 jobs (the 10 plus `ai-threat-scan`, 10 steps); 3-way merge conflict count **0** - the job survives |
+| Dirty vs remote-changed | 18 dirty, 57 remote-changed, **10 overlap**; none of the 10 is textually identical to the remote version |
+| Real conflict size (`git merge-file --diff3`, temp copies) | **9 hunks in 6 files**: `AGENTS.md` 3, `.agents/README.md` 2, `.agents/errors.md` 1, `.agents/session.md` 1, `.agents/user.md` 1, `CHANGELOG.md` 1 |
+| Auto-merge, no conflict | `.github/workflows/lint.yml`, `README.md`, `docs/FORMAT-V2.md`, `tools/gguf_reader.py` |
+| Collision-free local work | 8 paths the remote never touched: `.agents/rules.md`, `.agents/skills/session-workflow/SKILL.md`, `.agents/docs/AI-THREAT-MODEL.md`, `.agents/skills/sub-agents/`, `.subagents/` (all), `tools/bf16.py`, `tools/safetensors_to_hydra.py`, `tools/session_start_check.sh` |
+| Semantic risk: `tools/gguf_reader.py` | Remote added Q4_0/Q4_1 block decode; ours extracted the BF16 widening into `tools/bf16.py`. Simulated merge keeps **both**: `T_Q4_0`/`T_Q4_1` present, `_decode_bf16` delegates to `bf16.decode_bf16`; `pyflakes` on the merged file rc=0. The `halves = array('H')` left in the merged file belongs to the **F16** branch, verified by line context |
+| Semantic risk: `lint.yml` | none: our job is appended in a region the remote did not edit |
+
+**Verdict:** the divergence is *recoverable*, not broken. The commits are a clean fast-forward and the 9 conflict hunks sit in prose/log files, where "keep both" is the resolution. The genuinely dangerous part is not the merge: **the whole rounds-12-18 work (7-member team, scanner, R34/R35, CI job) exists only uncommitted in this worktree** - upstream has no `.subagents/`, no threat model and no `ai-threat-scan` job.
+
+**Recommended order (needs the owner's go, R17):** commit the 18 paths on this branch → `git merge FETCH_HEAD` → resolve the 9 hunks (ours appended after theirs, session/errors keep both) → run the full gate on the merged tree → then the green state is real and the merge can land. No `git checkout` anywhere (R20).
+
+**Not done:** no commit, no merge, no push (R17/R19/R20). `.gitignore` untouched.

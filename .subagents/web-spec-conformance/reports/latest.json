@@ -1,0 +1,5414 @@
+{
+  "generated_at": "2026-11-20T21:54:10",
+  "root": "/workspace/chats/6daeacda62104e261f2b28ce",
+  "excluded": [
+    ".git",
+    "node_modules",
+    "__pycache__",
+    ".gradle",
+    ".idea",
+    ".vscode",
+    "build",
+    "dist",
+    "llama.cpp",
+    "android/app/src/main/cpp/llama",
+    ".subagents/*/reports"
+  ],
+  "stats": {
+    "files": 253,
+    "bytes": 3068658,
+    "code": 124,
+    "docs": 81,
+    "edges": 124,
+    "external": 394,
+    "markers": 4,
+    "open_items": 36,
+    "doc_lag": 18
+  },
+  "nodes": [
+    {
+      "path": ".agents/CLAUDE.md",
+      "size": 1150,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 23
+    },
+    {
+      "path": ".agents/Environment.md",
+      "size": 30329,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 505
+    },
+    {
+      "path": ".agents/README.md",
+      "size": 5058,
+      "mtime": "2026-11-20 21:53:51",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 74
+    },
+    {
+      "path": ".agents/docs/AI-THREAT-MODEL.md",
+      "size": 17599,
+      "mtime": "2026-10-30 00:14:58",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 287
+    },
+    {
+      "path": ".agents/docs/ANDROID-AUDIT.md",
+      "size": 27970,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 455
+    },
+    {
+      "path": ".agents/docs/ANDROID_SKILL.md",
+      "size": 12432,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 271
+    },
+    {
+      "path": ".agents/docs/HYDRA2-RESEARCH.md",
+      "size": 22271,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 419
+    },
+    {
+      "path": ".agents/docs/RESEARCH-LOG.md",
+      "size": 23487,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 387
+    },
+    {
+      "path": ".agents/docs/RESEARCH.md",
+      "size": 5514,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 110
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "size": 132904,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 2188
+    },
+    {
+      "path": ".agents/docs/TECHNICAL-AUDIT.md",
+      "size": 14601,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 262
+    },
+    {
+      "path": ".agents/docs/gpu-feasibility.md",
+      "size": 9273,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 195
+    },
+    {
+      "path": ".agents/docs/pr-gpu-feasibility.md",
+      "size": 4585,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 82
+    },
+    {
+      "path": ".agents/errors.md",
+      "size": 163135,
+      "mtime": "2026-10-30 00:15:50",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 2739
+    },
+    {
+      "path": ".agents/rules.md",
+      "size": 13055,
+      "mtime": "2026-10-29 23:18:30",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 223
+    },
+    {
+      "path": ".agents/session.md",
+      "size": 97099,
+      "mtime": "2026-11-20 21:53:13",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 981
+    },
+    {
+      "path": ".agents/skills/android-lint-gate/SKILL.md",
+      "size": 3521,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 63
+    },
+    {
+      "path": ".agents/skills/android-ndk-build/SKILL.md",
+      "size": 5972,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 147
+    },
+    {
+      "path": ".agents/skills/ci-triage/SKILL.md",
+      "size": 4287,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 86
+    },
+    {
+      "path": ".agents/skills/engine-ci-verify/SKILL.md",
+      "size": 7279,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 155
+    },
+    {
+      "path": ".agents/skills/kotlin-stub-check/SKILL.md",
+      "size": 3485,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 80
+    },
+    {
+      "path": ".agents/skills/repo-docs-audit/SKILL.md",
+      "size": 3355,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 79
+    },
+    {
+      "path": ".agents/skills/session-workflow/SKILL.md",
+      "size": 4373,
+      "mtime": "2026-10-29 23:21:43",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 114
+    },
+    {
+      "path": ".agents/skills/sub-agents/SKILL.md",
+      "size": 6820,
+      "mtime": "2026-10-29 23:22:34",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 122
+    },
+    {
+      "path": ".agents/user.md",
+      "size": 11842,
+      "mtime": "2026-10-29 23:24:49",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 193
+    },
+    {
+      "path": ".github/actions/setup-android/action.yml",
+      "size": 4500,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "YAML",
+      "area": ".github",
+      "lines": 98
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "size": 42311,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "YAML",
+      "area": ".github",
+      "lines": 888
+    },
+    {
+      "path": ".github/workflows/lint.yml",
+      "size": 31566,
+      "mtime": "2026-10-29 23:48:01",
+      "kind": "config",
+      "lang": "YAML",
+      "area": ".github",
+      "lines": 693
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "size": 24722,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "YAML",
+      "area": ".github",
+      "lines": 586
+    },
+    {
+      "path": ".github/workflows/vibeworks-check.yml",
+      "size": 10154,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "YAML",
+      "area": ".github",
+      "lines": 205
+    },
+    {
+      "path": ".gitignore",
+      "size": 1890,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "other",
+      "area": "(root)",
+      "lines": 60
+    },
+    {
+      "path": ".gitmodules",
+      "size": 104,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "other",
+      "area": "(root)",
+      "lines": 3
+    },
+    {
+      "path": ".subagents/README.md",
+      "size": 6089,
+      "mtime": "2026-11-20 21:53:54",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 105
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "size": 3777,
+      "mtime": "2026-10-30 00:15:14",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 69
+    },
+    {
+      "path": ".subagents/ai-threat-scan/AGENTS.md",
+      "size": 11899,
+      "mtime": "2026-10-30 00:14:19",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 164
+    },
+    {
+      "path": ".subagents/ai-threat-scan/ERROR.md",
+      "size": 20130,
+      "mtime": "2026-10-30 00:15:50",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 402
+    },
+    {
+      "path": ".subagents/ai-threat-scan/ORIGINAL.md",
+      "size": 3230,
+      "mtime": "2026-10-29 23:18:53",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 57
+    },
+    {
+      "path": ".subagents/ai-threat-scan/PROPOSALS.md",
+      "size": 6052,
+      "mtime": "2026-10-30 00:15:31",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 69
+    },
+    {
+      "path": ".subagents/ai-threat-scan/REQUESTS.md",
+      "size": 5922,
+      "mtime": "2026-10-29 23:49:41",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 112
+    },
+    {
+      "path": ".subagents/ai-threat-scan/SKILL.md",
+      "size": 5545,
+      "mtime": "2026-10-29 23:24:05",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 100
+    },
+    {
+      "path": ".subagents/ai-threat-scan/__pycache__/codegraph.cpython-312.pyc",
+      "size": 11422,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/ai-threat-scan/__pycache__/scan.cpython-312.pyc",
+      "size": 59910,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/ai-threat-scan/codegraph.py",
+      "size": 7529,
+      "mtime": "2026-10-30 00:01:17",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 172
+    },
+    {
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "size": 57785,
+      "mtime": "2026-10-30 00:11:11",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 997
+    },
+    {
+      "path": ".subagents/critic-architecture/AGENTS.md",
+      "size": 2479,
+      "mtime": "2026-10-29 22:57:03",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 58
+    },
+    {
+      "path": ".subagents/critic-architecture/ERROR.md",
+      "size": 1075,
+      "mtime": "2026-10-29 23:21:36",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 26
+    },
+    {
+      "path": ".subagents/critic-architecture/ORIGINAL.md",
+      "size": 1940,
+      "mtime": "2026-10-29 22:57:03",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 46
+    },
+    {
+      "path": ".subagents/critic-architecture/PROPOSALS.md",
+      "size": 2612,
+      "mtime": "2026-10-29 23:07:15",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 42
+    },
+    {
+      "path": ".subagents/critic-architecture/REQUESTS.md",
+      "size": 1078,
+      "mtime": "2026-10-29 23:21:36",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 23
+    },
+    {
+      "path": ".subagents/critic-architecture/SKILL.md",
+      "size": 2443,
+      "mtime": "2026-10-29 23:21:46",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 50
+    },
+    {
+      "path": ".subagents/critic-architecture/__pycache__/codegraph.cpython-312.pyc",
+      "size": 6794,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/critic-architecture/codegraph.py",
+      "size": 4252,
+      "mtime": "2026-10-29 22:57:28",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 112
+    },
+    {
+      "path": ".subagents/critic-evidence/AGENTS.md",
+      "size": 2615,
+      "mtime": "2026-10-29 22:56:23",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 61
+    },
+    {
+      "path": ".subagents/critic-evidence/ERROR.md",
+      "size": 1289,
+      "mtime": "2026-10-29 23:21:36",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 30
+    },
+    {
+      "path": ".subagents/critic-evidence/ORIGINAL.md",
+      "size": 1863,
+      "mtime": "2026-10-29 22:56:23",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 45
+    },
+    {
+      "path": ".subagents/critic-evidence/PROPOSALS.md",
+      "size": 2420,
+      "mtime": "2026-10-29 23:07:15",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 40
+    },
+    {
+      "path": ".subagents/critic-evidence/REQUESTS.md",
+      "size": 1181,
+      "mtime": "2026-10-29 23:21:36",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 27
+    },
+    {
+      "path": ".subagents/critic-evidence/SKILL.md",
+      "size": 2090,
+      "mtime": "2026-10-29 23:21:46",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 49
+    },
+    {
+      "path": ".subagents/critic-evidence/__pycache__/codegraph.cpython-312.pyc",
+      "size": 6738,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/critic-evidence/codegraph.py",
+      "size": 4751,
+      "mtime": "2026-10-29 23:06:49",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 115
+    },
+    {
+      "path": ".subagents/critic-final/AGENTS.md",
+      "size": 2913,
+      "mtime": "2026-10-29 22:57:29",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 74
+    },
+    {
+      "path": ".subagents/critic-final/ERROR.md",
+      "size": 1431,
+      "mtime": "2026-10-29 23:21:36",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 33
+    },
+    {
+      "path": ".subagents/critic-final/ORIGINAL.md",
+      "size": 2787,
+      "mtime": "2026-10-29 22:57:29",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 58
+    },
+    {
+      "path": ".subagents/critic-final/PROPOSALS.md",
+      "size": 1124,
+      "mtime": "2026-10-29 22:59:49",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 32
+    },
+    {
+      "path": ".subagents/critic-final/REQUESTS.md",
+      "size": 1142,
+      "mtime": "2026-10-29 23:21:36",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 25
+    },
+    {
+      "path": ".subagents/critic-final/REVIEW.md",
+      "size": 25920,
+      "mtime": "2026-10-30 00:17:12",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 394
+    },
+    {
+      "path": ".subagents/critic-final/SKILL.md",
+      "size": 2164,
+      "mtime": "2026-10-29 23:21:46",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 48
+    },
+    {
+      "path": ".subagents/critic-final/__pycache__/codegraph.cpython-312.pyc",
+      "size": 8543,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/critic-final/codegraph.py",
+      "size": 6066,
+      "mtime": "2026-10-29 23:23:04",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 143
+    },
+    {
+      "path": ".subagents/tools/__pycache__/check_subagents.cpython-312.pyc",
+      "size": 24994,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/tools/__pycache__/codegraph_core.cpython-312.pyc",
+      "size": 39970,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/tools/__pycache__/run_all.cpython-312.pyc",
+      "size": 7965,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/tools/check_subagents.py",
+      "size": 21504,
+      "mtime": "2026-10-29 23:30:46",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 473
+    },
+    {
+      "path": ".subagents/tools/codegraph_core.py",
+      "size": 24866,
+      "mtime": "2026-10-29 22:58:39",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 614
+    },
+    {
+      "path": ".subagents/tools/run_all.py",
+      "size": 5266,
+      "mtime": "2026-10-29 23:22:22",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 144
+    },
+    {
+      "path": ".subagents/web-source-verifier/AGENTS.md",
+      "size": 2947,
+      "mtime": "2026-10-29 22:54:05",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 66
+    },
+    {
+      "path": ".subagents/web-source-verifier/ERROR.md",
+      "size": 1394,
+      "mtime": "2026-10-29 23:21:24",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 34
+    },
+    {
+      "path": ".subagents/web-source-verifier/ORIGINAL.md",
+      "size": 2038,
+      "mtime": "2026-10-29 22:54:05",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 47
+    },
+    {
+      "path": ".subagents/web-source-verifier/PROPOSALS.md",
+      "size": 2736,
+      "mtime": "2026-10-29 23:07:15",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 46
+    },
+    {
+      "path": ".subagents/web-source-verifier/REQUESTS.md",
+      "size": 963,
+      "mtime": "2026-10-29 23:21:24",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 22
+    },
+    {
+      "path": ".subagents/web-source-verifier/SKILL.md",
+      "size": 2640,
+      "mtime": "2026-10-29 23:21:46",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 59
+    },
+    {
+      "path": ".subagents/web-source-verifier/__pycache__/codegraph.cpython-312.pyc",
+      "size": 9352,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/web-source-verifier/codegraph.py",
+      "size": 6593,
+      "mtime": "2026-10-29 22:54:54",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 147
+    },
+    {
+      "path": ".subagents/web-spec-conformance/AGENTS.md",
+      "size": 2866,
+      "mtime": "2026-10-29 22:55:09",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 65
+    },
+    {
+      "path": ".subagents/web-spec-conformance/ERROR.md",
+      "size": 1097,
+      "mtime": "2026-10-29 23:21:24",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 26
+    },
+    {
+      "path": ".subagents/web-spec-conformance/ORIGINAL.md",
+      "size": 2085,
+      "mtime": "2026-10-29 22:55:09",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 49
+    },
+    {
+      "path": ".subagents/web-spec-conformance/PROPOSALS.md",
+      "size": 2573,
+      "mtime": "2026-10-29 23:07:15",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 43
+    },
+    {
+      "path": ".subagents/web-spec-conformance/REQUESTS.md",
+      "size": 1241,
+      "mtime": "2026-10-29 23:21:24",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 28
+    },
+    {
+      "path": ".subagents/web-spec-conformance/SKILL.md",
+      "size": 2502,
+      "mtime": "2026-10-29 23:21:46",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 53
+    },
+    {
+      "path": ".subagents/web-spec-conformance/__pycache__/codegraph.cpython-312.pyc",
+      "size": 7200,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/web-spec-conformance/codegraph.py",
+      "size": 4631,
+      "mtime": "2026-10-29 23:06:47",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 112
+    },
+    {
+      "path": ".subagents/web-tooling-scout/AGENTS.md",
+      "size": 2684,
+      "mtime": "2026-10-29 22:55:37",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 63
+    },
+    {
+      "path": ".subagents/web-tooling-scout/ERROR.md",
+      "size": 1287,
+      "mtime": "2026-10-29 23:21:24",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 33
+    },
+    {
+      "path": ".subagents/web-tooling-scout/ORIGINAL.md",
+      "size": 2052,
+      "mtime": "2026-10-29 22:55:37",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 48
+    },
+    {
+      "path": ".subagents/web-tooling-scout/PROPOSALS.md",
+      "size": 2623,
+      "mtime": "2026-10-29 23:07:15",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 43
+    },
+    {
+      "path": ".subagents/web-tooling-scout/REQUESTS.md",
+      "size": 1110,
+      "mtime": "2026-10-29 23:21:24",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 27
+    },
+    {
+      "path": ".subagents/web-tooling-scout/SKILL.md",
+      "size": 2296,
+      "mtime": "2026-10-29 23:21:46",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".subagents",
+      "lines": 52
+    },
+    {
+      "path": ".subagents/web-tooling-scout/__pycache__/codegraph.cpython-312.pyc",
+      "size": 7213,
+      "mtime": "2026-10-30 00:16:44",
+      "kind": "other",
+      "lang": "other",
+      "area": ".subagents",
+      "lines": 0
+    },
+    {
+      "path": ".subagents/web-tooling-scout/codegraph.py",
+      "size": 5161,
+      "mtime": "2026-10-29 22:56:22",
+      "kind": "code",
+      "lang": "Python",
+      "area": ".subagents",
+      "lines": 119
+    },
+    {
+      "path": "AGENTS.md",
+      "size": 25788,
+      "mtime": "2026-10-29 23:31:09",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "(root)",
+      "lines": 404
+    },
+    {
+      "path": "CHANGELOG.md",
+      "size": 104696,
+      "mtime": "2026-10-29 23:24:49",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "(root)",
+      "lines": 1722
+    },
+    {
+      "path": "CLAUDE.md",
+      "size": 651,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "(root)",
+      "lines": 15
+    },
+    {
+      "path": "LICENSE",
+      "size": 35149,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "(root)",
+      "lines": 674
+    },
+    {
+      "path": "Makefile",
+      "size": 4512,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "other",
+      "area": "(root)",
+      "lines": 88
+    },
+    {
+      "path": "README.md",
+      "size": 46886,
+      "mtime": "2026-10-29 23:31:09",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "(root)",
+      "lines": 489
+    },
+    {
+      "path": "android/.gitignore",
+      "size": 45,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "other",
+      "area": "android",
+      "lines": 5
+    },
+    {
+      "path": "android/README.md",
+      "size": 11523,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "android",
+      "lines": 224
+    },
+    {
+      "path": "android/app/build.gradle.kts",
+      "size": 6275,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "android",
+      "lines": 0
+    },
+    {
+      "path": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "size": 8448,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 209
+    },
+    {
+      "path": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "size": 13627,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 327
+    },
+    {
+      "path": "android/app/src/main/AndroidManifest.xml",
+      "size": 1693,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 37
+    },
+    {
+      "path": "android/app/src/main/assets/starter.hydra",
+      "size": 280,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "android",
+      "lines": 0
+    },
+    {
+      "path": "android/app/src/main/cpp/CMakeLists.txt",
+      "size": 4999,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "android",
+      "lines": 109
+    },
+    {
+      "path": "android/app/src/main/cpp/hydra_batch.h",
+      "size": 4342,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C header",
+      "area": "android",
+      "lines": 114
+    },
+    {
+      "path": "android/app/src/main/cpp/hydra_jni.c",
+      "size": 30623,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "android",
+      "lines": 734
+    },
+    {
+      "path": "android/app/src/main/cpp/hydra_sample_cfg.h",
+      "size": 3912,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C header",
+      "area": "android",
+      "lines": 81
+    },
+    {
+      "path": "android/app/src/main/cpp/llama_jni.cpp",
+      "size": 37949,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C++",
+      "area": "android",
+      "lines": 823
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/AtomicModelSwap.kt",
+      "size": 6311,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 164
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/CrashActivity.kt",
+      "size": 3278,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 93
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/CrashHandler.kt",
+      "size": 6059,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 163
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/EngineInterface.kt",
+      "size": 10982,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 285
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/HydraBridge.kt",
+      "size": 4315,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 111
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/HydraEngine.kt",
+      "size": 11957,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 277
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/LlamaBridge.kt",
+      "size": 3098,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 84
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/LlamaEngine.kt",
+      "size": 8324,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 223
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "size": 63882,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 1396
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "size": 45109,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 1119
+    },
+    {
+      "path": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "size": 1826,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "android",
+      "lines": 58
+    },
+    {
+      "path": "android/app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "size": 595,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 17
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "size": 480,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 8
+    },
+    {
+      "path": "android/app/src/main/res/mipmap-anydpi/ic_launcher.xml",
+      "size": 786,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 15
+    },
+    {
+      "path": "android/app/src/main/res/values-night/themes.xml",
+      "size": 346,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 8
+    },
+    {
+      "path": "android/app/src/main/res/values/colors.xml",
+      "size": 120,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 4
+    },
+    {
+      "path": "android/app/src/main/res/values/strings.xml",
+      "size": 11051,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 151
+    },
+    {
+      "path": "android/app/src/main/res/values/themes.xml",
+      "size": 560,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 11
+    },
+    {
+      "path": "android/app/src/main/res/xml/backup_rules.xml",
+      "size": 425,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 10
+    },
+    {
+      "path": "android/app/src/main/res/xml/data_extraction_rules.xml",
+      "size": 776,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "XML",
+      "area": "android",
+      "lines": 21
+    },
+    {
+      "path": "android/build.gradle.kts",
+      "size": 492,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "android",
+      "lines": 0
+    },
+    {
+      "path": "android/gradle.properties",
+      "size": 304,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "other",
+      "area": "android",
+      "lines": 6
+    },
+    {
+      "path": "android/local.properties.example",
+      "size": 84,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "android",
+      "lines": 0
+    },
+    {
+      "path": "android/settings.gradle.kts",
+      "size": 264,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "android",
+      "lines": 0
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "size": 26043,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "docs",
+      "lines": 357
+    },
+    {
+      "path": "docs/FORMAT-V2.md",
+      "size": 26605,
+      "mtime": "2026-10-29 23:04:48",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "docs",
+      "lines": 516
+    },
+    {
+      "path": "docs/FORMAT.md",
+      "size": 22495,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "docs",
+      "lines": 402
+    },
+    {
+      "path": "docs/GGUF-IMPORT.md",
+      "size": 28109,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "docs",
+      "lines": 608
+    },
+    {
+      "path": "eslint.config.mjs",
+      "size": 3333,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "JavaScript",
+      "area": "(root)",
+      "lines": 112
+    },
+    {
+      "path": "hydra-run",
+      "size": 76464,
+      "mtime": "2026-10-29 23:05:37",
+      "kind": "other",
+      "lang": "other",
+      "area": "(root)",
+      "lines": 0
+    },
+    {
+      "path": "include/hydra_model.h",
+      "size": 20677,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C header",
+      "area": "include",
+      "lines": 396
+    },
+    {
+      "path": "include/hydra_v2_container.h",
+      "size": 11262,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C header",
+      "area": "include",
+      "lines": 236
+    },
+    {
+      "path": "package-lock.json",
+      "size": 35077,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "JSON",
+      "area": "(root)",
+      "lines": 997
+    },
+    {
+      "path": "package.json",
+      "size": 485,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "JSON",
+      "area": "(root)",
+      "lines": 19
+    },
+    {
+      "path": "public/app.js",
+      "size": 34770,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "JavaScript",
+      "area": "public",
+      "lines": 855
+    },
+    {
+      "path": "public/index.html",
+      "size": 12275,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "asset",
+      "lang": "HTML",
+      "area": "public",
+      "lines": 253
+    },
+    {
+      "path": "public/style.css",
+      "size": 17275,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "asset",
+      "lang": "CSS",
+      "area": "public",
+      "lines": 482
+    },
+    {
+      "path": "server.js",
+      "size": 56919,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "JavaScript",
+      "area": "(root)",
+      "lines": 1408
+    },
+    {
+      "path": "src/hydra_engine.c",
+      "size": 75853,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "src",
+      "lines": 1732
+    },
+    {
+      "path": "src/hydra_neon.h",
+      "size": 16979,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C header",
+      "area": "src",
+      "lines": 343
+    },
+    {
+      "path": "src/hydra_simd.h",
+      "size": 14543,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C header",
+      "area": "src",
+      "lines": 287
+    },
+    {
+      "path": "src/hydra_v2_container.c",
+      "size": 52003,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "src",
+      "lines": 1200
+    },
+    {
+      "path": "src/main.c",
+      "size": 29786,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "src",
+      "lines": 677
+    },
+    {
+      "path": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "size": 2618,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tests",
+      "lines": 75
+    },
+    {
+      "path": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "size": 1926,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tests",
+      "lines": 64
+    },
+    {
+      "path": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "size": 2387,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tests",
+      "lines": 67
+    },
+    {
+      "path": "tests/fixtures/compose/scroll_ok.kt",
+      "size": 3316,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tests",
+      "lines": 96
+    },
+    {
+      "path": "tests/test_engine.c",
+      "size": 166065,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "tests",
+      "lines": 3966
+    },
+    {
+      "path": "tests/test_hydra2_container.c",
+      "size": 43279,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "tests",
+      "lines": 1017
+    },
+    {
+      "path": "tests/test_jni_batch.c",
+      "size": 14274,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "tests",
+      "lines": 376
+    },
+    {
+      "path": "tests/test_large_model.c",
+      "size": 12048,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "tests",
+      "lines": 338
+    },
+    {
+      "path": "tools/__pycache__/bf16.cpython-312.pyc",
+      "size": 3012,
+      "mtime": "2026-10-29 23:48:58",
+      "kind": "other",
+      "lang": "other",
+      "area": "tools",
+      "lines": 0
+    },
+    {
+      "path": "tools/android_autostart_check.sh",
+      "size": 12044,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 232
+    },
+    {
+      "path": "tools/android_autostart_negative_test.sh",
+      "size": 6754,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 152
+    },
+    {
+      "path": "tools/android_crash_check.sh",
+      "size": 5750,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 147
+    },
+    {
+      "path": "tools/android_header_check.sh",
+      "size": 5710,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 137
+    },
+    {
+      "path": "tools/apple_portability_check.sh",
+      "size": 4570,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 94
+    },
+    {
+      "path": "tools/bf16.py",
+      "size": 2296,
+      "mtime": "2026-10-29 23:05:18",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 59
+    },
+    {
+      "path": "tools/ci_release_version_test.sh",
+      "size": 4741,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 111
+    },
+    {
+      "path": "tools/ci_syntax_mirror_test.sh",
+      "size": 2862,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 66
+    },
+    {
+      "path": "tools/compose_scroll_check.sh",
+      "size": 5462,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 138
+    },
+    {
+      "path": "tools/compose_scroll_guard.py",
+      "size": 15811,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 408
+    },
+    {
+      "path": "tools/console_train_test.js",
+      "size": 4840,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "JavaScript",
+      "area": "tools",
+      "lines": 133
+    },
+    {
+      "path": "tools/contrast_check.js",
+      "size": 4352,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "JavaScript",
+      "area": "tools",
+      "lines": 122
+    },
+    {
+      "path": "tools/docs_claim_check.sh",
+      "size": 6124,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 129
+    },
+    {
+      "path": "tools/fetch_test_model.sh",
+      "size": 3871,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 95
+    },
+    {
+      "path": "tools/fixtures/workflow_lint_bad.yml",
+      "size": 717,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "YAML",
+      "area": "tools",
+      "lines": 19
+    },
+    {
+      "path": "tools/fixtures/workflow_yaml_bad.yml",
+      "size": 780,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "config",
+      "lang": "YAML",
+      "area": "tools",
+      "lines": 24
+    },
+    {
+      "path": "tools/gguf_fixture.js",
+      "size": 10330,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "JavaScript",
+      "area": "tools",
+      "lines": 276
+    },
+    {
+      "path": "tools/gguf_inspect.py",
+      "size": 5216,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 130
+    },
+    {
+      "path": "tools/gguf_minimal_llama.py",
+      "size": 11675,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 266
+    },
+    {
+      "path": "tools/gguf_reader.py",
+      "size": 22072,
+      "mtime": "2026-10-29 23:05:30",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 591
+    },
+    {
+      "path": "tools/gguf_speed.py",
+      "size": 4611,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 128
+    },
+    {
+      "path": "tools/gguf_test.py",
+      "size": 62382,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 1430
+    },
+    {
+      "path": "tools/gguf_to_hydra.py",
+      "size": 34332,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 846
+    },
+    {
+      "path": "tools/gpu_bench/README.md",
+      "size": 3758,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "tools",
+      "lines": 83
+    },
+    {
+      "path": "tools/gpu_bench/gpu_bench.c",
+      "size": 15111,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "C",
+      "area": "tools",
+      "lines": 383
+    },
+    {
+      "path": "tools/gpu_bench/ternary.comp",
+      "size": 1662,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "tools",
+      "lines": 0
+    },
+    {
+      "path": "tools/hydra_train.js",
+      "size": 14295,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "JavaScript",
+      "area": "tools",
+      "lines": 407
+    },
+    {
+      "path": "tools/jni_signature_check.sh",
+      "size": 10887,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 254
+    },
+    {
+      "path": "tools/jni_signature_negative_test.sh",
+      "size": 3909,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 96
+    },
+    {
+      "path": "tools/kotlin_stub_check/README.md",
+      "size": 2744,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "tools",
+      "lines": 66
+    },
+    {
+      "path": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "size": 1765,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 39
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_android.kt",
+      "size": 527,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 13
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_content.kt",
+      "size": 4043,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 78
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_database.kt",
+      "size": 272,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 9
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_graphics.kt",
+      "size": 343,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 10
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_inputmethod.kt",
+      "size": 231,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 5
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_misc.kt",
+      "size": 126,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 5
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_net.kt",
+      "size": 248,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 7
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_os.kt",
+      "size": 735,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 22
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_pm.kt",
+      "size": 137,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 5
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_util.kt",
+      "size": 402,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 9
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_view.kt",
+      "size": 705,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 20
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_viewgroup.kt",
+      "size": 245,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 9
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/A_widget.kt",
+      "size": 1912,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 40
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_fontstyle.kt",
+      "size": 78,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 2
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_foundation.kt",
+      "size": 134,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 4
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_foundation_layout.kt",
+      "size": 3316,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 90
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_graphics.kt",
+      "size": 293,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 9
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_graphics2.kt",
+      "size": 67,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 2
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_icons.kt",
+      "size": 497,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 16
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_icons_auto.kt",
+      "size": 195,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 4
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_icons_filled.kt",
+      "size": 186,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 4
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_lazy.kt",
+      "size": 1692,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 44
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_m3.kt",
+      "size": 6273,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 189
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_platform.kt",
+      "size": 264,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 5
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_res.kt",
+      "size": 205,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 6
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_runtime.kt",
+      "size": 1098,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 33
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_scroll.kt",
+      "size": 383,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 8
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_text2.kt",
+      "size": 289,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 10
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_textstyle.kt",
+      "size": 49,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 2
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_textunit.kt",
+      "size": 143,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 4
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_ui2.kt",
+      "size": 771,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 23
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/C_unit.kt",
+      "size": 346,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 10
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/OrgJson.kt",
+      "size": 339,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 7
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/R_gen.kt",
+      "size": 4991,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 121
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/X_activity.kt",
+      "size": 402,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 9
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/X_activity_compose.kt",
+      "size": 189,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 4
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/X_annotation.kt",
+      "size": 466,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 9
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/X_coroutines.kt",
+      "size": 326,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 11
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/X_result.kt",
+      "size": 97,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 4
+    },
+    {
+      "path": "tools/kotlin_stub_check/stubs/X_resultcontract.kt",
+      "size": 203,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Kotlin",
+      "area": "tools",
+      "lines": 5
+    },
+    {
+      "path": "tools/llama_pin_check.sh",
+      "size": 3354,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 85
+    },
+    {
+      "path": "tools/llama_pin_negative_test.sh",
+      "size": 8888,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 203
+    },
+    {
+      "path": "tools/make_model.py",
+      "size": 13390,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 329
+    },
+    {
+      "path": "tools/safetensors_to_hydra.py",
+      "size": 29743,
+      "mtime": "2026-10-29 23:05:32",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 756
+    },
+    {
+      "path": "tools/sampler_contract_check.sh",
+      "size": 7615,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 148
+    },
+    {
+      "path": "tools/server_test.js",
+      "size": 56678,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "JavaScript",
+      "area": "tools",
+      "lines": 1337
+    },
+    {
+      "path": "tools/session_start_check.sh",
+      "size": 3147,
+      "mtime": "2026-10-29 23:33:29",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 80
+    },
+    {
+      "path": "tools/string_format_check.py",
+      "size": 10060,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 270
+    },
+    {
+      "path": "tools/string_format_negative_test.sh",
+      "size": 8744,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 207
+    },
+    {
+      "path": "tools/test_count_baseline.txt",
+      "size": 7239,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "other",
+      "lang": "other",
+      "area": "tools",
+      "lines": 126
+    },
+    {
+      "path": "tools/test_count_check.sh",
+      "size": 4523,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 103
+    },
+    {
+      "path": "tools/workflow_lint_check.sh",
+      "size": 4545,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 123
+    },
+    {
+      "path": "tools/workflow_yaml_check.sh",
+      "size": 7889,
+      "mtime": "2026-10-29 22:48:02",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 192
+    }
+  ],
+  "edges": [
+    {
+      "from": ".agents/Environment.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/Environment.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/Environment.md",
+      "to": "tools/workflow_lint_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/Environment.md",
+      "to": "tools/workflow_yaml_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/ANDROID-AUDIT.md",
+      "to": "tools/android_header_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/ANDROID-AUDIT.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/ANDROID-AUDIT.md",
+      "to": "tools/jni_signature_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/ANDROID-AUDIT.md",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/RESEARCH-LOG.md",
+      "to": "tools/compose_scroll_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/errors.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/errors.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/errors.md",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/session.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/session.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/session.md",
+      "to": "tools/workflow_lint_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/session.md",
+      "to": "tools/workflow_yaml_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/android-lint-gate/SKILL.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/ci-triage/SKILL.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/ci-triage/SKILL.md",
+      "to": "tools/workflow_lint_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/ci-triage/SKILL.md",
+      "to": "tools/workflow_yaml_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/kotlin-stub-check/SKILL.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/repo-docs-audit/SKILL.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/repo-docs-audit/SKILL.md",
+      "to": "tools/workflow_lint_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/repo-docs-audit/SKILL.md",
+      "to": "tools/workflow_yaml_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/android_autostart_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/android_autostart_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/android_crash_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/android_header_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/apple_portability_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/ci_syntax_mirror_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/compose_scroll_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/jni_signature_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/jni_signature_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/jni_signature_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/llama_pin_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/llama_pin_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/sampler_contract_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/string_format_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/workflow_lint_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/workflow_yaml_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/lint.yml",
+      "to": "tools/ci_release_version_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/lint.yml",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/TODO.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/TODO.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/AGENTS.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/AGENTS.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/ERROR.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/PROPOSALS.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/PROPOSALS.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/REVIEW.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/REVIEW.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/SKILL.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/critic-final/SKILL.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/web-tooling-scout/PROPOSALS.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".subagents/web-tooling-scout/PROPOSALS.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/android_autostart_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/android_autostart_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/android_crash_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/android_header_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/ci_release_version_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/ci_syntax_mirror_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/ci_syntax_mirror_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/compose_scroll_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/jni_signature_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/jni_signature_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/llama_pin_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/llama_pin_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/sampler_contract_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/string_format_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "tools/workflow_yaml_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "CHANGELOG.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "android/README.md",
+      "to": "tools/android_crash_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "android/app/src/main/cpp/hydra_jni.c",
+      "to": "android/app/src/main/cpp/hydra_batch.h",
+      "how": "include"
+    },
+    {
+      "from": "android/app/src/main/cpp/hydra_jni.c",
+      "to": "android/app/src/main/cpp/hydra_sample_cfg.h",
+      "how": "include"
+    },
+    {
+      "from": "android/app/src/main/cpp/hydra_jni.c",
+      "to": "include/hydra_model.h",
+      "how": "include"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "to": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "how": "kotlin"
+    },
+    {
+      "from": "src/hydra_engine.c",
+      "to": "include/hydra_model.h",
+      "how": "include"
+    },
+    {
+      "from": "src/hydra_engine.c",
+      "to": "src/hydra_neon.h",
+      "how": "include"
+    },
+    {
+      "from": "src/hydra_engine.c",
+      "to": "src/hydra_simd.h",
+      "how": "include"
+    },
+    {
+      "from": "src/hydra_v2_container.c",
+      "to": "include/hydra_v2_container.h",
+      "how": "include"
+    },
+    {
+      "from": "src/main.c",
+      "to": "include/hydra_model.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_engine.c",
+      "to": "include/hydra_model.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_hydra2_container.c",
+      "to": "include/hydra_model.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_hydra2_container.c",
+      "to": "include/hydra_v2_container.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_large_model.c",
+      "to": "include/hydra_model.h",
+      "how": "include"
+    },
+    {
+      "from": "tools/android_autostart_negative_test.sh",
+      "to": "tools/android_autostart_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/android_autostart_negative_test.sh",
+      "to": "tools/android_autostart_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/android_crash_check.sh",
+      "to": "tools/android_crash_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/android_header_check.sh",
+      "to": "tools/android_header_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/ci_release_version_test.sh",
+      "to": "tools/ci_release_version_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/compose_scroll_check.sh",
+      "to": "tools/compose_scroll_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/fetch_test_model.sh",
+      "to": "tools/fetch_test_model.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/gguf_inspect.py",
+      "to": "tools/gguf_reader.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_minimal_llama.py",
+      "to": "tools/gguf_reader.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_reader.py",
+      "to": "tools/bf16.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_speed.py",
+      "to": "tools/gguf_reader.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_speed.py",
+      "to": "tools/gguf_to_hydra.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "to": "tools/gguf_minimal_llama.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "to": "tools/gguf_reader.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "to": "tools/gguf_to_hydra.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "to": "tools/safetensors_to_hydra.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "to": "tools/gguf_reader.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/jni_signature_check.sh",
+      "to": "tools/jni_signature_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/jni_signature_check.sh",
+      "to": "tools/jni_signature_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/jni_signature_check.sh",
+      "to": "tools/jni_signature_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/jni_signature_negative_test.sh",
+      "to": "tools/jni_signature_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/kotlin_stub_check/README.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/llama_pin_check.sh",
+      "to": "tools/llama_pin_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/llama_pin_negative_test.sh",
+      "to": "tools/llama_pin_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/llama_pin_negative_test.sh",
+      "to": "tools/llama_pin_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/llama_pin_negative_test.sh",
+      "to": "tools/llama_pin_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/safetensors_to_hydra.py",
+      "to": "tools/bf16.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/sampler_contract_check.sh",
+      "to": "tools/sampler_contract_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/string_format_negative_test.sh",
+      "to": "tools/string_format_negative_test.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/test_count_check.sh",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": "tools/test_count_check.sh",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    }
+  ],
+  "external": [
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "codegraph_core",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "contextlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "datetime",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "importlib.util",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "io",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/codegraph.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "base64",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "codecs",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "datetime",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "fnmatch",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "tempfile",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "unicodedata",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/ai-threat-scan/scan.py",
+      "name": "urllib.parse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-architecture/codegraph.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-architecture/codegraph.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-architecture/codegraph.py",
+      "name": "codegraph_core",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-architecture/codegraph.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-architecture/codegraph.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-architecture/codegraph.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-evidence/codegraph.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-evidence/codegraph.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-evidence/codegraph.py",
+      "name": "codegraph_core",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-evidence/codegraph.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-evidence/codegraph.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-final/codegraph.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-final/codegraph.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-final/codegraph.py",
+      "name": "codegraph_core",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-final/codegraph.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-final/codegraph.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/critic-final/codegraph.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "shutil",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "tempfile",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/check_subagents.py",
+      "name": "yaml",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "dataclasses",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "datetime",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "fnmatch",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/codegraph_core.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/run_all.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/run_all.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/run_all.py",
+      "name": "contextlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/run_all.py",
+      "name": "importlib.util",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/run_all.py",
+      "name": "io",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/run_all.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/tools/run_all.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-source-verifier/codegraph.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-source-verifier/codegraph.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-source-verifier/codegraph.py",
+      "name": "codegraph_core",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-source-verifier/codegraph.py",
+      "name": "collections",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-source-verifier/codegraph.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-source-verifier/codegraph.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-source-verifier/codegraph.py",
+      "name": "urllib.parse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-spec-conformance/codegraph.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-spec-conformance/codegraph.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-spec-conformance/codegraph.py",
+      "name": "codegraph_core",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-spec-conformance/codegraph.py",
+      "name": "collections",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-spec-conformance/codegraph.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-spec-conformance/codegraph.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-spec-conformance/codegraph.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-tooling-scout/codegraph.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-tooling-scout/codegraph.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-tooling-scout/codegraph.py",
+      "name": "codegraph_core",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-tooling-scout/codegraph.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-tooling-scout/codegraph.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": ".subagents/web-tooling-scout/codegraph.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "androidx.test.ext.junit.runners.AndroidJUnit4",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "androidx.test.platform.app.InstrumentationRegistry",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "org.junit.Assert.assertEquals",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "org.junit.Assert.assertFalse",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "org.junit.Assert.assertNotNull",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "org.junit.Assert.assertNull",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "org.junit.Assert.assertTrue",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "org.junit.Before",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "org.junit.Test",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt",
+      "name": "org.junit.runner.RunWith",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "android.util.Log",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "androidx.test.ext.junit.runners.AndroidJUnit4",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "androidx.test.platform.app.InstrumentationRegistry",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.json.JSONObject",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.After",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.Assert.assertEquals",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.Assert.assertFalse",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.Assert.assertNotNull",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.Assert.assertTrue",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.Assume.assumeTrue",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.Before",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.Test",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt",
+      "name": "org.junit.runner.RunWith",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/cpp/llama_jni.cpp",
+      "name": "llama.h",
+      "how": "include"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashActivity.kt",
+      "name": "android.app.Activity",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashActivity.kt",
+      "name": "android.os.Bundle",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashActivity.kt",
+      "name": "android.view.Gravity",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashActivity.kt",
+      "name": "android.widget.Button",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashActivity.kt",
+      "name": "android.widget.LinearLayout",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashActivity.kt",
+      "name": "android.widget.ScrollView",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashActivity.kt",
+      "name": "android.widget.TextView",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashHandler.kt",
+      "name": "android.content.ClipData",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashHandler.kt",
+      "name": "android.content.ClipboardManager",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashHandler.kt",
+      "name": "android.content.Context",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashHandler.kt",
+      "name": "android.os.Build",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/CrashHandler.kt",
+      "name": "android.util.Log",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/EngineInterface.kt",
+      "name": "kotlinx.coroutines.flow.MutableStateFlow",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/EngineInterface.kt",
+      "name": "kotlinx.coroutines.flow.StateFlow",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/EngineInterface.kt",
+      "name": "kotlinx.coroutines.flow.asStateFlow",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/HydraEngine.kt",
+      "name": "android.util.Log",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/HydraEngine.kt",
+      "name": "org.json.JSONObject",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/LlamaEngine.kt",
+      "name": "android.util.Log",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/LlamaEngine.kt",
+      "name": "org.json.JSONObject",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "android.content.Context",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "android.net.Uri",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "android.os.Build",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "android.os.Bundle",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "android.os.SystemClock",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "android.provider.OpenableColumns",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "android.view.inputmethod.InputMethodManager",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "androidx.activity.ComponentActivity",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "androidx.activity.compose.setContent",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "androidx.activity.enableEdgeToEdge",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "androidx.activity.result.contract.ActivityResultContracts",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "androidx.compose.runtime.LaunchedEffect",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "androidx.compose.runtime.collectAsState",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "androidx.compose.runtime.getValue",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "dev.hydrastone.ui.MainActions",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "dev.hydrastone.ui.MainUiState",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "dev.hydrastone.ui.RunStats",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "dev.hydrastone.ui.Tab",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "dev.hydrastone.ui.theme.HydraTheme",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "kotlinx.coroutines.flow.MutableStateFlow",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "kotlinx.coroutines.flow.StateFlow",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "kotlinx.coroutines.flow.asStateFlow",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/MainActivity.kt",
+      "name": "kotlinx.coroutines.flow.update",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.annotation.StringRes",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.Arrangement",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.Box",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.BoxWithConstraints",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.Column",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.PaddingValues",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.Row",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.Spacer",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.fillMaxSize",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.fillMaxWidth",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.height",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.heightIn",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.imePadding",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.navigationBarsPadding",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.padding",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.layout.widthIn",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.lazy.LazyColumn",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.lazy.items",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.lazy.rememberLazyListState",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.rememberScrollState",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.foundation.verticalScroll",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material.icons.Icons",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material.icons.automirrored.filled.List",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material.icons.automirrored.filled.Send",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material.icons.filled.Settings",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material.icons.filled.Star",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.AssistChip",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.Button",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.Card",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.CardDefaults",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.CircularProgressIndicator",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.ExperimentalMaterial3Api",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.FilledTonalButton",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.FilterChip",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.HorizontalDivider",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.Icon",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.MaterialTheme",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.NavigationBar",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.NavigationBarItem",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.OutlinedTextField",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.Scaffold",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.Slider",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.Switch",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.Text",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.TextButton",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.material3.TopAppBar",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.runtime.LaunchedEffect",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.runtime.getValue",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.runtime.mutableFloatStateOf",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.runtime.mutableStateOf",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.runtime.remember",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.runtime.setValue",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.Alignment",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.Modifier",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.graphics.vector.ImageVector",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.platform.LocalContext",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.res.stringResource",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.text.font.FontFamily",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.text.font.FontWeight",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.unit.Dp",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "androidx.compose.ui.unit.dp",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "dev.hydrastone.ChatMessage",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "dev.hydrastone.ChatState",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "dev.hydrastone.GenerationSettings",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "dev.hydrastone.R",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/HydraApp.kt",
+      "name": "dev.hydrastone.Role",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "android.os.Build",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.foundation.isSystemInDarkTheme",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.material3.MaterialTheme",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.material3.darkColorScheme",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.material3.dynamicDarkColorScheme",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.material3.dynamicLightColorScheme",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.material3.lightColorScheme",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.ui.graphics.Color",
+      "how": "kotlin"
+    },
+    {
+      "from": "android/app/src/main/java/dev/hydrastone/ui/theme/Theme.kt",
+      "name": "androidx.compose.ui.platform.LocalContext",
+      "how": "kotlin"
+    },
+    {
+      "from": "eslint.config.mjs",
+      "name": "@eslint/js",
+      "how": "js"
+    },
+    {
+      "from": "server.js",
+      "name": "./tools/hydra_train",
+      "how": "js"
+    },
+    {
+      "from": "server.js",
+      "name": "child_process",
+      "how": "js"
+    },
+    {
+      "from": "server.js",
+      "name": "fs",
+      "how": "js"
+    },
+    {
+      "from": "server.js",
+      "name": "http",
+      "how": "js"
+    },
+    {
+      "from": "server.js",
+      "name": "node:crypto",
+      "how": "js"
+    },
+    {
+      "from": "server.js",
+      "name": "not\n       * allowed",
+      "how": "js"
+    },
+    {
+      "from": "server.js",
+      "name": "path",
+      "how": "js"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.foundation.layout.Column",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.foundation.layout.Row",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.foundation.layout.fillMaxSize",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.foundation.layout.heightIn",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.foundation.layout.weight",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.foundation.lazy.LazyColumn",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.foundation.rememberScrollState",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.foundation.verticalScroll",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.material3.Text",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.ui.Modifier",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_bad.kt",
+      "name": "androidx.compose.ui.unit.dp",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.foundation.layout.Column",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.foundation.layout.Row",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.foundation.layout.fillMaxSize",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.foundation.layout.heightIn",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.foundation.layout.weight",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.foundation.lazy.LazyColumn",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.foundation.rememberScrollState",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.foundation.verticalScroll",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.material3.Text",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.ui.Modifier",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_lambda_ok.kt",
+      "name": "androidx.compose.ui.unit.dp",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.foundation.horizontalScroll",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.foundation.layout.Box",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.foundation.layout.Column",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.foundation.layout.Row",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.foundation.lazy.LazyColumn",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.foundation.lazy.LazyRow",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.foundation.rememberScrollState",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.foundation.verticalScroll",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_nested_bad.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.horizontalScroll",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.layout.Box",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.layout.Column",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.layout.Row",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.layout.fillMaxSize",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.layout.weight",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.lazy.LazyColumn",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.lazy.LazyRow",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.rememberScrollState",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.foundation.verticalScroll",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/fixtures/compose/scroll_ok.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tests/test_engine.c",
+      "name": "../android/app/src/main/cpp/hydra_batch.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_engine.c",
+      "name": "../src/hydra_neon.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_engine.c",
+      "name": "../src/hydra_simd.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_jni_batch.c",
+      "name": "../android/app/src/main/cpp/hydra_batch.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_jni_batch.c",
+      "name": "../android/app/src/main/cpp/hydra_sample_cfg.h",
+      "how": "include"
+    },
+    {
+      "from": "tools/bf16.py",
+      "name": "array",
+      "how": "python"
+    },
+    {
+      "from": "tools/bf16.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/compose_scroll_guard.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": "tools/compose_scroll_guard.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/console_train_test.js",
+      "name": "./hydra_train",
+      "how": "js"
+    },
+    {
+      "from": "tools/console_train_test.js",
+      "name": "child_process",
+      "how": "js"
+    },
+    {
+      "from": "tools/console_train_test.js",
+      "name": "fs",
+      "how": "js"
+    },
+    {
+      "from": "tools/console_train_test.js",
+      "name": "os",
+      "how": "js"
+    },
+    {
+      "from": "tools/console_train_test.js",
+      "name": "path",
+      "how": "js"
+    },
+    {
+      "from": "tools/contrast_check.js",
+      "name": "node:fs",
+      "how": "js"
+    },
+    {
+      "from": "tools/contrast_check.js",
+      "name": "node:path",
+      "how": "js"
+    },
+    {
+      "from": "tools/gguf_fixture.js",
+      "name": "fs",
+      "how": "js"
+    },
+    {
+      "from": "tools/gguf_fixture.js",
+      "name": "path",
+      "how": "js"
+    },
+    {
+      "from": "tools/gguf_inspect.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_inspect.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_inspect.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_inspect.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_minimal_llama.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_minimal_llama.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_minimal_llama.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_minimal_llama.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_reader.py",
+      "name": "array",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_reader.py",
+      "name": "itertools",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_reader.py",
+      "name": "mmap",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_reader.py",
+      "name": "operator",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_reader.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_reader.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_reader.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_speed.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_speed.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_speed.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_speed.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_speed.py",
+      "name": "time",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "contextlib",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "io",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "math",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "shutil",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "subprocess",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_test.py",
+      "name": "tempfile",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "name": "itertools",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "name": "math",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "name": "operator",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/hydra_train.js",
+      "name": "fs",
+      "how": "js"
+    },
+    {
+      "from": "tools/hydra_train.js",
+      "name": "path",
+      "how": "js"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/A_android.kt",
+      "name": "android.content.Context",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_foundation.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_foundation_layout.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_foundation_layout.kt",
+      "name": "androidx.compose.ui.Alignment",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_foundation_layout.kt",
+      "name": "androidx.compose.ui.Modifier",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_foundation_layout.kt",
+      "name": "androidx.compose.ui.unit.Dp",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_icons.kt",
+      "name": "androidx.compose.ui.graphics.vector.ImageVector",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_icons_auto.kt",
+      "name": "androidx.compose.ui.graphics.vector.ImageVector",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_icons_filled.kt",
+      "name": "androidx.compose.ui.graphics.vector.ImageVector",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_lazy.kt",
+      "name": "androidx.compose.foundation.layout.Arrangement",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_lazy.kt",
+      "name": "androidx.compose.foundation.layout.PaddingValues",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_lazy.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_lazy.kt",
+      "name": "androidx.compose.ui.Modifier",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_m3.kt",
+      "name": "android.content.Context",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_m3.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_m3.kt",
+      "name": "androidx.compose.ui.Modifier",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_m3.kt",
+      "name": "androidx.compose.ui.graphics.Color",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_m3.kt",
+      "name": "androidx.compose.ui.graphics.vector.ImageVector",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_m3.kt",
+      "name": "androidx.compose.ui.text.TextStyle",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_m3.kt",
+      "name": "androidx.compose.ui.unit.Dp",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_res.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_runtime.kt",
+      "name": "kotlin.reflect.KProperty",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_runtime.kt",
+      "name": "kotlinx.coroutines.flow.StateFlow",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_scroll.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/C_scroll.kt",
+      "name": "androidx.compose.ui.Modifier",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/X_activity.kt",
+      "name": "android.app.Activity",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/X_activity_compose.kt",
+      "name": "androidx.activity.ComponentActivity",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/kotlin_stub_check/stubs/X_activity_compose.kt",
+      "name": "androidx.compose.runtime.Composable",
+      "how": "kotlin"
+    },
+    {
+      "from": "tools/make_model.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": "tools/make_model.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/make_model.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/make_model.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/make_model.py",
+      "name": "zlib",
+      "how": "python"
+    },
+    {
+      "from": "tools/safetensors_to_hydra.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": "tools/safetensors_to_hydra.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": "tools/safetensors_to_hydra.py",
+      "name": "math",
+      "how": "python"
+    },
+    {
+      "from": "tools/safetensors_to_hydra.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/safetensors_to_hydra.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/safetensors_to_hydra.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "./gguf_fixture",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:assert",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:child_process",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:fs",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:http",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:os",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:path",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:stream",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:test",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:vm",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "\u2581c",
+      "how": "js"
+    },
+    {
+      "from": "tools/string_format_check.py",
+      "name": "__future__",
+      "how": "python"
+    },
+    {
+      "from": "tools/string_format_check.py",
+      "name": "pathlib",
+      "how": "python"
+    },
+    {
+      "from": "tools/string_format_check.py",
+      "name": "re",
+      "how": "python"
+    },
+    {
+      "from": "tools/string_format_check.py",
+      "name": "sys",
+      "how": "python"
+    }
+  ],
+  "markers": [
+    {
+      "path": ".github/workflows/vibeworks-check.yml",
+      "line": 3,
+      "kind": "TODO",
+      "text": "# Hadolint, actionlint und fallow (JS/TS) sowie offene Stellen (TODO/FIXME)."
+    },
+    {
+      "path": ".github/workflows/vibeworks-check.yml",
+      "line": 53,
+      "kind": "TODO",
+      "text": "- name: Offene Stellen (TODO/FIXME)"
+    },
+    {
+      "path": ".github/workflows/vibeworks-check.yml",
+      "line": 55,
+      "kind": "TODO",
+      "text": "# Only comments (// # /* * -- <!--) \u2014 not every word \"TODO\" in the code"
+    },
+    {
+      "path": ".github/workflows/vibeworks-check.yml",
+      "line": 57,
+      "kind": "TODO",
+      "text": "git grep -n -I -E '(//|#|/\\*|\\*|--|<!--)[[:space:]]*(TODO|FIXME|HACK|XXX)\\b' -- ':!*.lock' ':!package-lock.json' ':!.github/workflows/vibeworks-check.yml' > .vw"
+    }
+  ],
+  "open_items": [
+    {
+      "path": "README.md",
+      "line": 482,
+      "text": "MoE inference on the `.hydra2` container \u2014 the expert cache + slot leasing (spec \u00a76.2), the reading strategy (spec \u00a76.4) and the first measured `B_eff`/throughput numbers (spec \u00a76 is currently a worke"
+    },
+    {
+      "path": ".agents/session.md",
+      "line": 372,
+      "text": "All-.md audit (28 files listed in Workspace): stale paths, dead refs (deleted code-scanning workflow, old PR states), banned claims, R31 language."
+    },
+    {
+      "path": ".agents/session.md",
+      "line": 373,
+      "text": "errors.md entry (skipped-reads \u2192 R33 + this round's findings); user.md entry for the 4 directives."
+    },
+    {
+      "path": ".agents/session.md",
+      "line": 374,
+      "text": "Close PR #62 (superseded by merged #64; #62 CI red = the stage-2 error #64 fixed)."
+    },
+    {
+      "path": ".agents/session.md",
+      "line": 375,
+      "text": "Gates green (incl. new 1j), commit, push, PR (facts-only; owner merges)."
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 303,
+      "text": "**V Verification.** make clean && make && make test; all"
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 1531,
+      "text": "PR + merge \u2014 **user approval needed** (R14)"
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 1565,
+      "text": "PR + merge \u2014 **user approval needed** (R14). After the merge the"
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 1627,
+      "text": "PR + merge \u2014 **user approval needed** (R14)."
+    },
+    {
+      "path": ".agents/skills/session-workflow/SKILL.md",
+      "line": 89,
+      "text": "step 1"
+    },
+    {
+      "path": ".agents/skills/session-workflow/SKILL.md",
+      "line": 90,
+      "text": "step 2"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 9,
+      "text": "the member's folder exists with `ORIGINAL.md`, `AGENTS.md`, `SKILL.md`,"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 11,
+      "text": "`ORIGINAL.md` quotes the owner assignment verbatim and states the"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 13,
+      "text": "`ORIGINAL.md` records the creation date and the repository state it was"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 18,
+      "text": "`python3 .subagents/tools/run_all.py` exits 0 (all seven, no retries needed)"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 19,
+      "text": "`reports/latest.txt` and `reports/latest.json` exist for every member"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 20,
+      "text": "`PROPOSALS.md` of every member was written from that report, not from memory"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 21,
+      "text": "every proposal row carries a `file:line`, a command output or a URL"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 22,
+      "text": "no member modified anything outside its own folder"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 23,
+      "text": "`python3 .subagents/tools/check_subagents.py` is green"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 24,
+      "text": "`python3 .subagents/tools/check_subagents.py --self-test` proves the gate"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 26,
+      "text": "`python3 .subagents/ai-threat-scan/scan.py --self-test` proves every detection rule"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 30,
+      "text": "`python3 .subagents/ai-threat-scan/scan.py . --fail-on high` is green, or"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 36,
+      "text": "`critic-final/REVIEW.md` exists with a score and a per-criterion verdict"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 37,
+      "text": "score >= 7/10; below that, the fix list is applied and the critic re-run"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 38,
+      "text": "`.agents/session.md` plan updated (the todo list, step by step)"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 39,
+      "text": "`.agents/errors.md` has an entry for every error hit during the run"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 40,
+      "text": "`.agents/user.md` updated if the owner stated a new standing rule"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 41,
+      "text": "`bash tools/session_start_check.sh` and `bash tools/docs_claim_check.sh` green"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 45,
+      "text": "the failure is visible in `reports/latest.txt` (attempt number and error)"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 46,
+      "text": "`run_all.py` retried once; a second failure fails the whole run"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 47,
+      "text": "the failure is logged in `.agents/errors.md` with symptom, cause and fix"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 55,
+      "text": "Decoding deeper than three layers, and unknown ciphers (AES/XXTEA, custom"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 59,
+      "text": "Homoglyphs outside the built-in table: mathematical alphanumerics"
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 62,
+      "text": "Payloads in binaries/images/PDFs: separate extraction job, not this scanner."
+    },
+    {
+      "path": ".subagents/TODO.md",
+      "line": 63,
+      "text": "Typoglycemia / scrambled instruction words (\"ignroe all prevoius systme"
+    }
+  ],
+  "areas": {
+    "(root)": {
+      "files": 13,
+      "bytes": 391954,
+      "code": 2,
+      "docs": 4,
+      "newest": "2026-10-29T23:31:09",
+      "newest_path": "AGENTS.md",
+      "newest_code": "2026-10-29T22:48:02",
+      "newest_code_path": ".gitignore"
+    },
+    ".agents": {
+      "files": 25,
+      "bytes": 631396,
+      "code": 0,
+      "docs": 25,
+      "newest": "2026-11-20T21:53:51",
+      "newest_path": ".agents/README.md",
+      "newest_code": "",
+      "newest_code_path": ""
+    },
+    ".github": {
+      "files": 5,
+      "bytes": 113253,
+      "code": 0,
+      "docs": 0,
+      "newest": "2026-10-29T23:48:01",
+      "newest_path": ".github/workflows/lint.yml",
+      "newest_code": "2026-10-29T23:48:01",
+      "newest_code_path": ".github/workflows/lint.yml"
+    },
+    ".subagents": {
+      "files": 67,
+      "bytes": 498849,
+      "code": 11,
+      "docs": 45,
+      "newest": "2026-11-20T21:53:54",
+      "newest_path": ".subagents/README.md",
+      "newest_code": "2026-10-30T00:11:11",
+      "newest_code_path": ".subagents/ai-threat-scan/scan.py"
+    },
+    "android": {
+      "files": 36,
+      "bytes": 305140,
+      "code": 17,
+      "docs": 1,
+      "newest": "2026-10-29T22:48:02",
+      "newest_path": "android/.gitignore",
+      "newest_code": "2026-10-29T22:48:02",
+      "newest_code_path": "android/.gitignore"
+    },
+    "docs": {
+      "files": 4,
+      "bytes": 103252,
+      "code": 0,
+      "docs": 4,
+      "newest": "2026-10-29T23:04:48",
+      "newest_path": "docs/FORMAT-V2.md",
+      "newest_code": "",
+      "newest_code_path": ""
+    },
+    "include": {
+      "files": 2,
+      "bytes": 31939,
+      "code": 2,
+      "docs": 0,
+      "newest": "2026-10-29T22:48:02",
+      "newest_path": "include/hydra_model.h",
+      "newest_code": "2026-10-29T22:48:02",
+      "newest_code_path": "include/hydra_model.h"
+    },
+    "public": {
+      "files": 3,
+      "bytes": 64320,
+      "code": 1,
+      "docs": 0,
+      "newest": "2026-10-29T22:48:02",
+      "newest_path": "public/app.js",
+      "newest_code": "2026-10-29T22:48:02",
+      "newest_code_path": "public/app.js"
+    },
+    "src": {
+      "files": 5,
+      "bytes": 189164,
+      "code": 5,
+      "docs": 0,
+      "newest": "2026-10-29T22:48:02",
+      "newest_path": "src/hydra_engine.c",
+      "newest_code": "2026-10-29T22:48:02",
+      "newest_code_path": "src/hydra_engine.c"
+    },
+    "tests": {
+      "files": 8,
+      "bytes": 245913,
+      "code": 8,
+      "docs": 0,
+      "newest": "2026-10-29T22:48:02",
+      "newest_path": "tests/test_engine.c",
+      "newest_code": "2026-10-29T22:48:02",
+      "newest_code_path": "tests/test_engine.c"
+    },
+    "tools": {
+      "files": 85,
+      "bytes": 493478,
+      "code": 78,
+      "docs": 2,
+      "newest": "2026-10-29T23:48:58",
+      "newest_path": "tools/__pycache__/bf16.cpython-312.pyc",
+      "newest_code": "2026-10-29T23:33:29",
+      "newest_code_path": "tools/session_start_check.sh"
+    }
+  },
+  "doc_lag": [
+    {
+      "doc": ".subagents/web-source-verifier/AGENTS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/web-source-verifier/ORIGINAL.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/web-spec-conformance/AGENTS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/web-spec-conformance/ORIGINAL.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/web-tooling-scout/AGENTS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/web-tooling-scout/ORIGINAL.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/critic-evidence/AGENTS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/critic-evidence/ORIGINAL.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/critic-architecture/AGENTS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/critic-architecture/ORIGINAL.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/critic-final/AGENTS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/critic-final/ORIGINAL.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/critic-final/PROPOSALS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.05
+    },
+    {
+      "doc": ".subagents/critic-architecture/PROPOSALS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.04
+    },
+    {
+      "doc": ".subagents/critic-evidence/PROPOSALS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.04
+    },
+    {
+      "doc": ".subagents/web-source-verifier/PROPOSALS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.04
+    },
+    {
+      "doc": ".subagents/web-spec-conformance/PROPOSALS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.04
+    },
+    {
+      "doc": ".subagents/web-tooling-scout/PROPOSALS.md",
+      "area": ".subagents",
+      "newest_source": ".subagents/ai-threat-scan/scan.py",
+      "days_behind": 0.04
+    }
+  ],
+  "focus": [
+    "android/app/src/main/cpp/hydra_batch.h",
+    "android/app/src/main/cpp/hydra_jni.c",
+    "android/app/src/main/cpp/hydra_sample_cfg.h",
+    "docs/ARCHITECTURE.md",
+    "docs/FORMAT-V2.md",
+    "docs/FORMAT.md",
+    "docs/GGUF-IMPORT.md",
+    "include/hydra_model.h",
+    "include/hydra_v2_container.h",
+    "src/hydra_engine.c",
+    "src/hydra_neon.h",
+    "src/hydra_simd.h",
+    "src/hydra_v2_container.c",
+    "src/main.c",
+    "tools/gguf_inspect.py",
+    "tools/gguf_minimal_llama.py",
+    "tools/gguf_reader.py",
+    "tools/gguf_speed.py",
+    "tools/gguf_test.py",
+    "tools/gguf_to_hydra.py",
+    "tools/make_model.py"
+  ],
+  "extra": {
+    "sub": "web-spec-conformance",
+    "kind": "web-research",
+    "remit": "Cross-check implemented format constants, magic numbers, pinned revisions and version literals against the specification and the in-tree docs.",
+    "check": "spec cross-check: constants, pins, version literals",
+    "rows": [
+      "hex constants of 6+ digits in implementation files: 33 lines",
+      "  0x484E4459   android/app/src/main/cpp/llama_jni.cpp:104  NOT in any .md - classify (wire value or internal detail)",
+      "  0xEDB88320   include/hydra_v2_container.h:118  documented",
+      "  0xEDB88320   include/hydra_v2_container.h:227  documented",
+      "  0xCBF43926   include/hydra_v2_container.h:230  documented",
+      "  0x00000000   include/hydra_v2_container.h:230  documented",
+      "  0xEDB88320   src/hydra_v2_container.c:91  documented",
+      "  0xCBF43926   src/hydra_v2_container.c:93  documented",
+      "  0x48594452   src/hydra_v2_container.c:478  documented",
+      "  0x46554747   src/hydra_v2_container.c:490  documented",
+      "  0x46554747   tools/gguf_fixture.js:17  documented",
+      "  0x7fffff     tools/gguf_fixture.js:103  documented",
+      "  0x800000     tools/gguf_fixture.js:116  NOT in any .md - classify (wire value or internal detail)",
+      "  0x46554747   tools/gguf_minimal_llama.py:53  documented",
+      "  0x46554747   tools/gguf_reader.py:43  documented",
+      "  0x48594452   tools/gguf_test.py:54  documented",
+      "  0x7FFFFFFF   tools/gguf_test.py:186  documented",
+      "  0x48594452   tools/gguf_test.py:494  documented",
+      "  0xFFFFFFFFFFFFFFFF tools/gguf_test.py:855  documented",
+      "  0x48594452   tools/gguf_to_hydra.py:61  documented",
+      "  0x48594452   tools/hydra_train.js:33  documented",
+      "  0x48594452   tools/make_model.py:43  documented",
+      "  0x7FFFFFFF   tools/make_model.py:54  documented",
+      "  0xFFFFFFFF   tools/make_model.py:118  documented",
+      "  0x48594452   tools/safetensors_to_hydra.py:86  documented",
+      "  0xdeadbeef   tools/server_test.js:358  documented",
+      "  ... 9 more lines",
+      "",
+      "pinned 40-hex revisions: 4 distinct value(s)",
+      "  11d5960a3267...  mentioned 1x",
+      "      .github/workflows/vibeworks-check.yml:27",
+      "  7fe450e19305...  mentioned 16x",
+      "      AGENTS.md:73",
+      "      CHANGELOG.md:257",
+      "      .agents/Environment.md:423",
+      "      .agents/Environment.md:458",
+      "      .agents/session.md:478",
+      "      .agents/docs/ANDROID-AUDIT.md:165",
+      "      ... 10 more",
+      "  a21dac85c6da...  mentioned 1x",
+      "      .agents/docs/ANDROID-AUDIT.md:11",
+      "  ea165f8d65b6...  mentioned 1x",
+      "      .github/workflows/vibeworks-check.yml:201",
+      "",
+      "version literals in implementation: 7",
+      "  tools/gguf_test.py:70  def build_gguf(path, tensors, metadata=None, version=3, alignment=32,",
+      "  tools/gguf_test.py:542  _convert_fails(out, build_gguf(os.path.join(tmp, 'v9.gguf'), tensors, version=9)))",
+      "  tools/gguf_to_hydra.py:62  VERSION = 1",
+      "  tools/hydra_train.js:34  const VERSION = 1;",
+      "  tools/make_model.py:44  VERSION = 1",
+      "  tools/safetensors_to_hydra.py:87  VERSION = 2",
+      "  tools/server_test.js:965  const rel = writeModelFile('llama.hydra', { magic: 0x46554747, version: 3 });"
+    ]
+  }
+}

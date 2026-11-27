@@ -15,7 +15,7 @@
 | 1 | `../AGENTS.md` | Single entry point: protocol, architecture, gates. |
 | 2 | `session.md` | What was done, current plan, progress. **Read before code; update after every step.** |
 | 3 | `errors.md` | Every error ever hit + root cause + fix + prevention. |
-| 4 | `rules.md` | 33 standing rules (R1–R33; R33 = verifiable session-start read protocol, enforced by gate 1j). |
+| 4 | `rules.md` | 35 standing rules (R1–R35; R33 = verifiable session-start read protocol, enforced by gate 1j; R34 = untrusted input / AI-threat gate; R35 = readable, machine-valid agent docs). |
 | 5 | `user.md` | **Owner's standing directives** — highest priority after safety. |
 | 6 | `Environment.md` | Per-AI sandbox notes: tested tool install paths, failures, workarounds. |
 
@@ -30,6 +30,7 @@
 | `gpu-feasibility.md` | GPU acceleration feasibility: measured vs. blocked, split clearly. |
 | `pr-gpu-feasibility.md` | The PR companion for the GPU feasibility work. |
 | `TECHNICAL-AUDIT.md` | Evidence-based technical audit of the whole repo (2026-10-26). |
+| `AI-THREAT-MODEL.md` | Threat classes, sources and blind spots for instructions aimed at an AI agent; rule set of `.subagents/ai-threat-scan/` (2026-10-29). |
 | `RESEARCH-LOG.md` | Permanent in-repo research record (owner decision 2026-10-26): crash root causes, CI decisions, investigations with follow-up obligations. **Append, never delete.** |
 | `SESSION-ARCHIVE.md` | The complete session.md round log for everything before round 6 (2026-10-26), moved verbatim when session.md was slimmed (R33 context-budget finding). **Append, never delete.** |
 
@@ -44,6 +45,7 @@
 | `kotlin-stub-check` | The local kotlinc stub type-check: setup, run, and the stub-fidelity rules. |
 | `android-lint-gate` | The Android lint job: reading its annotations, the lint-only classes, the correct APIs. |
 | `repo-docs-audit` | The repeatable audit of every .md file in the repo (stale paths, dead refs, banned claims, language). |
+| `sub-agents` | The procedure for running the seven `.subagents` team members as read-only advisors: ORIGINAL.md before a first run, codegraph receipts as evidence, the AI-threat gate, graded final critic. The team's files live in `.subagents/`; this skill lives here and `check_subagents.py` enforces that only one `sub-agents` directory exists. |
 
 `.claude/skills` is a symlink to `skills/` so Claude Code's
 auto-discovery keeps working while all agent docs stay in `.agents/`
@@ -54,6 +56,12 @@ auto-discovery keeps working while all agent docs stay in `.agents/`
 - `docs/` at the root — **product** documentation (FORMAT.md, FORMAT-V2.md,
   GGUF-IMPORT.md, ARCHITECTURE.md): read by humans and agents, shipped with
   the project.
+- `.subagents/` — the seven-member team (three research, three critics, one
+  security scanner): one folder per member with `ORIGINAL.md`, `AGENTS.md`,
+  `SKILL.md`, `codegraph.py`, `ERROR.md`, `REQUESTS.md`, `PROPOSALS.md` and
+  `reports/`. Read-only by contract; the parent procedure is the `sub-agents`
+  skill above. Overview: `.subagents/README.md`, threat model:
+  `.agents/docs/AI-THREAT-MODEL.md`.
 - `tools/kotlin_stub_check/` — local Kotlin type-check without the Android
   SDK (how the round-6 CI compile errors were caught locally).
 
