@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-20T21:54:10",
+  "generated_at": "2026-11-27T22:31:32",
   "root": "/workspace/chats/6daeacda62104e261f2b28ce",
   "excluded": [
     ".git",
@@ -15,15 +15,15 @@
     ".subagents/*/reports"
   ],
   "stats": {
-    "files": 253,
-    "bytes": 3068658,
-    "code": 124,
-    "docs": 81,
-    "edges": 124,
-    "external": 394,
+    "files": 262,
+    "bytes": 3679436,
+    "code": 132,
+    "docs": 90,
+    "edges": 152,
+    "external": 417,
     "markers": 4,
-    "open_items": 36,
-    "doc_lag": 18
+    "open_items": 43,
+    "doc_lag": 21
   },
   "nodes": [
     {
@@ -37,21 +37,21 @@
     },
     {
       "path": ".agents/Environment.md",
-      "size": 30329,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 38115,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 505
+      "lines": 635
     },
     {
       "path": ".agents/README.md",
-      "size": 5058,
-      "mtime": "2026-11-20 21:53:51",
+      "size": 5355,
+      "mtime": "2026-11-27 22:31:02",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 74
+      "lines": 77
     },
     {
       "path": ".agents/docs/AI-THREAT-MODEL.md",
@@ -82,21 +82,30 @@
     },
     {
       "path": ".agents/docs/HYDRA2-RESEARCH.md",
-      "size": 22271,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 22702,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 419
+      "lines": 427
+    },
+    {
+      "path": ".agents/docs/ISSUE-72-AUDIT.md",
+      "size": 11592,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": ".agents",
+      "lines": 206
     },
     {
       "path": ".agents/docs/RESEARCH-LOG.md",
-      "size": 23487,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 32370,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 387
+      "lines": 535
     },
     {
       "path": ".agents/docs/RESEARCH.md",
@@ -109,12 +118,12 @@
     },
     {
       "path": ".agents/docs/SESSION-ARCHIVE.md",
-      "size": 132904,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 223693,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 2188
+      "lines": 3199
     },
     {
       "path": ".agents/docs/TECHNICAL-AUDIT.md",
@@ -145,12 +154,12 @@
     },
     {
       "path": ".agents/errors.md",
-      "size": 163135,
-      "mtime": "2026-10-30 00:15:50",
+      "size": 190707,
+      "mtime": "2026-11-27 22:31:02",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 2739
+      "lines": 3202
     },
     {
       "path": ".agents/rules.md",
@@ -163,12 +172,12 @@
     },
     {
       "path": ".agents/session.md",
-      "size": 97099,
-      "mtime": "2026-11-20 21:53:13",
+      "size": 146490,
+      "mtime": "2026-11-27 22:31:02",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 981
+      "lines": 1824
     },
     {
       "path": ".agents/skills/android-lint-gate/SKILL.md",
@@ -190,21 +199,21 @@
     },
     {
       "path": ".agents/skills/ci-triage/SKILL.md",
-      "size": 4287,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 5411,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 86
+      "lines": 99
     },
     {
       "path": ".agents/skills/engine-ci-verify/SKILL.md",
-      "size": 7279,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 10793,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 155
+      "lines": 207
     },
     {
       "path": ".agents/skills/kotlin-stub-check/SKILL.md",
@@ -244,12 +253,12 @@
     },
     {
       "path": ".agents/user.md",
-      "size": 11842,
-      "mtime": "2026-10-29 23:24:49",
+      "size": 12844,
+      "mtime": "2026-11-27 22:31:02",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".agents",
-      "lines": 193
+      "lines": 209
     },
     {
       "path": ".github/actions/setup-android/action.yml",
@@ -262,30 +271,30 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "size": 42311,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 50749,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "config",
       "lang": "YAML",
       "area": ".github",
-      "lines": 888
+      "lines": 1037
     },
     {
       "path": ".github/workflows/lint.yml",
-      "size": 31566,
-      "mtime": "2026-10-29 23:48:01",
+      "size": 31865,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "config",
       "lang": "YAML",
       "area": ".github",
-      "lines": 693
+      "lines": 697
     },
     {
       "path": ".github/workflows/release.yml",
-      "size": 24722,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 28463,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "config",
       "lang": "YAML",
       "area": ".github",
-      "lines": 586
+      "lines": 658
     },
     {
       "path": ".github/workflows/vibeworks-check.yml",
@@ -298,12 +307,12 @@
     },
     {
       "path": ".gitignore",
-      "size": 1890,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 1905,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "config",
       "lang": "other",
       "area": "(root)",
-      "lines": 60
+      "lines": 61
     },
     {
       "path": ".gitmodules",
@@ -343,12 +352,12 @@
     },
     {
       "path": ".subagents/ai-threat-scan/ERROR.md",
-      "size": 20130,
-      "mtime": "2026-10-30 00:15:50",
+      "size": 21351,
+      "mtime": "2026-11-20 21:55:08",
       "kind": "doc",
       "lang": "Markdown",
       "area": ".subagents",
-      "lines": 402
+      "lines": 425
     },
     {
       "path": ".subagents/ai-threat-scan/ORIGINAL.md",
@@ -385,24 +394,6 @@
       "lang": "Markdown",
       "area": ".subagents",
       "lines": 100
-    },
-    {
-      "path": ".subagents/ai-threat-scan/__pycache__/codegraph.cpython-312.pyc",
-      "size": 11422,
-      "mtime": "2026-10-30 00:16:44",
-      "kind": "other",
-      "lang": "other",
-      "area": ".subagents",
-      "lines": 0
-    },
-    {
-      "path": ".subagents/ai-threat-scan/__pycache__/scan.cpython-312.pyc",
-      "size": 59910,
-      "mtime": "2026-10-30 00:16:44",
-      "kind": "other",
-      "lang": "other",
-      "area": ".subagents",
-      "lines": 0
     },
     {
       "path": ".subagents/ai-threat-scan/codegraph.py",
@@ -477,15 +468,6 @@
       "lines": 50
     },
     {
-      "path": ".subagents/critic-architecture/__pycache__/codegraph.cpython-312.pyc",
-      "size": 6794,
-      "mtime": "2026-10-30 00:16:44",
-      "kind": "other",
-      "lang": "other",
-      "area": ".subagents",
-      "lines": 0
-    },
-    {
       "path": ".subagents/critic-architecture/codegraph.py",
       "size": 4252,
       "mtime": "2026-10-29 22:57:28",
@@ -547,15 +529,6 @@
       "lang": "Markdown",
       "area": ".subagents",
       "lines": 49
-    },
-    {
-      "path": ".subagents/critic-evidence/__pycache__/codegraph.cpython-312.pyc",
-      "size": 6738,
-      "mtime": "2026-10-30 00:16:44",
-      "kind": "other",
-      "lang": "other",
-      "area": ".subagents",
-      "lines": 0
     },
     {
       "path": ".subagents/critic-evidence/codegraph.py",
@@ -630,15 +603,6 @@
       "lines": 48
     },
     {
-      "path": ".subagents/critic-final/__pycache__/codegraph.cpython-312.pyc",
-      "size": 8543,
-      "mtime": "2026-10-30 00:16:44",
-      "kind": "other",
-      "lang": "other",
-      "area": ".subagents",
-      "lines": 0
-    },
-    {
       "path": ".subagents/critic-final/codegraph.py",
       "size": 6066,
       "mtime": "2026-10-29 23:23:04",
@@ -648,27 +612,9 @@
       "lines": 143
     },
     {
-      "path": ".subagents/tools/__pycache__/check_subagents.cpython-312.pyc",
-      "size": 24994,
-      "mtime": "2026-10-30 00:16:44",
-      "kind": "other",
-      "lang": "other",
-      "area": ".subagents",
-      "lines": 0
-    },
-    {
       "path": ".subagents/tools/__pycache__/codegraph_core.cpython-312.pyc",
-      "size": 39970,
-      "mtime": "2026-10-30 00:16:44",
-      "kind": "other",
-      "lang": "other",
-      "area": ".subagents",
-      "lines": 0
-    },
-    {
-      "path": ".subagents/tools/__pycache__/run_all.cpython-312.pyc",
-      "size": 7965,
-      "mtime": "2026-10-30 00:16:44",
+      "size": 40012,
+      "mtime": "2026-11-27 22:31:31",
       "kind": "other",
       "lang": "other",
       "area": ".subagents",
@@ -757,8 +703,8 @@
     },
     {
       "path": ".subagents/web-source-verifier/__pycache__/codegraph.cpython-312.pyc",
-      "size": 9352,
-      "mtime": "2026-10-30 00:16:44",
+      "size": 9394,
+      "mtime": "2026-11-27 22:31:31",
       "kind": "other",
       "lang": "other",
       "area": ".subagents",
@@ -829,8 +775,8 @@
     },
     {
       "path": ".subagents/web-spec-conformance/__pycache__/codegraph.cpython-312.pyc",
-      "size": 7200,
-      "mtime": "2026-10-30 00:16:44",
+      "size": 7242,
+      "mtime": "2026-11-27 22:31:32",
       "kind": "other",
       "lang": "other",
       "area": ".subagents",
@@ -900,15 +846,6 @@
       "lines": 52
     },
     {
-      "path": ".subagents/web-tooling-scout/__pycache__/codegraph.cpython-312.pyc",
-      "size": 7213,
-      "mtime": "2026-10-30 00:16:44",
-      "kind": "other",
-      "lang": "other",
-      "area": ".subagents",
-      "lines": 0
-    },
-    {
       "path": ".subagents/web-tooling-scout/codegraph.py",
       "size": 5161,
       "mtime": "2026-10-29 22:56:22",
@@ -919,21 +856,21 @@
     },
     {
       "path": "AGENTS.md",
-      "size": 25788,
-      "mtime": "2026-10-29 23:31:09",
+      "size": 28029,
+      "mtime": "2026-11-27 22:31:02",
       "kind": "doc",
       "lang": "Markdown",
       "area": "(root)",
-      "lines": 404
+      "lines": 434
     },
     {
       "path": "CHANGELOG.md",
-      "size": 104696,
-      "mtime": "2026-10-29 23:24:49",
+      "size": 135198,
+      "mtime": "2026-11-27 22:31:02",
       "kind": "doc",
       "lang": "Markdown",
       "area": "(root)",
-      "lines": 1722
+      "lines": 2222
     },
     {
       "path": "CLAUDE.md",
@@ -955,21 +892,21 @@
     },
     {
       "path": "Makefile",
-      "size": 4512,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 6893,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "config",
       "lang": "other",
       "area": "(root)",
-      "lines": 88
+      "lines": 119
     },
     {
       "path": "README.md",
-      "size": 46886,
-      "mtime": "2026-10-29 23:31:09",
+      "size": 54657,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": "(root)",
-      "lines": 489
+      "lines": 570
     },
     {
       "path": "android/.gitignore",
@@ -1297,39 +1234,57 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "size": 26043,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 27450,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": "docs",
-      "lines": 357
+      "lines": 367
     },
     {
       "path": "docs/FORMAT-V2.md",
-      "size": 26605,
-      "mtime": "2026-10-29 23:04:48",
+      "size": 49164,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": "docs",
-      "lines": 516
+      "lines": 871
     },
     {
       "path": "docs/FORMAT.md",
-      "size": 22495,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 22742,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": "docs",
-      "lines": 402
+      "lines": 405
     },
     {
       "path": "docs/GGUF-IMPORT.md",
-      "size": 28109,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 35488,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "doc",
       "lang": "Markdown",
       "area": "docs",
-      "lines": 608
+      "lines": 715
+    },
+    {
+      "path": "docs/LARGE-MODELS.md",
+      "size": 25652,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "docs",
+      "lines": 362
+    },
+    {
+      "path": "docs/README.md",
+      "size": 1275,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "docs",
+      "lines": 15
     },
     {
       "path": "eslint.config.mjs",
@@ -1350,27 +1305,54 @@
       "lines": 0
     },
     {
+      "path": "include/README.md",
+      "size": 1240,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "include",
+      "lines": 12
+    },
+    {
       "path": "include/hydra_model.h",
-      "size": 20677,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 21433,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "C header",
       "area": "include",
-      "lines": 396
+      "lines": 409
+    },
+    {
+      "path": "include/hydra_moe.h",
+      "size": 16657,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "code",
+      "lang": "C header",
+      "area": "include",
+      "lines": 331
     },
     {
       "path": "include/hydra_v2_container.h",
-      "size": 11262,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 14183,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "C header",
       "area": "include",
-      "lines": 236
+      "lines": 284
+    },
+    {
+      "path": "info.md",
+      "size": 4485,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "(root)",
+      "lines": 81
     },
     {
       "path": "package-lock.json",
-      "size": 35077,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 35081,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "config",
       "lang": "JSON",
       "area": "(root)",
@@ -1386,22 +1368,31 @@
       "lines": 19
     },
     {
+      "path": "public/README.md",
+      "size": 910,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "public",
+      "lines": 15
+    },
+    {
       "path": "public/app.js",
-      "size": 34770,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 36918,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "JavaScript",
       "area": "public",
-      "lines": 855
+      "lines": 899
     },
     {
       "path": "public/index.html",
-      "size": 12275,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 12691,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "asset",
       "lang": "HTML",
       "area": "public",
-      "lines": 253
+      "lines": 259
     },
     {
       "path": "public/style.css",
@@ -1414,21 +1405,39 @@
     },
     {
       "path": "server.js",
-      "size": 56919,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 78852,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "JavaScript",
       "area": "(root)",
-      "lines": 1408
+      "lines": 1912
+    },
+    {
+      "path": "src/README.md",
+      "size": 1883,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "src",
+      "lines": 16
     },
     {
       "path": "src/hydra_engine.c",
-      "size": 75853,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 78081,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "C",
       "area": "src",
-      "lines": 1732
+      "lines": 1780
+    },
+    {
+      "path": "src/hydra_moe.c",
+      "size": 70958,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "code",
+      "lang": "C",
+      "area": "src",
+      "lines": 1686
     },
     {
       "path": "src/hydra_neon.h",
@@ -1450,21 +1459,30 @@
     },
     {
       "path": "src/hydra_v2_container.c",
-      "size": 52003,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 58780,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "C",
       "area": "src",
-      "lines": 1200
+      "lines": 1335
     },
     {
       "path": "src/main.c",
-      "size": 29786,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 55642,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "C",
       "area": "src",
-      "lines": 677
+      "lines": 1288
+    },
+    {
+      "path": "tests/README.md",
+      "size": 1765,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "tests",
+      "lines": 22
     },
     {
       "path": "tests/fixtures/compose/scroll_lambda_bad.kt",
@@ -1504,30 +1522,39 @@
     },
     {
       "path": "tests/test_engine.c",
-      "size": 166065,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 172054,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "C",
       "area": "tests",
-      "lines": 3966
+      "lines": 4086
     },
     {
       "path": "tests/test_hydra2_container.c",
-      "size": 43279,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 52536,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "C",
       "area": "tests",
-      "lines": 1017
+      "lines": 1232
+    },
+    {
+      "path": "tests/test_hydra_moe.c",
+      "size": 80094,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "code",
+      "lang": "C",
+      "area": "tests",
+      "lines": 1898
     },
     {
       "path": "tests/test_jni_batch.c",
-      "size": 14274,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 33079,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "C",
       "area": "tests",
-      "lines": 376
+      "lines": 829
     },
     {
       "path": "tests/test_large_model.c",
@@ -1539,9 +1566,18 @@
       "lines": 338
     },
     {
+      "path": "tools/README.md",
+      "size": 3908,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "doc",
+      "lang": "Markdown",
+      "area": "tools",
+      "lines": 43
+    },
+    {
       "path": "tools/__pycache__/bf16.cpython-312.pyc",
-      "size": 3012,
-      "mtime": "2026-10-29 23:48:58",
+      "size": 3054,
+      "mtime": "2026-11-27 22:20:32",
       "kind": "other",
       "lang": "other",
       "area": "tools",
@@ -1600,6 +1636,15 @@
       "lang": "Python",
       "area": "tools",
       "lines": 59
+    },
+    {
+      "path": "tools/build_3b_synth_gguf.py",
+      "size": 5274,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 137
     },
     {
       "path": "tools/ci_release_version_test.sh",
@@ -1711,21 +1756,21 @@
     },
     {
       "path": "tools/gguf_minimal_llama.py",
-      "size": 11675,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 14073,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "Python",
       "area": "tools",
-      "lines": 266
+      "lines": 311
     },
     {
       "path": "tools/gguf_reader.py",
-      "size": 22072,
-      "mtime": "2026-10-29 23:05:30",
+      "size": 27570,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "Python",
       "area": "tools",
-      "lines": 591
+      "lines": 718
     },
     {
       "path": "tools/gguf_speed.py",
@@ -1738,21 +1783,39 @@
     },
     {
       "path": "tools/gguf_test.py",
-      "size": 62382,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 62510,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "Python",
       "area": "tools",
-      "lines": 1430
+      "lines": 1432
     },
     {
       "path": "tools/gguf_to_hydra.py",
-      "size": 34332,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 34415,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "Python",
       "area": "tools",
-      "lines": 846
+      "lines": 847
+    },
+    {
+      "path": "tools/gguf_to_hydra2.py",
+      "size": 44049,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 1002
+    },
+    {
+      "path": "tools/gguf_to_hydra2_test.py",
+      "size": 39110,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "code",
+      "lang": "Python",
+      "area": "tools",
+      "lines": 810
     },
     {
       "path": "tools/gpu_bench/README.md",
@@ -1783,8 +1846,8 @@
     },
     {
       "path": "tools/hydra_train.js",
-      "size": 14295,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 14391,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "JavaScript",
       "area": "tools",
@@ -2206,12 +2269,21 @@
     },
     {
       "path": "tools/make_model.py",
-      "size": 13390,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 33623,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "Python",
       "area": "tools",
-      "lines": 329
+      "lines": 764
+    },
+    {
+      "path": "tools/make_moe_fixtures.sh",
+      "size": 2329,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 42
     },
     {
       "path": "tools/safetensors_to_hydra.py",
@@ -2224,21 +2296,21 @@
     },
     {
       "path": "tools/sampler_contract_check.sh",
-      "size": 7615,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 8512,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "Shell",
       "area": "tools",
-      "lines": 148
+      "lines": 163
     },
     {
       "path": "tools/server_test.js",
-      "size": 56678,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 78131,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "code",
       "lang": "JavaScript",
       "area": "tools",
-      "lines": 1337
+      "lines": 1820
     },
     {
       "path": "tools/session_start_check.sh",
@@ -2269,12 +2341,12 @@
     },
     {
       "path": "tools/test_count_baseline.txt",
-      "size": 7239,
-      "mtime": "2026-10-29 22:48:02",
+      "size": 8466,
+      "mtime": "2026-11-27 22:29:39",
       "kind": "other",
       "lang": "other",
       "area": "tools",
-      "lines": 126
+      "lines": 146
     },
     {
       "path": "tools/test_count_check.sh",
@@ -2284,6 +2356,15 @@
       "lang": "Shell",
       "area": "tools",
       "lines": 103
+    },
+    {
+      "path": "tools/text_prompt_check.sh",
+      "size": 4915,
+      "mtime": "2026-11-27 22:29:39",
+      "kind": "code",
+      "lang": "Shell",
+      "area": "tools",
+      "lines": 101
     },
     {
       "path": "tools/workflow_lint_check.sh",
@@ -2305,6 +2386,11 @@
     }
   ],
   "edges": [
+    {
+      "from": ".agents/Environment.md",
+      "to": "tools/ci_release_version_test.sh",
+      "how": "shell"
+    },
     {
       "from": ".agents/Environment.md",
       "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
@@ -2346,8 +2432,38 @@
       "how": "shell"
     },
     {
+      "from": ".agents/docs/ISSUE-72-AUDIT.md",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
       "from": ".agents/docs/RESEARCH-LOG.md",
       "to": "tools/compose_scroll_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/SESSION-ARCHIVE.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/SESSION-ARCHIVE.md",
+      "to": "tools/kotlin_stub_check/kotlin_stub_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/SESSION-ARCHIVE.md",
+      "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/SESSION-ARCHIVE.md",
+      "to": "tools/workflow_lint_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/docs/SESSION-ARCHIVE.md",
+      "to": "tools/workflow_yaml_check.sh",
       "how": "shell"
     },
     {
@@ -2402,6 +2518,31 @@
     },
     {
       "from": ".agents/skills/ci-triage/SKILL.md",
+      "to": "tools/workflow_yaml_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/engine-ci-verify/SKILL.md",
+      "to": "tools/docs_claim_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/engine-ci-verify/SKILL.md",
+      "to": "tools/session_start_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/engine-ci-verify/SKILL.md",
+      "to": "tools/text_prompt_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/engine-ci-verify/SKILL.md",
+      "to": "tools/workflow_lint_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".agents/skills/engine-ci-verify/SKILL.md",
       "to": "tools/workflow_yaml_check.sh",
       "how": "shell"
     },
@@ -2513,6 +2654,11 @@
     {
       "from": ".github/workflows/ci.yml",
       "to": "tools/test_count_check.sh",
+      "how": "shell"
+    },
+    {
+      "from": ".github/workflows/ci.yml",
+      "to": "tools/text_prompt_check.sh",
       "how": "shell"
     },
     {
@@ -2672,6 +2818,11 @@
     },
     {
       "from": "AGENTS.md",
+      "to": "tools/make_moe_fixtures.sh",
+      "how": "shell"
+    },
+    {
+      "from": "AGENTS.md",
       "to": "tools/sampler_contract_check.sh",
       "how": "shell"
     },
@@ -2721,6 +2872,16 @@
       "how": "kotlin"
     },
     {
+      "from": "include/hydra_moe.h",
+      "to": "include/hydra_model.h",
+      "how": "include"
+    },
+    {
+      "from": "include/hydra_moe.h",
+      "to": "include/hydra_v2_container.h",
+      "how": "include"
+    },
+    {
       "from": "src/hydra_engine.c",
       "to": "include/hydra_model.h",
       "how": "include"
@@ -2736,6 +2897,16 @@
       "how": "include"
     },
     {
+      "from": "src/hydra_moe.c",
+      "to": "include/hydra_moe.h",
+      "how": "include"
+    },
+    {
+      "from": "src/hydra_moe.c",
+      "to": "include/hydra_v2_container.h",
+      "how": "include"
+    },
+    {
       "from": "src/hydra_v2_container.c",
       "to": "include/hydra_v2_container.h",
       "how": "include"
@@ -2743,6 +2914,16 @@
     {
       "from": "src/main.c",
       "to": "include/hydra_model.h",
+      "how": "include"
+    },
+    {
+      "from": "src/main.c",
+      "to": "include/hydra_moe.h",
+      "how": "include"
+    },
+    {
+      "from": "src/main.c",
+      "to": "include/hydra_v2_container.h",
       "how": "include"
     },
     {
@@ -2758,6 +2939,21 @@
     {
       "from": "tests/test_hydra2_container.c",
       "to": "include/hydra_v2_container.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_hydra_moe.c",
+      "to": "include/hydra_moe.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_hydra_moe.c",
+      "to": "include/hydra_v2_container.h",
+      "how": "include"
+    },
+    {
+      "from": "tests/test_jni_batch.c",
+      "to": "include/hydra_model.h",
       "how": "include"
     },
     {
@@ -2784,6 +2980,11 @@
       "from": "tools/android_header_check.sh",
       "to": "tools/android_header_check.sh",
       "how": "shell"
+    },
+    {
+      "from": "tools/build_3b_synth_gguf.py",
+      "to": "tools/gguf_to_hydra2.py",
+      "how": "python"
     },
     {
       "from": "tools/ci_release_version_test.sh",
@@ -2848,6 +3049,26 @@
     {
       "from": "tools/gguf_to_hydra.py",
       "to": "tools/gguf_reader.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "to": "tools/gguf_reader.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "to": "tools/gguf_minimal_llama.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "to": "tools/gguf_reader.py",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "to": "tools/gguf_to_hydra2.py",
       "how": "python"
     },
     {
@@ -4368,6 +4589,26 @@
       "how": "python"
     },
     {
+      "from": "tools/build_3b_synth_gguf.py",
+      "name": "numpy",
+      "how": "python"
+    },
+    {
+      "from": "tools/build_3b_synth_gguf.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/build_3b_synth_gguf.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/build_3b_synth_gguf.py",
+      "name": "time",
+      "how": "python"
+    },
+    {
       "from": "tools/compose_scroll_guard.py",
       "name": "re",
       "how": "python"
@@ -4618,6 +4859,91 @@
       "how": "python"
     },
     {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "argparse",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "importlib.util",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "json",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "math",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "numpy",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "zlib",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2.py",
+      "name": "zlib",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "name": "os",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "name": "random",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "name": "shutil",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "name": "struct",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "name": "subprocess",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "name": "sys",
+      "how": "python"
+    },
+    {
+      "from": "tools/gguf_to_hydra2_test.py",
+      "name": "tempfile",
+      "how": "python"
+    },
+    {
       "from": "tools/hydra_train.js",
       "name": "fs",
       "how": "js"
@@ -4774,6 +5100,11 @@
     },
     {
       "from": "tools/make_model.py",
+      "name": "math",
+      "how": "python"
+    },
+    {
+      "from": "tools/make_model.py",
       "name": "os",
       "how": "python"
     },
@@ -4845,6 +5176,11 @@
     {
       "from": "tools/server_test.js",
       "name": "node:http",
+      "how": "js"
+    },
+    {
+      "from": "tools/server_test.js",
+      "name": "node:net",
       "how": "js"
     },
     {
@@ -4926,11 +5262,6 @@
   ],
   "open_items": [
     {
-      "path": "README.md",
-      "line": 482,
-      "text": "MoE inference on the `.hydra2` container \u2014 the expert cache + slot leasing (spec \u00a76.2), the reading strategy (spec \u00a76.4) and the first measured `B_eff`/throughput numbers (spec \u00a76 is currently a worke"
-    },
-    {
       "path": ".agents/session.md",
       "line": 372,
       "text": "All-.md audit (28 files listed in Workspace): stale paths, dead refs (deleted code-scanning workflow, old PR states), banned claims, R31 language."
@@ -4951,6 +5282,16 @@
       "text": "Gates green (incl. new 1j), commit, push, PR (facts-only; owner merges)."
     },
     {
+      "path": ".agents/session.md",
+      "line": 1507,
+      "text": "Run focused tests and security checks."
+    },
+    {
+      "path": ".agents/session.md",
+      "line": 1508,
+      "text": "Update logs, scan changed files, run CodeQL, and report results."
+    },
+    {
       "path": ".agents/docs/SESSION-ARCHIVE.md",
       "line": 303,
       "text": "**V Verification.** make clean && make && make test; all"
@@ -4969,6 +5310,36 @@
       "path": ".agents/docs/SESSION-ARCHIVE.md",
       "line": 1627,
       "text": "PR + merge \u2014 **user approval needed** (R14)."
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 2479,
+      "text": "All-.md audit (28 files listed in Workspace): stale paths, dead refs (deleted code-scanning workflow, old PR states), banned claims, R31 language."
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 2480,
+      "text": "errors.md entry (skipped-reads \u2192 R33 + this round's findings); user.md entry for the 4 directives."
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 2481,
+      "text": "Close PR #62 (superseded by merged #64; #62 CI red = the stage-2 error #64 fixed)."
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 2482,
+      "text": "Gates green (incl. new 1j), commit, push, PR (facts-only; owner merges)."
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 2960,
+      "text": "R12-D: implement \u2014 stage 1 (JNI v3/v4 batch gap + inspect),"
+    },
+    {
+      "path": ".agents/docs/SESSION-ARCHIVE.md",
+      "line": 2964,
+      "text": "R12-E: full local gate (incl. CI cppcheck 2.13.2 replication),"
     },
     {
       "path": ".agents/skills/session-workflow/SKILL.md",
@@ -5108,42 +5479,42 @@
   ],
   "areas": {
     "(root)": {
-      "files": 13,
-      "bytes": 391954,
+      "files": 14,
+      "bytes": 461286,
       "code": 2,
-      "docs": 4,
-      "newest": "2026-10-29T23:31:09",
+      "docs": 5,
+      "newest": "2026-11-27T22:31:02",
       "newest_path": "AGENTS.md",
-      "newest_code": "2026-10-29T22:48:02",
-      "newest_code_path": ".gitignore"
+      "newest_code": "2026-11-27T22:29:39",
+      "newest_code_path": "package-lock.json"
     },
     ".agents": {
-      "files": 25,
-      "bytes": 631396,
+      "files": 26,
+      "bytes": 833777,
       "code": 0,
-      "docs": 25,
-      "newest": "2026-11-20T21:53:51",
-      "newest_path": ".agents/README.md",
+      "docs": 26,
+      "newest": "2026-11-27T22:31:02",
+      "newest_path": ".agents/session.md",
       "newest_code": "",
       "newest_code_path": ""
     },
     ".github": {
       "files": 5,
-      "bytes": 113253,
+      "bytes": 125731,
       "code": 0,
       "docs": 0,
-      "newest": "2026-10-29T23:48:01",
+      "newest": "2026-11-27T22:29:39",
       "newest_path": ".github/workflows/lint.yml",
-      "newest_code": "2026-10-29T23:48:01",
+      "newest_code": "2026-11-27T22:29:39",
       "newest_code_path": ".github/workflows/lint.yml"
     },
     ".subagents": {
-      "files": 67,
-      "bytes": 498849,
+      "files": 59,
+      "bytes": 366617,
       "code": 11,
       "docs": 45,
-      "newest": "2026-11-20T21:53:54",
-      "newest_path": ".subagents/README.md",
+      "newest": "2026-11-27T22:31:32",
+      "newest_path": ".subagents/web-spec-conformance/__pycache__/codegraph.cpython-312.pyc",
       "newest_code": "2026-10-30T00:11:11",
       "newest_code_path": ".subagents/ai-threat-scan/scan.py"
     },
@@ -5158,67 +5529,85 @@
       "newest_code_path": "android/.gitignore"
     },
     "docs": {
-      "files": 4,
-      "bytes": 103252,
+      "files": 6,
+      "bytes": 161771,
       "code": 0,
-      "docs": 4,
-      "newest": "2026-10-29T23:04:48",
-      "newest_path": "docs/FORMAT-V2.md",
+      "docs": 6,
+      "newest": "2026-11-27T22:29:39",
+      "newest_path": "docs/FORMAT.md",
       "newest_code": "",
       "newest_code_path": ""
     },
     "include": {
-      "files": 2,
-      "bytes": 31939,
-      "code": 2,
-      "docs": 0,
-      "newest": "2026-10-29T22:48:02",
-      "newest_path": "include/hydra_model.h",
-      "newest_code": "2026-10-29T22:48:02",
+      "files": 4,
+      "bytes": 53513,
+      "code": 3,
+      "docs": 1,
+      "newest": "2026-11-27T22:29:39",
+      "newest_path": "include/README.md",
+      "newest_code": "2026-11-27T22:29:39",
       "newest_code_path": "include/hydra_model.h"
     },
     "public": {
-      "files": 3,
-      "bytes": 64320,
+      "files": 4,
+      "bytes": 67794,
       "code": 1,
-      "docs": 0,
-      "newest": "2026-10-29T22:48:02",
-      "newest_path": "public/app.js",
-      "newest_code": "2026-10-29T22:48:02",
+      "docs": 1,
+      "newest": "2026-11-27T22:29:39",
+      "newest_path": "public/README.md",
+      "newest_code": "2026-11-27T22:29:39",
       "newest_code_path": "public/app.js"
     },
     "src": {
-      "files": 5,
-      "bytes": 189164,
-      "code": 5,
-      "docs": 0,
-      "newest": "2026-10-29T22:48:02",
+      "files": 7,
+      "bytes": 296866,
+      "code": 6,
+      "docs": 1,
+      "newest": "2026-11-27T22:29:39",
       "newest_path": "src/hydra_engine.c",
-      "newest_code": "2026-10-29T22:48:02",
+      "newest_code": "2026-11-27T22:29:39",
       "newest_code_path": "src/hydra_engine.c"
     },
     "tests": {
-      "files": 8,
-      "bytes": 245913,
-      "code": 8,
-      "docs": 0,
-      "newest": "2026-10-29T22:48:02",
-      "newest_path": "tests/test_engine.c",
-      "newest_code": "2026-10-29T22:48:02",
-      "newest_code_path": "tests/test_engine.c"
+      "files": 10,
+      "bytes": 361823,
+      "code": 9,
+      "docs": 1,
+      "newest": "2026-11-27T22:29:39",
+      "newest_path": "tests/test_hydra_moe.c",
+      "newest_code": "2026-11-27T22:29:39",
+      "newest_code_path": "tests/test_hydra_moe.c"
     },
     "tools": {
-      "files": 85,
-      "bytes": 493478,
-      "code": 78,
-      "docs": 2,
-      "newest": "2026-10-29T23:48:58",
-      "newest_path": "tools/__pycache__/bf16.cpython-312.pyc",
-      "newest_code": "2026-10-29T23:33:29",
-      "newest_code_path": "tools/session_start_check.sh"
+      "files": 91,
+      "bytes": 645118,
+      "code": 83,
+      "docs": 3,
+      "newest": "2026-11-27T22:29:39",
+      "newest_path": "tools/make_model.py",
+      "newest_code": "2026-11-27T22:29:39",
+      "newest_code_path": "tools/make_model.py"
     }
   },
   "doc_lag": [
+    {
+      "doc": "tools/gpu_bench/README.md",
+      "area": "tools",
+      "newest_source": "tools/make_model.py",
+      "days_behind": 28.99
+    },
+    {
+      "doc": "tools/kotlin_stub_check/README.md",
+      "area": "tools",
+      "newest_source": "tools/make_model.py",
+      "days_behind": 28.99
+    },
+    {
+      "doc": "CLAUDE.md",
+      "area": "(root)",
+      "newest_source": "package-lock.json",
+      "days_behind": 28.99
+    },
     {
       "doc": ".subagents/web-source-verifier/AGENTS.md",
       "area": ".subagents",
@@ -5337,8 +5726,10 @@
     "docs/FORMAT.md",
     "docs/GGUF-IMPORT.md",
     "include/hydra_model.h",
+    "include/hydra_moe.h",
     "include/hydra_v2_container.h",
     "src/hydra_engine.c",
+    "src/hydra_moe.c",
     "src/hydra_neon.h",
     "src/hydra_simd.h",
     "src/hydra_v2_container.c",
@@ -5349,6 +5740,8 @@
     "tools/gguf_speed.py",
     "tools/gguf_test.py",
     "tools/gguf_to_hydra.py",
+    "tools/gguf_to_hydra2.py",
+    "tools/gguf_to_hydra2_test.py",
     "tools/make_model.py"
   ],
   "extra": {
@@ -5357,16 +5750,17 @@
     "remit": "Cross-check implemented format constants, magic numbers, pinned revisions and version literals against the specification and the in-tree docs.",
     "check": "spec cross-check: constants, pins, version literals",
     "rows": [
-      "hex constants of 6+ digits in implementation files: 33 lines",
+      "hex constants of 6+ digits in implementation files: 35 lines",
       "  0x484E4459   android/app/src/main/cpp/llama_jni.cpp:104  NOT in any .md - classify (wire value or internal detail)",
-      "  0xEDB88320   include/hydra_v2_container.h:118  documented",
-      "  0xEDB88320   include/hydra_v2_container.h:227  documented",
-      "  0xCBF43926   include/hydra_v2_container.h:230  documented",
-      "  0x00000000   include/hydra_v2_container.h:230  documented",
-      "  0xEDB88320   src/hydra_v2_container.c:91  documented",
-      "  0xCBF43926   src/hydra_v2_container.c:93  documented",
-      "  0x48594452   src/hydra_v2_container.c:478  documented",
-      "  0x46554747   src/hydra_v2_container.c:490  documented",
+      "  0xEDB88320   include/hydra_v2_container.h:150  documented",
+      "  0xEDB88320   include/hydra_v2_container.h:275  documented",
+      "  0xCBF43926   include/hydra_v2_container.h:278  documented",
+      "  0x00000000   include/hydra_v2_container.h:278  documented",
+      "  0xEDB88320   src/hydra_v2_container.c:98  documented",
+      "  0xCBF43926   src/hydra_v2_container.c:100  documented",
+      "  0x48594452   src/hydra_v2_container.c:525  documented",
+      "  0x46554747   src/hydra_v2_container.c:537  documented",
+      "  0x46554747   tools/build_3b_synth_gguf.py:44  documented",
       "  0x46554747   tools/gguf_fixture.js:17  documented",
       "  0x7fffff     tools/gguf_fixture.js:103  documented",
       "  0x800000     tools/gguf_fixture.js:116  NOT in any .md - classify (wire value or internal detail)",
@@ -5377,38 +5771,38 @@
       "  0x48594452   tools/gguf_test.py:494  documented",
       "  0xFFFFFFFFFFFFFFFF tools/gguf_test.py:855  documented",
       "  0x48594452   tools/gguf_to_hydra.py:61  documented",
+      "  0xFFFFFFFF   tools/gguf_to_hydra2.py:130  documented",
       "  0x48594452   tools/hydra_train.js:33  documented",
-      "  0x48594452   tools/make_model.py:43  documented",
-      "  0x7FFFFFFF   tools/make_model.py:54  documented",
-      "  0xFFFFFFFF   tools/make_model.py:118  documented",
-      "  0x48594452   tools/safetensors_to_hydra.py:86  documented",
-      "  0xdeadbeef   tools/server_test.js:358  documented",
-      "  ... 9 more lines",
+      "  0x48594452   tools/make_model.py:44  documented",
+      "  0x7FFFFFFF   tools/make_model.py:55  documented",
+      "  0xFFFFFFFF   tools/make_model.py:119  documented",
+      "  ... 11 more lines",
       "",
       "pinned 40-hex revisions: 4 distinct value(s)",
       "  11d5960a3267...  mentioned 1x",
       "      .github/workflows/vibeworks-check.yml:27",
-      "  7fe450e19305...  mentioned 16x",
-      "      AGENTS.md:73",
-      "      CHANGELOG.md:257",
+      "  7fe450e19305...  mentioned 17x",
+      "      AGENTS.md:76",
+      "      CHANGELOG.md:760",
       "      .agents/Environment.md:423",
       "      .agents/Environment.md:458",
       "      .agents/session.md:478",
       "      .agents/docs/ANDROID-AUDIT.md:165",
-      "      ... 10 more",
+      "      ... 11 more",
       "  a21dac85c6da...  mentioned 1x",
       "      .agents/docs/ANDROID-AUDIT.md:11",
       "  ea165f8d65b6...  mentioned 1x",
       "      .github/workflows/vibeworks-check.yml:201",
       "",
-      "version literals in implementation: 7",
+      "version literals in implementation: 8",
+      "  tools/build_3b_synth_gguf.py:44  MAGIC, VERSION = 0x46554747, 3",
       "  tools/gguf_test.py:70  def build_gguf(path, tensors, metadata=None, version=3, alignment=32,",
       "  tools/gguf_test.py:542  _convert_fails(out, build_gguf(os.path.join(tmp, 'v9.gguf'), tensors, version=9)))",
       "  tools/gguf_to_hydra.py:62  VERSION = 1",
       "  tools/hydra_train.js:34  const VERSION = 1;",
-      "  tools/make_model.py:44  VERSION = 1",
+      "  tools/make_model.py:45  VERSION = 1",
       "  tools/safetensors_to_hydra.py:87  VERSION = 2",
-      "  tools/server_test.js:965  const rel = writeModelFile('llama.hydra', { magic: 0x46554747, version: 3 });"
+      "  tools/server_test.js:1175  const rel = writeModelFile('llama.hydra', { magic: 0x46554747, version: 3 });"
     ]
   }
 }

@@ -5,40 +5,59 @@
 ------------------------------------------------------------------------------
 ==============================================================================
 CODE GRAPH — 6daeacda62104e261f2b28ce
-generated   2026-11-20 21:54:09
-inventory   253 files (234 text, 19 binary), 2.9 MiB
+generated   2026-11-27 22:31:31
+inventory   261 files (251 text, 10 binary), 3.5 MiB
 excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dist, llama.cpp, android/app/src/main/cpp/llama, .subagents/*/reports
 ==============================================================================
 
 -- areas (11) --------------------------------------------------
-  (root)                         13 files    2 code   4 md  newest 2026-10-29 23:31  AGENTS.md
-  .agents                        25 files    0 code  25 md  newest 2026-11-20 21:53  .agents/README.md
-  .github                         5 files    0 code   0 md  newest 2026-10-29 23:48  .github/workflows/lint.yml
-  .subagents                     67 files   11 code  45 md  newest 2026-11-20 21:53  .subagents/README.md
+  (root)                         14 files    2 code   5 md  newest 2026-11-27 22:31  AGENTS.md
+  .agents                        26 files    0 code  26 md  newest 2026-11-27 22:31  .agents/session.md
+  .github                         5 files    0 code   0 md  newest 2026-11-27 22:29  .github/workflows/lint.yml
+  .subagents                     58 files   11 code  45 md  newest 2026-11-27 22:31  .subagents/tools/__pycache__/codegraph_core.cpython-312.pyc
   android                        36 files   17 code   1 md  newest 2026-10-29 22:48  android/.gitignore
-  docs                            4 files    0 code   4 md  newest 2026-10-29 23:04  docs/FORMAT-V2.md
-  include                         2 files    2 code   0 md  newest 2026-10-29 22:48  include/hydra_model.h
-  public                          3 files    1 code   0 md  newest 2026-10-29 22:48  public/app.js
-  src                             5 files    5 code   0 md  newest 2026-10-29 22:48  src/hydra_engine.c
-  tests                           8 files    8 code   0 md  newest 2026-10-29 22:48  tests/test_engine.c
-  tools                          85 files   78 code   2 md  newest 2026-10-29 23:48  tools/__pycache__/bf16.cpython-312.pyc
+  docs                            6 files    0 code   6 md  newest 2026-11-27 22:29  docs/FORMAT.md
+  include                         4 files    3 code   1 md  newest 2026-11-27 22:29  include/README.md
+  public                          4 files    1 code   1 md  newest 2026-11-27 22:29  public/README.md
+  src                             7 files    6 code   1 md  newest 2026-11-27 22:29  src/hydra_engine.c
+  tests                          10 files    9 code   1 md  newest 2026-11-27 22:29  tests/test_hydra_moe.c
+  tools                          91 files   83 code   3 md  newest 2026-11-27 22:29  tools/make_model.py
 
--- Markdown inventory (81) ----------------------------------------
+-- Markdown inventory (90) ----------------------------------------
+  2026-11-27 22:31:02    146490    1824 lines  .agents/session.md
+  2026-11-27 22:31:02     28029     434 lines  AGENTS.md
+  2026-11-27 22:31:02    135198    2222 lines  CHANGELOG.md
+  2026-11-27 22:31:02     12844     209 lines  .agents/user.md
+  2026-11-27 22:31:02    190707    3202 lines  .agents/errors.md
+  2026-11-27 22:31:02      5355      77 lines  .agents/README.md
+  2026-11-27 22:29:39      3908      43 lines  tools/README.md
+  2026-11-27 22:29:39      1765      22 lines  tests/README.md
+  2026-11-27 22:29:39       910      15 lines  public/README.md
+  2026-11-27 22:29:39      1883      16 lines  src/README.md
+  2026-11-27 22:29:39     22742     405 lines  docs/FORMAT.md
+  2026-11-27 22:29:39     35488     715 lines  docs/GGUF-IMPORT.md
+  2026-11-27 22:29:39     25652     362 lines  docs/LARGE-MODELS.md
+  2026-11-27 22:29:39      1275      15 lines  docs/README.md
+  2026-11-27 22:29:39      1240      12 lines  include/README.md
+  2026-11-27 22:29:39      4485      81 lines  info.md
+  2026-11-27 22:29:39     54657     570 lines  README.md
+  2026-11-27 22:29:39     27450     367 lines  docs/ARCHITECTURE.md
+  2026-11-27 22:29:39     49164     871 lines  docs/FORMAT-V2.md
+  2026-11-27 22:29:39      5411      99 lines  .agents/skills/ci-triage/SKILL.md
+  2026-11-27 22:29:39     10793     207 lines  .agents/skills/engine-ci-verify/SKILL.md
+  2026-11-27 22:29:39    223693    3199 lines  .agents/docs/SESSION-ARCHIVE.md
+  2026-11-27 22:29:39     38115     635 lines  .agents/Environment.md
+  2026-11-27 22:29:39     22702     427 lines  .agents/docs/HYDRA2-RESEARCH.md
+  2026-11-27 22:29:39     11592     206 lines  .agents/docs/ISSUE-72-AUDIT.md
+  2026-11-27 22:29:39     32370     535 lines  .agents/docs/RESEARCH-LOG.md
+  2026-11-20 21:55:08     21351     425 lines  .subagents/ai-threat-scan/ERROR.md
   2026-11-20 21:53:54      6089     105 lines  .subagents/README.md
-  2026-11-20 21:53:51      5058      74 lines  .agents/README.md
-  2026-11-20 21:53:13     97099     981 lines  .agents/session.md
   2026-10-30 00:17:12     25920     394 lines  .subagents/critic-final/REVIEW.md
-  2026-10-30 00:15:50    163135    2739 lines  .agents/errors.md
-  2026-10-30 00:15:50     20130     402 lines  .subagents/ai-threat-scan/ERROR.md
   2026-10-30 00:15:31      6052      69 lines  .subagents/ai-threat-scan/PROPOSALS.md
   2026-10-30 00:15:14      3777      69 lines  .subagents/TODO.md
   2026-10-30 00:14:58     17599     287 lines  .agents/docs/AI-THREAT-MODEL.md
   2026-10-30 00:14:19     11899     164 lines  .subagents/ai-threat-scan/AGENTS.md
   2026-10-29 23:49:41      5922     112 lines  .subagents/ai-threat-scan/REQUESTS.md
-  2026-10-29 23:31:09     25788     404 lines  AGENTS.md
-  2026-10-29 23:31:09     46886     489 lines  README.md
-  2026-10-29 23:24:49     11842     193 lines  .agents/user.md
-  2026-10-29 23:24:49    104696    1722 lines  CHANGELOG.md
   2026-10-29 23:24:05      5545     100 lines  .subagents/ai-threat-scan/SKILL.md
   2026-10-29 23:22:34      6820     122 lines  .agents/skills/sub-agents/SKILL.md
   2026-10-29 23:21:46      2443      50 lines  .subagents/critic-architecture/SKILL.md
@@ -67,7 +86,6 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
   2026-10-29 23:07:15      2736      46 lines  .subagents/web-source-verifier/PROPOSALS.md
   2026-10-29 23:07:15      2573      43 lines  .subagents/web-spec-conformance/PROPOSALS.md
   2026-10-29 23:07:15      2623      43 lines  .subagents/web-tooling-scout/PROPOSALS.md
-  2026-10-29 23:04:48     26605     516 lines  docs/FORMAT-V2.md
   2026-10-29 22:59:49      1124      32 lines  .subagents/critic-final/PROPOSALS.md
   2026-10-29 22:57:29      2913      74 lines  .subagents/critic-final/AGENTS.md
   2026-10-29 22:57:29      2787      58 lines  .subagents/critic-final/ORIGINAL.md
@@ -82,53 +100,45 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
   2026-10-29 22:54:05      2947      66 lines  .subagents/web-source-verifier/AGENTS.md
   2026-10-29 22:54:05      2038      47 lines  .subagents/web-source-verifier/ORIGINAL.md
   2026-10-29 22:48:02      1150      23 lines  .agents/CLAUDE.md
-  2026-10-29 22:48:02     30329     505 lines  .agents/Environment.md
   2026-10-29 22:48:02     27970     455 lines  .agents/docs/ANDROID-AUDIT.md
   2026-10-29 22:48:02     12432     271 lines  .agents/docs/ANDROID_SKILL.md
-  2026-10-29 22:48:02     22271     419 lines  .agents/docs/HYDRA2-RESEARCH.md
-  2026-10-29 22:48:02     23487     387 lines  .agents/docs/RESEARCH-LOG.md
   2026-10-29 22:48:02      5514     110 lines  .agents/docs/RESEARCH.md
-  2026-10-29 22:48:02    132904    2188 lines  .agents/docs/SESSION-ARCHIVE.md
   2026-10-29 22:48:02     14601     262 lines  .agents/docs/TECHNICAL-AUDIT.md
   2026-10-29 22:48:02      9273     195 lines  .agents/docs/gpu-feasibility.md
   2026-10-29 22:48:02      4585      82 lines  .agents/docs/pr-gpu-feasibility.md
   2026-10-29 22:48:02      3521      63 lines  .agents/skills/android-lint-gate/SKILL.md
   2026-10-29 22:48:02      5972     147 lines  .agents/skills/android-ndk-build/SKILL.md
-  2026-10-29 22:48:02      4287      86 lines  .agents/skills/ci-triage/SKILL.md
-  2026-10-29 22:48:02      7279     155 lines  .agents/skills/engine-ci-verify/SKILL.md
   2026-10-29 22:48:02      3485      80 lines  .agents/skills/kotlin-stub-check/SKILL.md
   2026-10-29 22:48:02      3355      79 lines  .agents/skills/repo-docs-audit/SKILL.md
   2026-10-29 22:48:02       651      15 lines  CLAUDE.md
   2026-10-29 22:48:02     11523     224 lines  android/README.md
-  2026-10-29 22:48:02     26043     357 lines  docs/ARCHITECTURE.md
-  2026-10-29 22:48:02     22495     402 lines  docs/FORMAT.md
-  2026-10-29 22:48:02     28109     608 lines  docs/GGUF-IMPORT.md
   2026-10-29 22:48:02      3758      83 lines  tools/gpu_bench/README.md
   2026-10-29 22:48:02      2744      66 lines  tools/kotlin_stub_check/README.md
 
--- code files newest first (124) --------------------------------
-  2026-10-30 00:11:11     57785  .subagents/ai-threat-scan/scan.py
-  2026-10-30 00:01:17      7529  .subagents/ai-threat-scan/codegraph.py
-  2026-10-29 23:33:29      3147  tools/session_start_check.sh
-  2026-10-29 23:30:46     21504  .subagents/tools/check_subagents.py
-  2026-10-29 23:23:04      6066  .subagents/critic-final/codegraph.py
-  2026-10-29 23:22:22      5266  .subagents/tools/run_all.py
-  2026-10-29 23:06:49      4751  .subagents/critic-evidence/codegraph.py
-  2026-10-29 23:06:47      4631  .subagents/web-spec-conformance/codegraph.py
-  2026-10-29 23:05:32     29743  tools/safetensors_to_hydra.py
-  2026-10-29 23:05:30     22072  tools/gguf_reader.py
-  2026-10-29 23:05:18      2296  tools/bf16.py
-  2026-10-29 22:58:39     24866  .subagents/tools/codegraph_core.py
-  2026-10-29 22:57:28      4252  .subagents/critic-architecture/codegraph.py
-  2026-10-29 22:56:22      5161  .subagents/web-tooling-scout/codegraph.py
-  2026-10-29 22:54:54      6593  .subagents/web-source-verifier/codegraph.py
-  2026-10-29 22:48:02      8448  android/app/src/androidTest/java/dev/hydrastone/AtomicModelSwapTest.kt
-  2026-10-29 22:48:02     13627  android/app/src/androidTest/java/dev/hydrastone/LlamaEngineInstrumentedTest.kt
-  2026-10-29 22:48:02      4342  android/app/src/main/cpp/hydra_batch.h
-  2026-10-29 22:48:02     30623  android/app/src/main/cpp/hydra_jni.c
-  2026-10-29 22:48:02      3912  android/app/src/main/cpp/hydra_sample_cfg.h
+-- code files newest first (132) --------------------------------
+  2026-11-27 22:29:39     33623  tools/make_model.py
+  2026-11-27 22:29:39      2329  tools/make_moe_fixtures.sh
+  2026-11-27 22:29:39      8512  tools/sampler_contract_check.sh
+  2026-11-27 22:29:39     78131  tools/server_test.js
+  2026-11-27 22:29:39      4915  tools/text_prompt_check.sh
+  2026-11-27 22:29:39     62510  tools/gguf_test.py
+  2026-11-27 22:29:39     34415  tools/gguf_to_hydra.py
+  2026-11-27 22:29:39     44049  tools/gguf_to_hydra2.py
+  2026-11-27 22:29:39     39110  tools/gguf_to_hydra2_test.py
+  2026-11-27 22:29:39     14391  tools/hydra_train.js
+  2026-11-27 22:29:39     80094  tests/test_hydra_moe.c
+  2026-11-27 22:29:39     33079  tests/test_jni_batch.c
+  2026-11-27 22:29:39      5274  tools/build_3b_synth_gguf.py
+  2026-11-27 22:29:39     14073  tools/gguf_minimal_llama.py
+  2026-11-27 22:29:39     27570  tools/gguf_reader.py
+  2026-11-27 22:29:39    172054  tests/test_engine.c
+  2026-11-27 22:29:39     52536  tests/test_hydra2_container.c
+  2026-11-27 22:29:39     78081  src/hydra_engine.c
+  2026-11-27 22:29:39     70958  src/hydra_moe.c
+  2026-11-27 22:29:39     58780  src/hydra_v2_container.c
 
--- internal dependency edges (124) ---------------------------------
+-- internal dependency edges (152) ---------------------------------
+  .agents/Environment.md  ->  tools/ci_release_version_test.sh   [shell]
   .agents/Environment.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
   .agents/Environment.md  ->  tools/session_start_check.sh   [shell]
   .agents/Environment.md  ->  tools/workflow_lint_check.sh   [shell]
@@ -137,7 +147,13 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
   .agents/docs/ANDROID-AUDIT.md  ->  tools/docs_claim_check.sh   [shell]
   .agents/docs/ANDROID-AUDIT.md  ->  tools/jni_signature_check.sh   [shell]
   .agents/docs/ANDROID-AUDIT.md  ->  tools/test_count_check.sh   [shell]
+  .agents/docs/ISSUE-72-AUDIT.md  ->  tools/test_count_check.sh   [shell]
   .agents/docs/RESEARCH-LOG.md  ->  tools/compose_scroll_check.sh   [shell]
+  .agents/docs/SESSION-ARCHIVE.md  ->  tools/docs_claim_check.sh   [shell]
+  .agents/docs/SESSION-ARCHIVE.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
+  .agents/docs/SESSION-ARCHIVE.md  ->  tools/test_count_check.sh   [shell]
+  .agents/docs/SESSION-ARCHIVE.md  ->  tools/workflow_lint_check.sh   [shell]
+  .agents/docs/SESSION-ARCHIVE.md  ->  tools/workflow_yaml_check.sh   [shell]
   .agents/errors.md  ->  tools/session_start_check.sh   [shell]
   .agents/errors.md  ->  tools/session_start_check.sh   [shell]
   .agents/errors.md  ->  tools/test_count_check.sh   [shell]
@@ -149,6 +165,11 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
   .agents/skills/ci-triage/SKILL.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
   .agents/skills/ci-triage/SKILL.md  ->  tools/workflow_lint_check.sh   [shell]
   .agents/skills/ci-triage/SKILL.md  ->  tools/workflow_yaml_check.sh   [shell]
+  .agents/skills/engine-ci-verify/SKILL.md  ->  tools/docs_claim_check.sh   [shell]
+  .agents/skills/engine-ci-verify/SKILL.md  ->  tools/session_start_check.sh   [shell]
+  .agents/skills/engine-ci-verify/SKILL.md  ->  tools/text_prompt_check.sh   [shell]
+  .agents/skills/engine-ci-verify/SKILL.md  ->  tools/workflow_lint_check.sh   [shell]
+  .agents/skills/engine-ci-verify/SKILL.md  ->  tools/workflow_yaml_check.sh   [shell]
   .agents/skills/kotlin-stub-check/SKILL.md  ->  tools/kotlin_stub_check/kotlin_stub_check.sh   [shell]
   .agents/skills/repo-docs-audit/SKILL.md  ->  tools/docs_claim_check.sh   [shell]
   .agents/skills/repo-docs-audit/SKILL.md  ->  tools/workflow_lint_check.sh   [shell]
@@ -157,21 +178,9 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
   .github/workflows/ci.yml  ->  tools/android_autostart_negative_test.sh   [shell]
   .github/workflows/ci.yml  ->  tools/android_crash_check.sh   [shell]
   .github/workflows/ci.yml  ->  tools/android_header_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/apple_portability_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/ci_syntax_mirror_test.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/compose_scroll_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/docs_claim_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/jni_signature_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/jni_signature_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/jni_signature_negative_test.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/llama_pin_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/llama_pin_negative_test.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/sampler_contract_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/session_start_check.sh   [shell]
-  .github/workflows/ci.yml  ->  tools/string_format_negative_test.sh   [shell]
-  ... 84 more (use --json for the full set)
+  ... 112 more (use --json for the full set)
 
--- unresolved (external) references (394) ------------------------
+-- unresolved (external) references (417) ------------------------
   __future__                               [python] first seen in .subagents/ai-threat-scan/codegraph.py
   argparse                                 [python] first seen in .subagents/ai-threat-scan/codegraph.py
   codegraph_core                           [python] first seen in .subagents/ai-threat-scan/codegraph.py
@@ -328,24 +337,27 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
   ../src/hydra_simd.h                      [include] first seen in tests/test_engine.c
   ../android/app/src/main/cpp/hydra_sample_cfg.h [include] first seen in tests/test_jni_batch.c
   array                                    [python] first seen in tools/bf16.py
+  numpy                                    [python] first seen in tools/build_3b_synth_gguf.py
+  struct                                   [python] first seen in tools/build_3b_synth_gguf.py
+  time                                     [python] first seen in tools/build_3b_synth_gguf.py
   ./hydra_train                            [js] first seen in tools/console_train_test.js
   os                                       [js] first seen in tools/console_train_test.js
   node:fs                                  [js] first seen in tools/contrast_check.js
   node:path                                [js] first seen in tools/contrast_check.js
-  struct                                   [python] first seen in tools/gguf_minimal_llama.py
   itertools                                [python] first seen in tools/gguf_reader.py
   mmap                                     [python] first seen in tools/gguf_reader.py
   operator                                 [python] first seen in tools/gguf_reader.py
-  time                                     [python] first seen in tools/gguf_speed.py
   math                                     [python] first seen in tools/gguf_test.py
   subprocess                               [python] first seen in tools/gguf_test.py
+  zlib                                     [python] first seen in tools/gguf_to_hydra2.py
+  random                                   [python] first seen in tools/gguf_to_hydra2_test.py
   androidx.compose.ui.text.TextStyle       [kotlin] first seen in tools/kotlin_stub_check/stubs/C_m3.kt
   kotlin.reflect.KProperty                 [kotlin] first seen in tools/kotlin_stub_check/stubs/C_runtime.kt
-  zlib                                     [python] first seen in tools/make_model.py
   ./gguf_fixture                           [js] first seen in tools/server_test.js
   node:assert                              [js] first seen in tools/server_test.js
   node:child_process                       [js] first seen in tools/server_test.js
   node:http                                [js] first seen in tools/server_test.js
+  node:net                                 [js] first seen in tools/server_test.js
   node:os                                  [js] first seen in tools/server_test.js
   node:stream                              [js] first seen in tools/server_test.js
   node:test                                [js] first seen in tools/server_test.js
@@ -353,34 +365,37 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
   ▁c                                       [js] first seen in tools/server_test.js
 
 -- what still needs changing (measured signals) ----------------------------
-  open checkboxes (written-down work): 36
-    [open]   README.md:482  MoE inference on the `.hydra2` container — the expert cache + slot leasing (spec §6.2), the reading strategy (spec §6.4) and the first measured `B_eff`/throughput numbers (spec §6 is currently a worke
+  open checkboxes (written-down work): 43
     [open]   .agents/session.md:372  All-.md audit (28 files listed in Workspace): stale paths, dead refs (deleted code-scanning workflow, old PR states), banned claims, R31 language.
     [open]   .agents/session.md:373  errors.md entry (skipped-reads → R33 + this round's findings); user.md entry for the 4 directives.
     [open]   .agents/session.md:374  Close PR #62 (superseded by merged #64; #62 CI red = the stage-2 error #64 fixed).
     [open]   .agents/session.md:375  Gates green (incl. new 1j), commit, push, PR (facts-only; owner merges).
+    [open]   .agents/session.md:1507  Run focused tests and security checks.
+    [open]   .agents/session.md:1508  Update logs, scan changed files, run CodeQL, and report results.
     [open]   .agents/docs/SESSION-ARCHIVE.md:303  **V Verification.** make clean && make && make test; all
     [open]   .agents/docs/SESSION-ARCHIVE.md:1531  PR + merge — **user approval needed** (R14)
     [open]   .agents/docs/SESSION-ARCHIVE.md:1565  PR + merge — **user approval needed** (R14). After the merge the
     [open]   .agents/docs/SESSION-ARCHIVE.md:1627  PR + merge — **user approval needed** (R14).
+    [open]   .agents/docs/SESSION-ARCHIVE.md:2479  All-.md audit (28 files listed in Workspace): stale paths, dead refs (deleted code-scanning workflow, old PR states), banned claims, R31 language.
+    [open]   .agents/docs/SESSION-ARCHIVE.md:2480  errors.md entry (skipped-reads → R33 + this round's findings); user.md entry for the 4 directives.
+    [open]   .agents/docs/SESSION-ARCHIVE.md:2481  Close PR #62 (superseded by merged #64; #62 CI red = the stage-2 error #64 fixed).
+    [open]   .agents/docs/SESSION-ARCHIVE.md:2482  Gates green (incl. new 1j), commit, push, PR (facts-only; owner merges).
+    [open]   .agents/docs/SESSION-ARCHIVE.md:2960  R12-D: implement — stage 1 (JNI v3/v4 batch gap + inspect),
+    [open]   .agents/docs/SESSION-ARCHIVE.md:2964  R12-E: full local gate (incl. CI cppcheck 2.13.2 replication),
     [open]   .agents/skills/session-workflow/SKILL.md:89  step 1
     [open]   .agents/skills/session-workflow/SKILL.md:90  step 2
     [open]   .subagents/TODO.md:9  the member's folder exists with `ORIGINAL.md`, `AGENTS.md`, `SKILL.md`,
     [open]   .subagents/TODO.md:11  `ORIGINAL.md` quotes the owner assignment verbatim and states the
-    [open]   .subagents/TODO.md:13  `ORIGINAL.md` records the creation date and the repository state it was
-    [open]   .subagents/TODO.md:18  `python3 .subagents/tools/run_all.py` exits 0 (all seven, no retries needed)
-    [open]   .subagents/TODO.md:19  `reports/latest.txt` and `reports/latest.json` exist for every member
-    [open]   .subagents/TODO.md:20  `PROPOSALS.md` of every member was written from that report, not from memory
-    [open]   .subagents/TODO.md:21  every proposal row carries a `file:line`, a command output or a URL
-    [open]   .subagents/TODO.md:22  no member modified anything outside its own folder
-    [open]   .subagents/TODO.md:23  `python3 .subagents/tools/check_subagents.py` is green
-    ... 16 more
+    ... 23 more
   marker comments (TODO/FIXME/...): 4
     [TODO       ] .github/workflows/vibeworks-check.yml:3  # Hadolint, actionlint und fallow (JS/TS) sowie offene Stellen (TODO/FIXME).
     [TODO       ] .github/workflows/vibeworks-check.yml:53  - name: Offene Stellen (TODO/FIXME)
     [TODO       ] .github/workflows/vibeworks-check.yml:55  # Only comments (// # /* * -- <!--) — not every word "TODO" in the code
     [TODO       ] .github/workflows/vibeworks-check.yml:57  git grep -n -I -E '(//|#|/\*|\*|--|<!--)[[:space:]]*(TODO|FIXME|HACK|XXX)\b' -- ':!*.lock' ':!package-lock.json' ':!.github/workflows/vibeworks-check.yml' > .vw
-  docs older than their area's newest source: 18
+  docs older than their area's newest source: 21
+    [doc-lag] tools/gpu_bench/README.md  (29.0 d behind tools/make_model.py in tools)
+    [doc-lag] tools/kotlin_stub_check/README.md  (29.0 d behind tools/make_model.py in tools)
+    [doc-lag] CLAUDE.md  (29.0 d behind package-lock.json in (root))
     [doc-lag] .subagents/web-source-verifier/AGENTS.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
     [doc-lag] .subagents/web-source-verifier/ORIGINAL.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
     [doc-lag] .subagents/web-spec-conformance/AGENTS.md  (0.1 d behind .subagents/ai-threat-scan/scan.py in .subagents)
@@ -398,59 +413,62 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
     [doc-lag] .subagents/critic-evidence/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
     [doc-lag] .subagents/web-source-verifier/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
     [doc-lag] .subagents/web-spec-conformance/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
-    [doc-lag] .subagents/web-tooling-scout/PROPOSALS.md  (0.0 d behind .subagents/ai-threat-scan/scan.py in .subagents)
+    ... 1 more
 
--- focus (33 files) -------------------------------------------
+-- focus (36 files) -------------------------------------------
   README.md                             1 files
-      2026-10-29 23:31:09     46886  README.md
+      2026-11-27 22:29:39     54657  README.md
   AGENTS.md                             1 files
-      2026-10-29 23:31:09     25788  AGENTS.md
+      2026-11-27 22:31:02     28029  AGENTS.md
   CHANGELOG.md                          1 files
-      2026-10-29 23:24:49    104696  CHANGELOG.md
+      2026-11-27 22:31:02    135198  CHANGELOG.md
   CLAUDE.md                             1 files
       2026-10-29 22:48:02       651  CLAUDE.md
-  docs/*.md                             4 files
-      2026-10-29 23:04:48     26605  docs/FORMAT-V2.md
-      2026-10-29 22:48:02     26043  docs/ARCHITECTURE.md
-      2026-10-29 22:48:02     22495  docs/FORMAT.md
-      2026-10-29 22:48:02     28109  docs/GGUF-IMPORT.md
-  .agents/*.md                         25 files
-      2026-11-20 21:53:51      5058  .agents/README.md
-      2026-11-20 21:53:13     97099  .agents/session.md
-      2026-10-30 00:15:50    163135  .agents/errors.md
-      2026-10-30 00:14:58     17599  .agents/docs/AI-THREAT-MODEL.md
-      2026-10-29 23:24:49     11842  .agents/user.md
-      2026-10-29 23:22:34      6820  .agents/skills/sub-agents/SKILL.md
-      2026-10-29 23:21:43      4373  .agents/skills/session-workflow/SKILL.md
-      2026-10-29 23:18:30     13055  .agents/rules.md
-      ... 17 more
-  .agents/docs/*.md                    10 files
+  docs/*.md                             6 files
+      2026-11-27 22:29:39     22742  docs/FORMAT.md
+      2026-11-27 22:29:39     35488  docs/GGUF-IMPORT.md
+      2026-11-27 22:29:39     25652  docs/LARGE-MODELS.md
+      2026-11-27 22:29:39      1275  docs/README.md
+      2026-11-27 22:29:39     27450  docs/ARCHITECTURE.md
+      2026-11-27 22:29:39     49164  docs/FORMAT-V2.md
+  .agents/*.md                         26 files
+      2026-11-27 22:31:02    146490  .agents/session.md
+      2026-11-27 22:31:02     12844  .agents/user.md
+      2026-11-27 22:31:02    190707  .agents/errors.md
+      2026-11-27 22:31:02      5355  .agents/README.md
+      2026-11-27 22:29:39      5411  .agents/skills/ci-triage/SKILL.md
+      2026-11-27 22:29:39     10793  .agents/skills/engine-ci-verify/SKILL.md
+      2026-11-27 22:29:39    223693  .agents/docs/SESSION-ARCHIVE.md
+      2026-11-27 22:29:39     38115  .agents/Environment.md
+      ... 18 more
+  .agents/docs/*.md                    11 files
+      2026-11-27 22:29:39    223693  .agents/docs/SESSION-ARCHIVE.md
+      2026-11-27 22:29:39     22702  .agents/docs/HYDRA2-RESEARCH.md
+      2026-11-27 22:29:39     11592  .agents/docs/ISSUE-72-AUDIT.md
+      2026-11-27 22:29:39     32370  .agents/docs/RESEARCH-LOG.md
       2026-10-30 00:14:58     17599  .agents/docs/AI-THREAT-MODEL.md
       2026-10-29 22:48:02     27970  .agents/docs/ANDROID-AUDIT.md
       2026-10-29 22:48:02     12432  .agents/docs/ANDROID_SKILL.md
-      2026-10-29 22:48:02     22271  .agents/docs/HYDRA2-RESEARCH.md
-      2026-10-29 22:48:02     23487  .agents/docs/RESEARCH-LOG.md
       2026-10-29 22:48:02      5514  .agents/docs/RESEARCH.md
-      2026-10-29 22:48:02    132904  .agents/docs/SESSION-ARCHIVE.md
-      2026-10-29 22:48:02     14601  .agents/docs/TECHNICAL-AUDIT.md
-      ... 2 more
+      ... 3 more
   .agents/skills/*/SKILL.md             8 files
+      2026-11-27 22:29:39      5411  .agents/skills/ci-triage/SKILL.md
+      2026-11-27 22:29:39     10793  .agents/skills/engine-ci-verify/SKILL.md
       2026-10-29 23:22:34      6820  .agents/skills/sub-agents/SKILL.md
       2026-10-29 23:21:43      4373  .agents/skills/session-workflow/SKILL.md
       2026-10-29 22:48:02      3521  .agents/skills/android-lint-gate/SKILL.md
       2026-10-29 22:48:02      5972  .agents/skills/android-ndk-build/SKILL.md
-      2026-10-29 22:48:02      4287  .agents/skills/ci-triage/SKILL.md
-      2026-10-29 22:48:02      7279  .agents/skills/engine-ci-verify/SKILL.md
       2026-10-29 22:48:02      3485  .agents/skills/kotlin-stub-check/SKILL.md
       2026-10-29 22:48:02      3355  .agents/skills/repo-docs-audit/SKILL.md
 
 -- source census: hosts, and pin/version claims without a source -----
-  documents scanned: 33   URLs found: 55
+  documents scanned: 36   URLs found: 59
   
   host census (count, host, source class):
-      13  github.com                               vendor/code host - verify the org is the upstream project
+      15  github.com                               vendor/code host - verify the org is the upstream project
        3  codeload.github.com                      vendor/code host - verify the org is the upstream project
        3  aws.amazon.com                           CHECK - not a known primary source
+       2  deb.debian.org                           CHECK - not a known primary source
        2  genai.owasp.org                          CHECK - not a known primary source
        2  blog.trailofbits.com                     CHECK - not a known primary source
        2  snyk.io                                  CHECK - not a known primary source
@@ -459,25 +477,24 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
        2  semgrep.dev                              CHECK - not a known primary source
        2  arxiv.org                                secondary - context only, never the proof
        2  agents.md                                CHECK - not a known primary source
-       2  agentskills.io                           CHECK - not a known primary source
   
-  documents that state a version/pin: 20
+  documents that state a version/pin: 22
   ...of those, documents with NO source URL anywhere: 11
     .agents/docs/ANDROID-AUDIT.md  (27 pin line(s))
         :8  - **Audited commit:** `6ed9ce5` (`origin/main`, "Merge pull request #40 from
         :10  - **Local tree audited:** `docs/agent-skills-and-protocol` @ `ccc23b3`, tree
-    .agents/docs/RESEARCH-LOG.md  (4 pin line(s))
-        :37  **Method:** fetched the foundation v1.7.3 sources from the JetBrains
-        :38  `compose-multiplatform-core` mirror (tags v1.7.0–v1.7.3; identical line maps)
+    .agents/docs/ISSUE-72-AUDIT.md  (5 pin line(s))
+        :3  Issue #72 ("post-`fd1848ac` transformer + `.hydra2` expansion", 6
+        :6  `94f8e08` (merge of PR #70, branch `arena/44edb923-bestai` base).
+    .agents/docs/RESEARCH-LOG.md  (13 pin line(s))
+        :42  **Method:** fetched the foundation v1.7.3 sources from the JetBrains
+        :43  `compose-multiplatform-core` mirror (tags v1.7.0–v1.7.3; identical line maps)
     .agents/docs/TECHNICAL-AUDIT.md  (5 pin line(s))
         :24  - Measured: `sizeof(HydraEngine) = 664` (x86-64, gcc; pinned at compile
         :149  the `version == 2` branch at line 379) — that is a v1.1 *packing*
-    .agents/errors.md  (33 pin line(s))
-        :408  ## 2026-10-26 (round 9) — pinned llama.cpp smoke: five layout/vocab facts, a REPL stdin spin, and an F16 type mismatch (environment traps, all documented)
-        :416  - **Cause (verified against the pin's source, v0.5.0
-    .agents/session.md  (45 pin line(s))
-        :95  ### Root causes of the red CI (main f79ff96, all four workflows)
-        :211  the same day (commit after 303b5c8):
+    .agents/errors.md  (49 pin line(s))
+        :20  - **Fix (layer 1, PR #87, merged 4b9e075):**
+        :117  - **Symptom:** after the #82 merge (`b086a92`), `CI` → `neon-test`
     .agents/skills/repo-docs-audit/SKILL.md  (1 pin line(s))
         :27  `llama.cpp` is a pinned submodule — its docs are upstream's, never
     .agents/user.md  (2 pin line(s))
@@ -485,19 +502,20 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
         :136  (JNI -> pinned llama.cpp loader) proven with that model.
     CLAUDE.md  (1 pin line(s))
         :6  Claude Code version, including those before v2.1.277 (2026-09-18), whose
-    docs/ARCHITECTURE.md  (2 pin line(s))
-        :43  (measured with `sizeof` on x86-64; pinned at compile time on all LP64
-        :324  belongs as a v1.1 optimisation, not as a second version.
-    docs/FORMAT-V2.md  (3 pin line(s))
-        :68  available as a possible *v1.1 file-level optimisation* if it is ever wanted, and
-        :97  model are bit-identical token streams, pinned by parity tests. Two
+    docs/ARCHITECTURE.md  (4 pin line(s))
+        :48  (measured with `sizeof` on x86-64; pinned at compile time on all LP64
+        :209  11 — `src/hydra_simd.h` / `src/hydra_neon.h`, parity-pinned bit-identical
+    docs/FORMAT-V2.md  (9 pin line(s))
+        :71  available as a possible *v1.1 file-level optimisation* if it is ever wanted, and
+        :136  legacy engine and its pinned streams are not modified. The CLI prompt
     docs/FORMAT.md  (1 pin line(s))
-        :393  > and for the note that it remains available as a v1.1 file-level optimisation.
+        :396  > and for the note that it remains available as a v1.1 file-level optimisation.
   
-  documents with no external URL at all: 23
+  documents with no external URL at all: 24
     .agents/CLAUDE.md
     .agents/README.md
     .agents/docs/ANDROID-AUDIT.md
+    .agents/docs/ISSUE-72-AUDIT.md
     .agents/docs/RESEARCH-LOG.md
     .agents/docs/RESEARCH.md
     .agents/docs/TECHNICAL-AUDIT.md
@@ -505,7 +523,6 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
     .agents/docs/pr-gpu-feasibility.md
     .agents/errors.md
     .agents/rules.md
-    .agents/session.md
     .agents/skills/android-lint-gate/SKILL.md
     .agents/skills/ci-triage/SKILL.md
     .agents/skills/engine-ci-verify/SKILL.md
@@ -513,6 +530,6 @@ excluded    .git, node_modules, __pycache__, .gradle, .idea, .vscode, build, dis
     .agents/skills/repo-docs-audit/SKILL.md
     .agents/skills/session-workflow/SKILL.md
     .agents/skills/sub-agents/SKILL.md
-    ... 5 more
+    ... 6 more
 
 report written: /workspace/chats/6daeacda62104e261f2b28ce/.subagents/web-source-verifier/reports/latest.json
