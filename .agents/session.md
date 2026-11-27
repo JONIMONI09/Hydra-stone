@@ -1822,3 +1822,51 @@ fixed by `git submodule update --init`, recorded in Environment.md).
 **Recommended order (needs the owner's go, R17):** commit the 18 paths on this branch → `git merge FETCH_HEAD` → resolve the 9 hunks (ours appended after theirs, session/errors keep both) → run the full gate on the merged tree → then the green state is real and the merge can land. No `git checkout` anywhere (R20).
 
 **Not done:** no commit, no merge, no push (R17/R19/R20). `.gitignore` untouched.
+
+### Reconciliation with origin/main (2026-11-27, merge `a2f182e`)
+
+**Safety first.** The pre-merge state is preserved twice: commit `40c8b97`
+(everything of rounds 12-19 in one change, 88 files) and the branch
+`backup/rounds-12-18-pre-arena-merge`, which points at exactly that commit. A
+merge on top of a fast-forwarding upstream is the operation that can lose work,
+so the backup exists before the merge touches a single file.
+
+**Fresh fetch.** `origin/main` had moved again while this session ran: the first
+fetch saw `4b9e075` (2026-11-09), the second `48b4608` (2026-11-25, PR #89) -
+53 commits ahead of our commit. The authenticated fetch reports the URL
+`github.com/JONIMONI09/Hydra-stone` while `origin` is `BestAI.git`: the repository
+was renamed, GitHub redirects, both names are the same repository.
+
+**Resolution, per file (both sides kept, nothing dropped):**
+
+| File | Conflict | Resolution |
+|---|---|---|
+| `.agents/README.md` | 2 hunks | docs table keeps both rows (`AI-THREAT-MODEL.md` + `ISSUE-72-AUDIT.md`); the docs paragraph takes upstream's `LARGE-MODELS.md` line **and** the seven-member `.subagents/` bullet |
+| `.agents/errors.md` | 1 hunk, 320 vs 403 lines | upstream entries (2026-10-31 to 2026-11-09) first, then the round-12-18 entries - the log stays newest-first |
+| `.agents/session.md` | 2 hunks, structural | ours as the base (it holds rounds 12-19); upstream's ten round sections that ours lacked inserted as one labelled block before the 2026-11-27 section, so the file reads chronologically. Upstream numbered its arena rounds 16-20, which collides with our 12-18 - the block says so and the dates decide |
+| `.agents/user.md` | 1 hunk | both directive sets kept; our three 2026-10-29 directives renumbered 32-34 after upstream's new item 31 |
+| `AGENTS.md` | 3 hunks | gguf paragraph takes upstream's six-layout sentence plus our `tools/bf16.py` CA-1 sentence; the two test comments keep upstream's factual counts *and* R21 ("the count parses from output, never hard-coded") |
+| `CHANGELOG.md` | 1 hunk | upstream entries first, our round-14-18 entries below |
+
+No conflict markers remain (`grep '^<<<<<<<'` over the tree: none).
+
+**Verification on the merged tree (observed):**
+
+| Check | Result |
+|---|---|
+| `scan.py . --fail-on high` | 250 text files, **0 high / 0 medium / 21 low / 48 waived**, rc=0 |
+| `scan.py --self-test` | 31 detection rules, 10 near misses, rc=0 |
+| injection sample (`/tmp/inject`: tag-block payload + zero-width "ignore previous") | rc=1, `[HIGH] invisible-tag-block poison.md:5`, `[MEDIUM] invisible-zero-width zwsp.py:1` |
+| SKILL.md YAML frontmatter (all 15) | 15 valid, 0 invalid (name == folder, description present, ASCII-only) |
+| `check_subagents.py` / `--self-test` | 25 checks 0 failures / 8 deliberate defects rejected |
+| `run_all.py` | 7/7 members, rc=0 |
+| `ERROR.md` per member | 7 of 7 present |
+| workflow YAML / lint | 5 parsed / 4 linted, negative controls proven |
+| `lint.yml` `ai-threat-scan` | present, 11 jobs total, 10 steps, self-test step 4 before tree scan step 5 |
+| `session_start_check.sh`, `docs_claim_check.sh` | ok / no banned claims |
+| `pyflakes`, `bandit` | rc=0 / rc=0 (0 issues) |
+| `make`, `make test-run` | rc=0: 234 tests 0 failures, 101 + 128 + 7 checks 0 failed, 152 + 216 tests 0 failures |
+
+**Open:** the backup branch is local only - pushing it would require checking it
+out (R20) and the authenticated push sends the current HEAD. The working branch
+carries the merge, so the backup is a session-local safety net.
