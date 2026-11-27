@@ -157,9 +157,25 @@
     not to be touched. Proceed thoroughly: legacy behaviour stays
     bit-identical, every local gate green before any commit.
 
+31. **(2026-10-31)** Full documentation audit (owner text, verbatim):
+    "Ok lese dir die ganze DOKU durch, und bitte alles aktualisieren,
+    auch wenn du was auf Linear gepostet hast und so, bitte alles
+    aktualisieren, finde in jedem ordner ne Readme und prüfe diese gegen
+    den Code bitte!" — STANDING for this task: (a) EVERY .md in the repo
+    is read and checked against the code (stale counts/claims/paths
+    fixed, proof obligation R6/R7 applies to docs too); (b) every folder
+    gets a README (create the missing ones: src/, include/, tests/,
+    public/, tools/, docs/); (c) the Linear project is brought up to date
+    (round 16 + the CI fix + this audit); (d) process per the
+    `.agents/skills/repo-docs-audit/SKILL.md` (4 mechanical checks green
+    + per-file findings list in session.md). Dated point-in-time audit
+    records (.agents/docs/TECHNICAL-AUDIT.md, ANDROID-AUDIT.md,
+    SESSION-ARCHIVE.md) keep their historical state — they are records,
+    not live docs.
+
 ## The `.subagents` team (2026-10-29, round 12)
 
-31. **(2026-10-29)** "starte bitte 6 Agenten ... 3 die im Websuchen können und 3
+32. **(2026-10-29)** "starte bitte 6 Agenten ... 3 die im Websuchen können und 3
     die kritisieren müssen ... unsre Subs müssen in einem Ordner zusammen
     arbeiten der .subagents heißt! bevor jeder Anfängt muss eine Original.MD
     erstellt werden ... für den Erstellst du einen Skill und eine eigene
@@ -173,13 +189,13 @@
     `reports/`; one shared read-only graph engine; a runner that retries a failing
     member once; a structural gate with an in-gate negative control; and the
     parent skill `sub-agents` in `.agents/skills/`.
-32. **(2026-10-29)** "Der criticer bewertet wenn du 10/10 hast bist der Beste
+33. **(2026-10-29)** "Der criticer bewertet wenn du 10/10 hast bist der Beste
     wenn du unter 7/10 bist musst du fibdings beheben" — every round that uses
     the team ends with `critic-final`, which preflights all six folders, audits
     the parent agent's claims and scores 1-10 in
     `.subagents/critic-final/REVIEW.md`; a score below 7/10 blocks the round until
     the fix list is applied. Docs stay English, the conversation stays German.
-33. **(2026-10-29)** "achte auf Lesbarkeit und Wertbarkeit also skills mit
+34. **(2026-10-29)** "achte auf Lesbarkeit und Wertbarkeit also skills mit
     richtigen YML ... einen Sub Agenten der nach Schadcode und nach
     Schadanweisung für KI erkennt ... darf ein py selber schreiben um Sachen zu
     scannen ... suche nach unsichtbaren Zeichen Instruktionen die bösen Willen

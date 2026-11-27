@@ -1,8 +1,411 @@
 # Error Log — Hydra-Stone
-
 > Protocol: see `.agents/skills/session-workflow/SKILL.md`.
 > Every error gets an entry immediately, with symptom, cause, fix and
 > prevention. Newest entries at the top.
+
+## 2026-11-09 (round 19) — early rejection reset the socket while the client was still sending (413 upload, 400 readBody) — three layers of the same bug
+
+- **Symptom (layer 1):** `node tools/server_test.js` failed
+  intermittently (2 of 14 runs in the round-19 verification pass) in
+  "an over-sized upload answers 413 with a body the client can read":
+  `TypeError: fetch failed` instead of the 413.
+- **Cause (layer 1):** both upload routes (`/api/models/upload`,
+  `/api/models/import`) answered the 413 and destroyed the request
+  socket on `res.on('finish')` — before the client finished sending
+  the body. A destroy with unread body bytes in the socket buffer
+  sends RST, not FIN, so a client mid-send sees a connection reset.
+  The pre-check path (declared Content-Length over the limit) makes
+  it likely: the server rejects before the body stream is attached,
+  so every unsent byte is "unread".
+- **Fix (layer 1, PR #87, merged 4b9e075):**
+  `closeAfterBodyDrained(req, res)` — resume + discard the remainder
+  (never buffered), destroy only after BOTH the response is flushed
+  and the client has finished sending (or gone away); both 413
+  branches use it; `streamToTmpFile` removes its data handler at the
+  limit so the drain is not re-paused. Deterministic raw-socket
+  regression test (1 MiB guaranteed unread, 100 ms pause): 8/8 red
+  pre-fix, green post-fix.
+- **Symptom (layer 2):** after layer 1, the ORIGINAL 413 test still
+  flaked — isolated repro: 15 of 30 runs `fetch failed, cause=EPIPE`
+  on the fast 3 MiB buffer body.
+- **Cause (layer 2):** the `Connection: close` header the 413 branches
+  set makes **Node itself** destroy the socket when the response
+  finishes — before the drain completes. Same RST mechanism, different
+  destroy owner (the runtime, not our handler).
+- **Fix (layer 2, this PR):** drop the header from both 413 branches.
+  Without it, Node leaves the socket alone, the request finishes
+  (drained), and `closeAfterBodyDrained` closes it with an empty
+  buffer (clean FIN). Repro: 15/30 → 0/30; full-suite stress 0/25.
+- **Symptom (layer 3):** the same bug class in `readBody` (all four
+  JSON routes): on `body > MAX_BODY` it rejected AND destroyed the
+  socket — a client still sending its JSON body got a reset instead
+  of the 400.
+- **Fix (layer 3, this PR):** readBody discards the remainder instead
+  of destroying (no unbounded growth: it stops accumulating); the
+  four route catch blocks answer the 400 and call
+  `closeAfterBodyDrained`. Deterministic raw-socket regression test
+  (same 1 MiB/100 ms pattern against `/api/cancel`): 8/8 red pre-fix,
+  green post-fix.
+- **Also fixed (this PR):** clang-tidy
+  `bugprone-implicit-widening-of-multiplication-result` at
+  `src/main.c:558` — explicit `(size_t)` at the pointer-offset use
+  site (i <= 7, offset <= 14, hex[17]).
+- **Prevention:** a server that rejects a request early must let the
+  client finish sending — answer, drain, close. AND: `Connection:
+  close` on such a response hands the destroy decision to Node, which
+  destroys on response finish, not on request completion — do not use
+  it on a path that still has to drain. And: a flaky race is worth a
+  deterministic sibling test (raw socket + guaranteed unread bytes),
+  not just a higher run count.
+
+## 2026-11-09 — ESLint binary missing
+
+- **Symptom:** `npm run lint` failed with `sh: 1: eslint: not found`.
+- **Cause:** the sandbox did not have the repository's npm dev dependencies installed.
+- **Fix:** install dependencies with `npm ci` before rerunning the existing lint gate.
+- **Prevention:** run `npm ci` after a fresh checkout before invoking npm scripts.
+
+## 2026-11-09 — CodeQL retained one allocation finding after first fix
+
+- **Symptom:** the first CodeQL review found one remaining
+  `js/resource-exhaustion` alert at the trainer state allocation.
+- **Cause:** CodeQL did not treat the repository's custom configuration
+  clamp as an upper-bound proof.
+- **Fix:** made the allocation's upper bound explicit with
+  `Math.min(safeCfg.dim, MAX_DIM)` and reran the trainer parity test
+  successfully.
+- **Prevention:** express security-relevant allocation bounds at the
+  allocation site, not only in helper functions that static analysis may not
+  model.
+
+## 2026-11-09 — CodeQL required a fixed-size trainer state
+
+- **Symptom:** the explicit `Math.min` bound still left resource-exhaustion
+  findings for both trainer state allocations.
+- **Cause:** CodeQL continued to track the tainted dimension through the
+  bounded expression.
+- **Fix:** state arrays now have the fixed `MAX_DIM` length and only the
+  validated dimension is zero-filled; trainer parity remains green.
+- **Prevention:** use fixed-capacity buffers when static analysis cannot prove
+  a helper-derived bound and the cap is already part of the model contract.
+
+## 2026-11-09 — Static-analysis venv absent
+
+- **Symptom:** the targeted cppcheck/flawfinder command failed with
+  `/tmp/lintenv/bin/cppcheck: No such file or directory` and the equivalent
+  flawfinder path was also absent.
+- **Cause:** this sandbox's ephemeral `/tmp` did not contain the documented
+  linter virtual environment.
+- **Fix:** recreate `/tmp/lintenv` and install the documented PyPI tools before
+  rerunning the checks.
+- **Prevention:** probe the environment-specific linter path and recreate it
+  from `.agents/Environment.md` whenever `/tmp` has been reset.
+
+## 2026-11-09 — Trainer parity test missing hydra-run
+
+- **Symptom:** `node tools/console_train_test.js` failed with
+  `hydra-run not found at .../hydra-run - run "make" first`.
+- **Cause:** `make test` builds the test binaries but does not build the CLI
+  executable required by the trainer parity test.
+- **Fix:** build the complete project with `make` before rerunning the parity
+  test.
+- **Prevention:** use the repository's full `make` gate before Node tests that
+  invoke the compiled CLI.
+
+## 2026-11-01 (round 17.8) — Ubuntu 26.04 dropped qemu-user-static too; third install-step failure on the same step
+
+- **Symptom:** after the #82 merge (`b086a92`), `CI` → `neon-test`
+  (run 41342270169) and `Release` → `CLI (Linux)` (run
+  41342270201) failed at the install step a third time — but this
+  time the gcc probe had succeeded (`installed cross package:
+  gcc-aarch64-linux-gnu`): the failure was the very next command,
+  `sudo apt-get install -y -qq qemu-user-static` → `E: Package
+  'qemu-user-static' has no installation candidate` (exit 100).
+- **Cause:** same single event as rounds 17.6/17.7 — `ubuntu-latest`
+  moved to Ubuntu 26.04 (actions/runner-images#14748), which drops
+  more than one package from the workflow's toolchain. Side finding:
+  the round-17.6 "unversioned gcc" failure was almost certainly this
+  same qemu line all along (apt fails the whole install if ANY
+  listed package is missing; `gcc-aarch64-linux-gnu` is on 26.04, as
+  the #82 run proved).
+- **Fix:** qemu install is now a probe — `qemu-user-static`, then
+  `qemu-user` (dynamic variant) — with the working emulator
+  exported as `$QEMU_AARCH64` (GITHUB_ENV); all three emulator
+  invocations (neon run, ARM test-count gate, cross-arch parity) +
+  the release parity use it. The emulator is invoked explicitly
+  (never via binfmt), so static vs dynamic is irrelevant. Same
+  self-diagnosis pattern as the gcc probe (annotations with apt
+  error tail + `apt-cache search qemu` candidates).
+- **Proof:** local execution of the install script with stubbed apt
+  binaries reproducing the exact 26.04 state → fallback selected,
+  both env vars exported, exit 0.
+- **Prevention:** when a runner image major-version move breaks an
+  apt install, do not fix only the named package — audit every
+  package the workflow installs and give each one a probe +
+  fallback + self-diagnosis. And remember: in a multi-package
+  `apt-get install a b c`, the failing package is not necessarily
+  the one apt's summary line names.
+
+## 2026-11-01 (round 17.7, completed by round 17.8) — the unversioned cross-compiler is ALSO gone on Ubuntu 26.04; self-diagnosing probe list
+
+- **Symptom:** after the #81 merge (`a3f5c44`, the round-17.6
+  unversioned fix), the same two jobs failed at the same step again:
+  `CI` → `neon-test` (run 41340751971) and `Release` → `CLI
+  (Linux)` (run 41340751982), now on
+  `sudo apt-get install -y -qq gcc-aarch64-linux-gnu
+  qemu-user-static`.
+- **Cause:** the image refresh was a major-version move, not a patch:
+  `ubuntu-latest` switched to Ubuntu 26.04 in November 2026
+  (actions/runner-images#14748). The gcc-12 pin is gone from the new
+  image's apt sources; the exact apt error text for the #81 failure
+  was not retrievable (log endpoint EOF) — **corrected by round
+  17.8:** the #82 run proved `gcc-aarch64-linux-gnu` IS on 26.04, so
+  the #81 failure was the `qemu-user-static` line of the same
+  command (see the round-17.8 entry), not the gcc package.
+- **Fix:** the install steps in `ci.yml` (neon-test) and `release.yml`
+  (CLI Linux) now walk a probe list — `gcc-aarch64-linux-gnu`, then
+  `gcc-15/14/13-aarch64-linux-gnu` — and export the working binary
+  as `$CC_AARCH64` (GITHUB_ENV), which all three aarch64 build steps
+  use. If the whole list fails, the step emits `::error::`/
+  `::notice::` annotations with the apt error tail and
+  `apt-cache search` candidates — diagnosable through the Checks API
+  without the log endpoint.
+- **Prevention:** on infra moves that change a package inventory, do
+  not assume the "obvious" package name survives; probe + export +
+  self-diagnose. And keep the behaviour gates (parity, test-count
+  baseline) so the compiler version stays non-load-bearing. See
+  RESEARCH-LOG.md §13.
+
+## 2026-11-01 (round 17.6, fix superseded by round 17.7) — runner image refresh dropped gcc-12-aarch64-linux-gnu; two jobs red at their apt install step
+
+- **Symptom:** after the #80 merge (`2c11d20`), two main-tier jobs
+  failed at their first real step: `CI` → `neon-test` (run
+  41339831236) at "Install AArch64 cross-compiler and qemu-user" and
+  `Release` → `CLI (Linux)` (run 41339831264) at "Install cross
+  toolchain + qemu" — both running
+  `sudo apt-get install -y -qq gcc-12-aarch64-linux-gnu
+  qemu-user-static`. Every other job in both runs was green (Android
+  APK, all lint jobs, GPU bench).
+- **Cause:** the ubuntu-latest runner image was refreshed (the same
+  event that also brought the newer cppcheck, round 17.5). The
+  refresh removed `gcc-12-aarch64-linux-gnu` from the image's apt
+  sources, so the version-pinned install fails. Proven non-transient:
+  the identical step failed on two consecutive runs, two days apart,
+  on two different commits (41337186425 on `07bf74d`, 41339831264 on
+  `2c11d20`).
+- **Attempt (PR #81, merged `a3f5c44`):** unversioned cross-compiler
+  in both workflows (`gcc-aarch64-linux-gnu` →
+  `aarch64-linux-gnu-gcc`). **Insufficient** — see the round-17.7
+  entry above; the metapackage is also not installable on the 26.04
+  image.
+- **Prevention (updated in 17.7):** prefer "default tool + behaviour
+  gate" over "pinned old version" in CI — but a major image move can
+  drop even the default name, so the install must probe and
+  self-diagnose. See RESEARCH-LOG.md §13.
+
+## 2026-11-01 (round 17.5) — newer distro cppcheck turned 32 nullPointerOutOfMemory findings into a red lint job
+
+- **Symptom:** main run 41337186327 (the docs-audit push `07bf74d`)
+  failed exactly one step: `lint` job → "Static analysis (cppcheck)"
+  with `--error-exitcode=2`. Identical code was green on `8606d58`
+  (run 41225936406) the day before.
+- **Cause:** the round-16 KV test helpers allocated per-layer
+  calloc/malloc chains without checking the results. The older distro
+  cppcheck did not report it; the image refresh shipped a newer
+  cppcheck that does (27× in `tests/test_hydra_moe.c`, 5× + 1
+  `nullPointerArithmeticOutOfMemory` in `tests/test_engine.c`).
+  Verified not the doc PR: `git diff 8606d58..07bf74d -- src/
+  include/` = comments only. Job log and lint-errors artifact were
+  unreadable from this sandbox (log endpoint EOF; artifact blob host
+  not on the egress allowlist) — the diagnosis used the Jobs API step
+  conclusions + local reproduction with cppcheck 2.22 (superset).
+- **Fix (PR #80, merged `2c11d20`):** `kv_set_alloc`/`kv_set_free`
+  helpers own the whole cache chain (checked allocations, full
+  cleanup on OOM, no leak); all five KV test sites + the sink
+  `k0/v0/ak/av` buffers + the four unchecked `ref_get` calls now
+  checked; the two `tests/test_engine.c` blocks got the file's own
+  OOM convention.
+- **Prevention:** unchecked allocations in test code are a landmine
+  for any future static-analysis version bump — the fix is clean
+  under cppcheck 2.22 (a superset of the distro version), so the
+  next version bump cannot re-flag the same class. RESEARCH-LOG.md
+  §12.
+
+## 2026-10-31 (round 15) — making Q4_0 decodable broke two tests that ENCODED the old behaviour
+
+- **Symptom:** after adding the Q4_0/Q4_1 decoders to
+  `tools/gguf_reader.py`, `tools/gguf_test.py` failed twice: first an
+  `AssertionError: Q8_0 needs whole blocks` in the fixture builder (a
+  tensor built as "type 2 = undecodable" now went through the block-size
+  path with a non-multiple-of-32 element count), then
+  "a Q8_0 tensor is decodable, not on the refused list" failing (its
+  `quantised_names()` expectation listed the Q4_0 tensor as
+  not-decodable).
+- **Cause (both mine, both structural):** the v1 gate's negative controls
+  used **type 2 (Q4_0) as the standing "undecodable" example** - a control
+  that hard-codes the behaviour under test goes stale the moment that
+  behaviour legitimately changes. The comment even said so ("a negative
+  control that silently starts passing is worse than no control at all"),
+  but the fix for that warning was to *relabel*, not to *re-derive*:
+  when a layout graduates from refused to decodable, every control that
+  named it must move to a type that is still refused (Q4_K, 12).
+- **Fix:** both controls now use `ggml_type 12` (Q4_K); comments say
+  which types they used to use. 101/0 re-verified.
+- **Prevention:** a negative control must pick its example type from the
+  REFUSED set by construction (e.g. a constant `REFUSED_EXAMPLE = 12`
+  next to `BLOCK_TYPES`), and whenever `BLOCK_TYPES` grows, the gate run
+  itself is the detector - a stale control failing is a feature, not a
+  flake: re-derive the control's example, never revert the feature.
+
+## 2026-10-31 (round 14) — macOS CI leg crashed on detect_leaks=1: AppleClang has no LeakSanitizer
+
+- **Symptom:** after the PR #73 merge (`d1729ba`), the main-tier run failed
+  exactly one step: `build-test (macos-latest)` → "Sanitizers (ASan+UBSan)
+  over the whole test suite", **exit 134 (SIGABRT)**. Every other job and
+  step passed - including the ubuntu leg of the SAME step (identical
+  commands, green there).
+- **Cause:** round 13 (Qodo #6) changed the step to
+  `export ASAN_OPTIONS=detect_leaks=1`. AppleClang (macOS) ships NO
+  LeakSanitizer; when detect_leaks is requested, the ASan runtime aborts
+  at process startup on macOS. The option is platform-specific, and the
+  sandbox has no macOS toolchain, so the change could not be verified on
+  that leg locally. The green ubuntu leg was mistaken for proof.
+- **Fix:** platform-conditional option in `.github/workflows/ci.yml`
+  (commit `fe2edc6`, PR #75, merged `5ff3011`):
+  `case $(uname -s) in Darwin) ASAN_OPTIONS= ;; *) detect_leaks=1 ;; esac`;
+  ASan + UBSan stay fully active on both legs. Main run after the merge:
+  9/9 jobs success, main green.
+- **Prevention:** treat every `ASAN_OPTIONS`/sanitizer-runtime option as
+  platform-specific: either verify it on every matrix leg or guard it with
+  `uname -s`. Exit 134 = SIGABRT = the process died at startup (runtime
+  option / missing runtime), not a test failure - read the step name first,
+  don't assume the suite code regressed.
+
+## 2026-10-30 (round 13) — self-inflicted test/pin mistakes during the Qodo-fix round (five distinct traps, all caught before commit)
+
+- **Symptom:** after the engine fixes, the moe suite and the CLI gate
+  failed in ways the fixes could not have caused: six dequant unit
+  anchors wrong, a "divergence" between text and numeric prompt
+  streams, a meta-tamper test that refused the wrong file, a GQA pin
+  that could not distinguish old from new mapping, and one server
+  test receiving 500 instead of 200.
+- **Cause (each one real, each one mine):**
+  (1) The `test_moe_dequant_flat_unit` anchors were computed by hand
+  against a WRONG code pattern (0,0,3,3,2,1,1,2 instead of the
+  generator's 0,0,3,0,2,1,1,2) and a WRONG payload size (n/4 bytes
+  instead of the n/2 the engine reads, `payload[k/2]`) — a 64-byte
+  payload for 256 elements let groups 2/3 read OOB stack garbage,
+  which is exactly why only their anchors failed while 0/1 passed.
+  The compiler warnings ("iteration 64 invokes UB", "writing 32 bytes
+  into region of size 0") pointed at the first overflow variant.
+  (2) The #23 dispatch move made `--prompt` win over the positional
+  start token on .hydra2 too, so the R12 text/numeric parity check
+  compared different START tokens (the header line differs); the
+  streams only become equal with the #30 prefill. The gate's byte
+  comparison then needed to exclude the metadata header line — and
+  my first regex excluded `^\[Hydra\]:` (with a colon) while the
+  line is `[Hydra] .hydra2 ...` (no colon), so the exclusion
+  silently did nothing until the second fix.
+  (3) The meta-tamper helper computed FILE offsets from the
+  container's `meta_blob` offsets — but the blob is a COMPACT
+  re-serialization (key bytes, value bytes, no headers), not the
+  on-disk region; the tamper wrote the wrong 4 bytes, the file still
+  opened, and the refusal check failed. The on-disk wire format
+  (u32 count, then klen/vlen-prefixed pairs) has to be walked from
+  `metadata_offset`.
+  (4) The first GQA pin (`12 12 12 12 12 12 5 5 5 5 13 5`) was
+  captured from a binary that had NOT been rebuilt after the
+  mapping fix — it is the OLD interleave stream; a scripted
+  A/B (build-swap-build-run per mapping) showed every tested
+  geometry actually differs, and the corrected pin is
+  `15 9 12 12 9 13 13 13 13 13 10 13`.
+  (5) Node's ASYNC execFile error object carries the exit code in
+  `.code` (the SYNC throw uses `.status`), so the refusal branch
+  (`rc === 2`) after the #27 async conversion never matched and the
+  inspect endpoint returned 500 for broken .hydra2 files.
+- **Fix/lesson (one rule each):** anchors and pins are ALWAYS
+  verified by an independent implementation (byte-level Python replay
+  for the packing; a scripted build/swap/run A/B for any stream pin,
+  which must prove old != new before the pin is meaningful); offsets
+  across an API boundary are re-derived from the on-disk format, not
+  from the in-memory view; a rebuilt binary is verified (mtime or a
+  canary behavior) before it pins anything; sync/async subprocess
+  error shapes differ in every runtime — read the docs, don't assume.
+
+
+## 2026-10-30 (round 12) — cppcheck found two warnings the local gates could not (one a real latent OOB), and the CI logs were unreadable from this sandbox
+
+- **Symptom:** every CI run of the R12 branch failed in the `lint`
+  job with only "Process completed with exit code 2" visible. `gh run
+  view --log-failed` and `gh run download` hit the sandbox network
+  whitelist (results-receiver / blob storage -> EOF) and the jobs API
+  returned an empty step list, so the failing step was unknown.
+  Meanwhile all local gates (gcc/clang -Werror, -fanalyzer, ASan+UBSan,
+  full test suite) were green — only cppcheck could not be run locally
+  (the proxy whitelist no longer serves the cppcheck repo; no root for
+  apt).
+- **Cause (gate red):** two real findings, both in round-12 code:
+  (1) `tests/test_hydra_moe.c` reference top-k used a `best = -1`
+  sentinel; with zero experts the elimination write `rk[best]` would
+  index -1 — `[negativeIndex]` error. (2) `src/hydra_moe.c` casts the
+  raw expert scratch buffer `uint8_t *` -> `const float *` for the F32
+  path — `[invalidPointerCast]` (portability). Second subtlety:
+  cppcheck ABORTS at 82% when it hits the first error-severity
+  finding, so a second analysis pass after the fixes was required to
+  prove the remaining files were clean (they were: 9/9, 0 findings).
+- **Fix:** (1) restructured the reference scan to a `best = 0` start
+  with a strict `>` comparison (epl >= 1 is guaranteed by the model
+  config; identical winner, tie -> lower id; 138/0 re-verified).
+  (2) documented the cast inline (malloc-aligned buffer, F32 payload by
+  format contract) + `cppcheck-suppress invalidPointerCast` — the gate
+  is explicitly run with `--inline-suppr`. Triage method that worked:
+  check-run ANNOTATIONS API (`/check-runs/<id>/annotations`) exposes
+  the failing line + exit code, and a temporary workflow step that
+  re-ran cppcheck with `--error-exitcode=0` re-emitting every line as
+  a `::error::` annotation made the findings visible. The diagnostic
+  step was removed again in the final commit.
+- **Prevention:** (1) a `-1` sentinel that can reach an array index is
+  a defect even when the caller's invariants make it unreachable —
+  write index loops so the sentinel cannot be used (init from a
+  provably-valid element); (2) for any gate whose tool is unreachable
+  locally, keep the CI reproducible from the log AND keep the
+  annotation-API fallback (see the ci-triage skill); (3) after fixing
+  findings from an aborted static-analysis run, re-run it to 100% —
+  the first pass hides what comes after the abort point.
+
+## 2026-10-30 (round 12) — the ternary expert dequant read its scales through a misaligned float pointer (UBSan-only: the -O3 suite was green)
+
+- **Symptom:** an ASan+UBSan rebuild of `hydra-moe-test` (same
+  sources, `-fsanitize=address,undefined`) reported
+  `runtime error: load of misaligned address … for type 'const float'`
+  at `src/hydra_moe.c:911` (and in the test's independent reference
+  dequant). The regular `-O3` build ran all 138 checks green, so
+  nothing in the existing gates could have seen it.
+- **Cause:** in the block-scaled ternary expert layout the per-group
+  F32 scales are stored directly AFTER the packed code bytes (`n/2`
+  bytes). When `rows*cols % 4 == 2` (e.g. the dequant unit test's
+  inter=2 x dim=3 blob, and any valid .hydra2 expert matrix of that
+  shape) the scale section starts at a 2-byte-aligned, not
+  4-byte-aligned, offset. `const float *scales = (const float
+  *)(p + n/2)` and then `scales[i]` is a misaligned load: silently
+  "works" on x86-64, a trap/perf hazard on ARM. The format's
+  code|scales concatenation makes the misalignment unavoidable, so
+  the READ side must be portable, not the layout.
+- **Fix:** read each scale through `memcpy` (4-byte copy, identical
+  value, portable) in both `src/hydra_moe.c` (`moe_dequant_block`)
+  and the independent reference in `tests/test_hydra_moe.c`
+  (`ref_dequant_expert`). No numeric change - the dequant values are
+  bit-identical, the pinned greedy streams re-verified.
+- **Prevention:** CI now has a "Sanitizers (ASan+UBSan) over the
+  whole test suite" step (build-test job, both matrix legs): all
+  five test binaries are rebuilt with
+  `-fsanitize=address,undefined` and run with
+  `UBSAN_OPTIONS=halt_on_error=1`, so any runtime error - including
+  misaligned accesses the -O3 build serves silently - fails the
+  build. Rule: a cast from `uint8_t *` to `float *` (or any wider
+  type) is only legal when the alignment is PROVEN by construction
+  (malloc/aligned array/16-byte-aligned section); byte-stream offsets
+  get a memcpy.
 
 ## 2026-10-29 (round 18, post-round verification) — two overview documents carried stale counts
 
@@ -2755,3 +3158,45 @@
   (zig for the NEON side, since there is no local ARM runtime);
   (5) the pinned token-stream tests are the real regression gate for
   kernel swaps — they caught Bug 1 before the parity test existed.
+
+## 2026-10-31 (R16) — the hydra-moe-test fixture list existed twice (Makefile + ci.yml ASan leg) and drifted: main-tier CI red on both matrix legs
+
+- **Symptom:** the merge of PR #77 (round 16) to `main` failed the CI
+  workflow run 41222651267 on BOTH `build-test` matrix legs
+  (ubuntu-latest + macos-latest), in the "Sanitizers (ASan+UBSan) over
+  the whole test suite" step:
+  `FAIL: fixture paths missing - run make test-run (the Makefile passes
+  F32 as argv[1], … Q4_0 as argv[8], Q4-same-shape F32 as argv[9])` →
+  `=== 1 Tests, 1 failures ===`, exit 1. Lint & Security and Release
+  were green; every suite in the user-visible log was green right up to
+  the moe line.
+- **Root cause:** round 16 added two fixtures to the moe suite (the Q4_0
+  engine pins: `--moe-q4` and the same-shape F32 cross-check) and updated
+  the `test-run` recipe in the Makefile accordingly (7 → 9 fixtures).
+  But ci.yml's sanitizer leg does NOT run `make test-run` — it compiles
+  its own ASan binaries into `/tmp` (the Makefile has no sanitizer
+  CFLAGS) and therefore carries an **inline copy** of the fixture list,
+  which still had the old 7 entries. The binary now hard-requires 9
+  argv fixtures (argv count check before any test) → loud refusal.
+  Local `make test-run` was green, the PR-tier CI is lint-only by owner
+  rule, so the drift was invisible until the first main-tier functional
+  run after the merge.
+- **Fix:** the fixture list now lives exactly once in
+  `tools/make_moe_fixtures.sh <base>` — it generates all nine fixtures
+  (the seven original shapes + `-q4` + `-q4f32`) and prints their paths
+  as the last stdout line, in the argv order `tests/test_hydra_moe.c`
+  expects. The Makefile's `test-run` recipe and the ci.yml sanitizer
+  leg both call the script (`… | tee <args-file>` keeps the generator's
+  byte-count lines in the logs; `tail -n 1` extracts the path list).
+  Verified: local `make test-run` 216/0, and the sanitizer leg
+  reproduced byte-for-byte locally (ASan+UBSan build,
+  `ASAN_OPTIONS=detect_leaks=1`, `UBSAN_OPTIONS=halt_on_error=1`) —
+  failing with the old 7-fixture list, 216/0 and sanitizer-clean with
+  the script.
+- **Prevention:** any list that must stay in sync across build entries
+  (fixtures, env contract, sampler ranges) is a script or a check, not
+  a copy — the same reasoning that produced `tools/sampler_contract_check.sh`
+  for the Android/server sampler ranges. If a new fixture is ever added,
+  there is exactly one place to edit (the script), and both the Makefile
+  and every CI leg pick it up automatically; a count mismatch still
+  fails loudly in the test binary itself.

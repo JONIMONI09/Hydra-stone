@@ -2,6 +2,509 @@
 All notable changes to this project, per change, are recorded here and in
 `.agents/session.md` (.agents/rules.md R2). Newest entries first.
 
+## 2026-10-25 (round 20, this PR) — web console can now pin the sampler seed; full surface parity verified + info.md
+
+An external feature request asked for exactly what this repository
+already is (C inference tool, `.hydra` load, seed + token-ID prompt,
+temperature / min-p / repetition penalty / window / seed, greedy by
+default, mmap of weights with no weight heap, web console + mobile
+app on the same engine, plain or JSON output). The one real gap found
+by executing every claim: **the web surface could not pin the RNG
+seed** — the CLI (`--seed`) and the Android bridge (`jint seed`)
+could, but `/api/infer` had no seed field, so a web sampling run could
+not be requested at a specific seed.
+
+- **Fix:** `/api/infer` accepts `seed` (integer in [0, 2^32-1] — the
+  Android bridge's 32-bit range, so a web-seeded run stays reproducible
+  on every surface), passes it through as `--seed` to the same
+  `hydra-run` binary. The console UI gains a seed field; a seed left at
+  0 is not sent, so legacy requests stay bit-identical.
+- **Contract:** `tools/sampler_contract_check.sh` now pins the seed
+  ceiling (2^32-1) and the pass-through on both surfaces (39 checks).
+- **Regression test:** `server_test.js` asserts a web run with
+  seed 42 and seed 7 is token-identical to the CLI run with the same
+  `--seed` (the cross-surface same-results proof), and that every bad
+  seed value is rejected with a 400 that names the field.
+- **Docs:** new root `info.md` — a concise English explainer of what
+  the project is, how it works, what it does today, and four verified
+  explainer videos (sampling, decoding, min-p, the LLM core). The
+  web-UI sampler help text is corrected (only temperature must leave
+  its default for sampling to activate; min-p's default 0 already
+  satisfies the engine's `min-p < 1` half of the rule).
+- **Verification:** full local gate green — gcc strict, cppcheck 0,
+  234/152/216 (+ the gguf/jni/large-model suites) 0 failures,
+  ASan+UBSan+LSan clean, `--fanalyzer` 0, server suite 61/61,
+  sampler contract 39 checks + negative control, live web↔CLI parity
+  confirmed by execution. clang strict and the Android APK build run
+  in CI (this sandbox cannot install clang — apt index fetch is
+  blocked by the egress allowlist — recorded in `.agents/Environment.md`).
+
+## 2026-11-09 (round 19b, this PR) — the same socket-reset bug, three layers: Connection: close race, readBody, main.c cast
+
+PR #87 (round 19a, merged `4b9e075`) fixed the 413 upload branches
+(`closeAfterBodyDrained`: drain the body, close only after the
+client finished sending + deterministic raw-socket regression
+test). This PR finishes the job — two more layers of the same bug
+class plus one static-analysis finding:
+
+- **Layer 2 (the `Connection: close` race):** after #87 the original
+  413 test still flaked — isolated repro: 15 of 30 runs
+  `fetch failed, cause=EPIPE`. Cause: the `Connection: close` header
+  makes **Node itself** destroy the socket on response finish,
+  before the drain completes (RST with unread body bytes → EPIPE).
+  Fix: drop the header from both 413 branches; the header-less path
+  lets the request finish, `closeAfterBodyDrained` closes with an
+  empty buffer (clean FIN). Repro 15/30 → 0/30.
+- **Layer 3 (`readBody`, all four JSON routes):** on
+  `body > MAX_BODY` it rejected AND destroyed the socket — a client
+  still sending its JSON body got a reset instead of the 400. Fix:
+  readBody discards the remainder (stops accumulating), the four
+  route catch blocks answer 400 + `closeAfterBodyDrained`.
+- **`src/main.c:558`:** clang-tidy
+  `bugprone-implicit-widening-of-multiplication-result` — explicit
+  `(size_t)` at the pointer-offset use site.
+- **Regression test:** second deterministic raw-socket test
+  (over-sized JSON body against `/api/cancel`, 1 MiB guaranteed
+  unread, 100 ms pause): 8/8 red against the pre-fix server, green
+  after.
+- **Verification:** full suite (59 tests) stress 0/25 red; repro
+  0/30; eslint clean; cppcheck (exact CI command) 0 findings;
+  ASan+UBSan+LSan 5/5 clean; test count 234 = baseline.
+- **Doc backfill (round 18):** the 2026-11-09 agentic-autofix work
+  (PRs #85/#86) had no CHANGELOG entry; added below.
+
+## 2026-11-09 (round 18, entry written late — PRs #85/#86 shipped without one) — CodeQL + code-scanning alert remediation (agentic-autofix)
+
+- **PR #85** (merged `fdf7607`): CodeQL security alerts —
+  `server.js` (TOCTOU: fstat-on-fd in `analyseHydraFile`; clamped
+  layers/vocab in `verifyModelFile`; `Object.create(null)` in the
+  vocab-map endpoint), `tools/hydra_train.js` (fixed-capacity
+  `MAX_DIM` state buffers + consistent `safeCfg` in `train()`),
+  `tests/test_engine.c` (hardened temp-file opens: O_NOFOLLOW +
+  0600, 10 sites).
+- **PR #86** (merged `fc5996e`): code-scanning alerts —
+  `tools/server_test.js` file-backed HTTP test fixtures replaced by
+  in-memory `buildModelBytes()`/`buildGgufBytes()` (no temp files,
+  no `python3 make_model.py` subprocess in the upload test).
+- Both carry their own records in `.agents/errors.md` (five
+  2026-11-09 entries) and `.agents/session.md` (round 18); main CI
+  green on both merges (3/3 runs on `fc5996e`).
+
+## 2026-11-01 (round 17.8) — Ubuntu 26.04 also dropped qemu-user-static: qemu probe + $QEMU_AARCH64
+
+The post-#82 main runs (41342270169 CI, 41342270201 Release)
+confirmed the round-17.7 gcc probe works — `gcc-aarch64-linux-gnu`
+installed fine on 26.04 (the unversioned metapackage IS on the new
+image; the round-17.6 failure was actually this next line) — but
+both jobs failed at the very next command:
+`E: Package 'qemu-user-static' has no installation candidate`.
+
+- **Fix (this PR, workflows only):** the qemu install is now a probe
+  — `qemu-user-static` first, then `qemu-user` (dynamic variant) —
+  and the working emulator is exported as `$QEMU_AARCH64`
+  (GITHUB_ENV), used by all three emulator invocations (neon-test
+  run, ARM test-count drift gate, cross-arch parity in ci.yml;
+  release parity in release.yml) + the neon failure-report echo.
+  The emulator is always invoked explicitly (never via binfmt), so
+  the static-vs-dynamic distinction is irrelevant. Same
+  self-diagnosis pattern as the gcc probe: `::error::`/`::notice::`
+  annotations with the apt error tail + `apt-cache search qemu`
+  candidates if nothing installs.
+- **Proof the new logic matches the production failure:** the
+  install script was executed locally with stubbed apt binaries
+  reproducing the exact 26.04 state (gcc metapackage available,
+  qemu-user-static "no installation candidate", qemu-user
+  available) → qemu-user fallback selected,
+  `QEMU_AARCH64=qemu-aarch64` + `CC_AARCH64=aarch64-linux-gnu-gcc`
+  exported, exit 0.
+- **Incident record:** three install-step failures on three
+  different packages across three runs (gcc-12 pin → unversioned
+  gcc [actually qemu] → qemu-user-static). All caused by the single
+  event `ubuntu-latest` → Ubuntu 26.04 (actions/runner-images#14748).
+
+## 2026-11-01 (round 17.7, completed by 17.8) — AArch64 cross-compiler: probe list + $CC_AARCH64 (supersedes the round-17.6 attempt)
+
+The round-17.6 attempt (unversioned `gcc-aarch64-linux-gnu`) was
+insufficient: after that merge, `neon-test` (run 41340751971) and
+Release `CLI (Linux)` (run 41340751982) failed at the install step
+again — the unversioned package is not installable on the new image
+either. The log endpoint was unreachable (EOF), so the install step
+is now self-diagnosing.
+
+- **Fix (this PR):** both install steps (ci.yml neon-test,
+  release.yml CLI-Linux) now try a probe list —
+  `gcc-aarch64-linux-gnu`, then `gcc-15/14/13-aarch64-linux-gnu` —
+  and record the working compiler in `$CC_AARCH64` (GITHUB_ENV),
+  which all three aarch64 build steps use. If nothing is
+  installable, `::error::`/`::notice::` annotations (readable through
+  the Checks API) name the exact apt failure and the candidate
+  packages from `apt-cache search`, so the next red run is
+  diagnosable without the log. The install step still prints the
+  resolved compiler version.
+- **Why the compiler version is not load-bearing:** unchanged — the
+  ARM test-count baseline, the NEON-vs-scalar comparison tests, and
+  the x86-vs-ARM/NEON bit-identical parity check in both workflows
+  prove behaviour on every main push.
+
+## 2026-11-01 (round 17.6, superseded by 17.7) — runner image moved to Ubuntu 26.04; first cross-compiler fix attempt
+
+The `ubuntu-latest` runner image moved to Ubuntu 26.04 in
+November 2026 (actions/runner-images#14748) — the same event that
+brought the newer cppcheck (round 17.5). The refresh removed
+`gcc-12-aarch64-linux-gnu` from the image's apt sources, so two
+main-tier jobs failed at their install step: `CI` → `neon-test`
+(run 41339831236) and `Release` → `CLI (Linux)` (run 41339831264) —
+both on `apt-get install gcc-12-aarch64-linux-gnu qemu-user-static`.
+
+- **Attempt (PR #81, merged `a3f5c44`):** the unversioned
+  cross-compiler (`gcc-aarch64-linux-gnu` →
+  `aarch64-linux-gnu-gcc`). **Insufficient** — the unversioned
+  package is also not installable on the new image (runs
+  41340751971/41340751982 red at the same step). Superseded by the
+  round-17.7 probe-list fix above.
+- **Proof the failure was persistent, not transient:** the identical
+  step failed on three runs in a row across two image generations
+  (41337186425 on `07bf74d`, 41339831264 on `2c11d20`,
+  41340751971+41340751982 on `a3f5c44`).
+
+## 2026-11-01 (round 17.5, entry written late — PR #80 shipped without one) — newer distro cppcheck flags round-16 test allocations (merged `2c11d20`)
+
+Main CI went red in the `lint` job's cppcheck step after the round-17
+docs audit merged (`07bf74d`, run 41337186327): the refreshed runner
+image's newer cppcheck reports `nullPointerOutOfMemory` for the
+round-16 KV test code (unchecked calloc/malloc chains — 27× in
+`tests/test_hydra_moe.c`, 5× + 1× `nullPointerArithmeticOutOfMemory`
+in `tests/test_engine.c`). `--error-exitcode=2` turned the warnings
+into a job failure. The code was green on `8606d58` with the older
+distro cppcheck; the doc PR itself only touched comments (verified by
+diff).
+
+- **Fix (PR #80):** `kv_set_alloc`/`kv_set_free` helpers in
+  `tests/test_hydra_moe.c` own the whole per-layer cache chain
+  (checked allocations, full cleanup on OOM, no leak); all five KV
+  test sites use them; the eviction sink's `k0/v0/ak/av` buffers and
+  the four unchecked `ref_get` calls got checks; the two
+  `tests/test_engine.c` blocks got the file's own OOM convention.
+- **Proof:** local cppcheck 2.22 (a superset of the distro version)
+  with the exact CI command: 32 findings before, 0 after. Tests
+  234/128/7/101/152/216 all 0 failures, counts identical to baseline
+  (the OOM paths never execute in practice). ASan+UBSan moe+engine
+  clean. PR #80 CI: all 16 executed checks SUCCESS.
+- **Verification:** post-merge main re-run on `2c11d20` — see the
+  round 17.6 entry above for the two unrelated image-drift jobs that
+  failed in the same window.
+
+## 2026-10-31 (round 16 follow-up) — main CI red after #77: one script owns the hydra-moe-test fixture list (merged `8606d58`)
+
+The main-tier `build-test` (macOS + Ubuntu) went red in the Sanitizers step
+after the round-16 merge: that step carried an inline copy of the
+`hydra-moe-test` fixture list from before `-q4`/`-q4f32` existed, while the
+binary hard-requires 9 fixture argv entries (argv-count check before any
+test), so it refused loudly. `make test-run` stayed green because the
+Makefile had been updated, and the PR tier is lint-only by owner rule, so
+the drift was only visible on the first main-tier functional run.
+
+- **Fix (PR #78, `c5d281e`):** `tools/make_moe_fixtures.sh <base>` is now
+  the single source of the fixture list — it generates all nine fixtures
+  (`<base>`, `-t64`, `-t128`, `-t64-lg`, `-nv`, `-at64`, `-gqa`, `-q4`,
+  `-q4f32`) and prints their paths as the last stdout line, in the argv
+  order `tests/test_hydra_moe.c` expects. The Makefile `test-run` recipe
+  and the ci.yml sanitizer step both call the script — the copy is gone,
+  and a future fixture has exactly one place to be added. The 9-argv
+  contract in the test binary is unchanged.
+- **Proof:** the 7-argv error was reproduced locally before the fix; after
+  the fix `make test-run` 234/128/7/101/152/216 all 0, and the sanitizer
+  leg reproduced byte-for-byte locally (ASan + UBSan,
+  `ASAN_OPTIONS=detect_leaks=1`, `UBSAN_OPTIONS=halt_on_error=1`) → exit 0.
+- **Verification:** main CI run 41225936406 = 9/9 jobs success (build-test
+  30 s, the red run needed 36–38 s to reach the same step); Lint
+  41225936262 success; Release 41225936402 success. Main is fully green.
+
+## 2026-10-31 (round 16) — T4_0 4-bit resident engine, streaming converter (--t4/--probe), server configuration surface, 3B-geometry E2E
+
+Owner task: "Bereite uns 3B + die 4bit Engine vor". A1 = the 4-bit resident
+engine type; A2 = the streaming converter path for it; B1 = the server
+configuration surface; B2 = a 3B-geometry synthetic model as the E2E
+target. No Android changes; no release (PR-tier CI verifies functionality,
+the release stays on the main tier).
+
+1. **A1 — T4_0 4-bit resident engine type (the main deliverable).**
+   `HYDRA2_Q4_0` (0x0030) graduates from reserved to implemented: the
+   container validates the 18 B/32 block layout and the /32 element group;
+   `expert_layout` 2 = Q4_0 expert blob ([gate][up][down] as 18-byte
+   blocks). The mat-vec kernels dequantize ONE row at a time into a shared
+   scratch — the resident memory stays 4-bit and F32 is never materialized
+   (that is the point of the type). A block is F16 `d` + 16 nibble bytes,
+   `w = d*(q-8)` (FORMAT-V2 §3.2). Parity against the F32 fixture within
+   the test eps (40 checks in `tests/test_hydra_moe.c`).
+2. **A2 — streaming Q4_0 converter path.** `tools/gguf_to_hydra2.py`:
+   `--t4` (all trunk tensors written as Q4_0 blocks; a Q4_0 SOURCE tensor
+   is copied bit-exact; dim/inter must be divisible by 32) and `--probe`
+   (reports whether a model is Q4_0-clean, per tensor family). Still
+   32-chunk streaming. The reference quantizer is Python standard
+   library only; when numpy happens to be importable a vectorized fast
+   path is used instead — bit-identical output either way.
+   `gguf_to_hydra2_test.py`: 44 checks.
+3. **B1 — server configuration surface.** New env: `HYDRA_DEFAULT_MODEL`,
+   `HYDRA_MAX_TRAIN_BODY`, `HYDRA_MAX_PROMPT` (only a CAP — the request may
+   pass a smaller value, never a larger one; default 256),
+   `HYDRA_INFER_TIMEOUT_MS`, `HYDRA_DEFAULT_STEPS`, `HYDRA_IMPORT_MODE`,
+   documented read-only at `GET /api/config`. Import gains
+   `?mode=auto|v1|v2&t4=auto|force|none&max_experts=1..8`; a v2 target is
+   written to `models/converted/<name>.hydra2`. `server_test.js`: 57/57.
+4. **B2 — 3B synthetic fixture.** `tools/build_3b_synth_gguf.py`: a 3072 MB
+   GGUF with a 11,696-tensor listing (llama architecture: vocab 128256,
+   36 layers, 32/8 GQA heads, inter 7680, rope 5e6, BOS 128005) whose trunk
+   is Q4_0 (10,153 entries) with F32 attention/routing, tied embed, 16 B
+   merges. md5 `51943c49967b`.
+5. **E2E (opt-in, `HYDRA2_3B_E2E=1`, on a 64 GB host):** the server imports
+   the 3B with `--t4` → `models/converted/3B-geometry-synth-v2.hydra2`
+   (1569 MB); the container loads; the MoE forward runs 16 tokens
+   (`64241 360 360 360 …`); md5 `6848f37ecd55c2777674d97aea1865bf`; peak
+   2.58 GiB RSS (vs 10.7 GiB F32); 5.98 s/token; fixed point 77348.
+   Golden pins: mini-f32 `4e3fc239bd63`, mini-q40 `da9a59aca458`,
+   t4src-f32 `c9ce7a1074d2`.
+6. **Verification:** `make test-run` 234/128/7/101/152/216;
+   `node --test tools/server_test.js` 57/57; `python3
+   tools/gguf_to_hydra2_test.py` 44; PR-tier CI 16/16. PR #77 `aeb978e`
+   (commits `208c1d5` server config, `ce906a4` engine + converter + 3B,
+   `297c4b5` docs).
+7. **State after this round:** tests 216 (moe) / 152 (v2 container) /
+   128 (jni) / 101 (gguf) / 44 (v2 converter) / 57 (server);
+   FORMAT-V2.md implementation status + LARGE-MODELS.md §8 record the
+   round.
+
+## 2026-10-31 (round 15) — large-model analysis (700B→8B), 2026 technique scan, README architecture diagram, Q4_0/Q4_1 GGUF import
+
+Owner round: analyse how a 700B model reaches every device (or why not),
+search the current (2026) techniques and integrate what fits, add the
+final Mermaid architecture diagram to the main README (GitHub-rendered),
+extend the test pipeline toward 8B-class models, docs.
+
+1. **Q4_0 + Q4_1 GGUF import (the 8B-class quants).** `tools/gguf_reader.py`
+   now decodes six layouts (F32/F16/BF16/Q8_0/Q4_0/Q4_1): the 4-bit pair
+   follows ggml's `block_q4_0`/`block_q4_1` exactly (`w = d*(q-8)` /
+   `w = d*(q-8)+m`, low-nibble-first packing) with C-speed decoders
+   (strided gather + `bytes.translate` + `array` maps - no Python value
+   loop). `gguf_minimal_llama.py` gains `--dtype q40/q41`. The v2
+   converter therefore takes a real 8B Q4_0 GGUF (4.9 GB) without a
+   `--convert-f16` re-export; the `.hydra2` output stays F32-resident
+   (the container's own `Q4_0` type `0x0030` stays reserved - the
+   4-bit-resident engine type is the next engine milestone, documented in
+   `docs/LARGE-MODELS.md`). Gates: converter 35 -> **44 checks**
+   (Q4_0/Q4_1 convert + run + deterministic, quantisation visibly changes
+   the stream vs F32, embedded F32 bit-exact against an independent
+   from-scratch block decode); `gguf_test.py` 101/0 (its two
+   "undecodable" negative controls moved from Q4_0 to Q4_K - a control
+   must never encode the behaviour under test).
+2. **`docs/LARGE-MODELS.md` (new).** The honest 700B answer: 350 GB at
+   4-bit, 185 GB at 2-bit - no device path exists, and "no loss" is the
+   F32 reference, so the product answer is a precision ladder (Q8 server /
+   Q4 phone / 2-bit small) + QAT for the Q4 gap; "no lag" is a bandwidth
+   story (8B Q4 = 4-15 tok/s on 2026 flagships). Memory table
+   8B→700B x F32/16/8/4/2-bit; 2026 technique scan with per-technique
+   verdicts (MXFP4/NVFP4 landed in llama.cpp March-April 2026 - adopted at
+   the converter boundary now, `T4_0` engine type next; KV INT8/FP8 =
+   round-16 candidate; speculative decoding = best fit, v1 ternary as
+   draft for the v2 target; prefix caching = cheap server win; NPU
+   QNN/LiteRT-LM = the phone no-lag answer); the concrete 8B path with a
+   4-step phone milestone list; the 120B-MoE showcase case (expert
+   streaming is its access pattern); the hybrid 8B-local + big-server
+   architecture; the Android section (nothing breaks this round; the app
+   already runs 8B GGUFs via the bundled llama.cpp); sources.
+3. **README:** new `## Architecture` section - one Mermaid flowchart of
+   the whole system (sources -> converter -> .hydra2 -> MoE/v1 engines ->
+   CLI/web/Android -> gate wall), rendered natively by GitHub; honest
+   v1-vs-v2 paragraph; converter bullet now names the six decoded layouts
+   and the 44-check gate.
+4. **Docs sync:** `docs/GGUF-IMPORT.md` (reader table, Q4 layout
+   descriptions, §9, §12, gate paragraph), `docs/FORMAT-V2.md` (decoder
+   paragraph + import-path sentence; v2 container type table unchanged),
+   `tools/gguf_to_hydra.py` refusal messages now name all six layouts.
+
+Verified (local sandbox 2026-10-31: Linux e2b.local 6.1.158+ x86_64,
+gcc 12.2.0, Python 3.11.2): hydra 234/0 (x86 baseline 234, count gate),
+jni 128/0, large 7/0, hydra2 152/0, hydra-moe 180/0, gguf_test 101/0,
+converter 44/0, text_prompt_check ok, server_test 47/0, workflow gates
+ok, docs_claim_check ok, pyflakes rc 0, bandit rc 0. C sources unchanged
+this round (Python + docs only).
+
+## 2026-10-31 (round 14, merge follow-up) — macOS sanitizer leg: LeakSanitizer is Linux-only
+
+PR #73 merged (`d1729ba`). The main-tier CI run failed exactly one step:
+`build-test (macos-latest)` → "Sanitizers (ASan+UBSan) over the whole test
+suite", exit 134 (SIGABRT). Cause: the round-13 `detect_leaks=1` (Qodo #6)
+- AppleClang ships no LeakSanitizer, and the ASan runtime aborts at
+startup when detect_leaks is requested on macOS. The ubuntu leg of the
+same step was green, which masked the platform-specific option.
+
+Fix (PR #75, merged `5ff3011`): the sanitizer step selects the option per
+platform (`uname -s`) - `detect_leaks=1` on Linux, empty on macOS; ASan +
+UBSan (`halt_on_error=1`) stay fully active on both legs. Verified:
+workflow gates green; after the merge all three main workflows succeeded
+(9/9 CI jobs incl. `build-test (macos-latest)`). `.agents/errors.md` +
+`.agents/session.md` round-14 entries. Also removed an orphaned
+preamble block that had sat mid-file since an earlier round.
+
+## 2026-10-30 (round 13, Qodo/CodeQL audit of PR #73 @ c5fcd38) — engine hardening: all 26 open, fixable findings fixed with regression tests (+ the CodeQL alert)
+
+Owner directive 2026-10-30 (verbatim intent): review every Qodo
+finding + the CodeQL alert of PR #73 and verify whether each is really
+fixed or still open, then fix what is open. Audit result: all 29
+still-open findings + the CodeQL alert CONFIRMED (0 false positives,
+0 already fixed by a later commit). Outcome of the 30: 26 Qodo
+findings fixed in this round (23 code + 3 docs) + the 1 CodeQL alert
+fixed (code); the 1 already-resolved finding confirmed; 3 explicit
+deferrals with the reason.
+
+1. **Converter (5 fixes, 38-check gate).** File-order tensor copy
+   (the v1/v2 layout bug), expert up/gate scaling (gate rows x E,
+   up rows x E — `masked_block`), strict token normalization
+   (general `normalize_token`), U16 merge-operand overflow refusal,
+   norm-shape refusal. Gate: `gguf_to_hydra2_test.py` 26 -> 35 checks (the "38" written at the time was a miscount - the file at commit 3c448c9 runs 35 checks, re-verified 2026-10-31).
+2. **MoE engine (9 fixes).** Ternary in-place dequant aliasing
+   (separate packed buffer + public `hydra_moe_dequant_flat`, AT64
+   stream re-pinned — the pre-fix stream was silently wrong);
+   sampler temperature now scales the EXPONENT (`exp((v-mx)/T)`;
+   pre-fix T cancelled out entirely, pinned by a 3-temperature test);
+   repetition penalty walks the whole window (pre-fix capped at the
+   vocab size); stochastic path requires a non-NULL RNG; UTF-8
+   validator distinguishes "invalid at offset 0"; 64-bit shape
+   products + `n_heads % n_kv_heads == 0` refusal; GQA BLOCK mapping
+   (head i reads KV head `i/(nh/nkv)`, llama.cpp convention — the
+   pre-fix interleave `i % nkv` is wrong for nkv > 1, new GQA
+   fixture + stream pin); mismatched KV-cache dim refused; trunk
+   mapping munmapped with the REMEMBERED length (pre-fix
+   `munmap(ptr, 0)` leaked it — CI LeakSanitizer now runs ENABLED
+   on all five binaries, all clean).
+3. **CLI (5 fixes).** Repetition ring is a true circular buffer
+   (pre-fix: every post-fill write hit slot 0; `--rep-window 0` was a
+   SIGFPE — both pinned in `text_prompt_check.sh`); positional
+   defaults/clamp apply to `.hydra2` too (pre-fix a bare
+   `hydra-run model.hydra2` ran with start=-1/steps=-1); the prompt
+   now CONDITIONS the model (prefill + continue from the last prompt
+   token — pre-fix the generated stream ignored the prompt
+   entirely); generated stream printed as decoded text (`[Text-out]:`
+   + JSON `generated_text`); `--inspect` JSON emits complete JSON
+   values (no more double-quoted hex blobs) and a failed read no
+   longer echoes the path.
+4. **Server (1 fix).** `/api/models/inspect` uses ASYNC `execFile`
+   (the pre-fix `execFileSync` stalled the whole event loop for up to
+   the 10 s timeout; the async error carries the exit code in `.code`,
+   probed alongside `.status`).
+5. **CI (1 fix).** Sanitizer gate: `detect_leaks=1` (verified clean
+   on all five binaries in the local sandbox before enabling) + the
+   7th MoE fixture (GQA) in the suite invocation.
+6. **Docs.** `.agents/session.md` rounds 6-11 archived verbatim to
+   `.agents/docs/SESSION-ARCHIVE.md` (the archive rule); `CHANGELOG`
+   "local" verification lines now name the machine; FORMAT-V2.md
+   updated (GQA block mapping, 64-bit shape checks, KV-dim refusal,
+   sampler contract, `trunk_map_len`, inspect JSON contract).
+
+Deferrals (recorded, not silent): JNI batch test for the `.hydra2`
+MoE engine (separate milestone — the JNI bridge has v3/v4 coverage),
+SIMD dispatch for the MoE matvecs (scalar is correct; a benchmark
+round decides), zero-copy expert streaming (the packed-buffer
+contract of fix 2 makes it a format-level decision, not a patch).
+
+Verification (local sandbox 2026-10-30: Linux e2b.local 6.1.158+
+x86_64, gcc 12.2.0, Python 3.11.2): `make test-run` -> hydra-test
+234/0 (x86 baseline 234), jni-batch 128/0, large-model 7/0, hydra2
+152/0, **hydra-moe 180/0** (138 -> 180: the dequant-aliasing unit,
+the shape/GQA + wrap-tamper section incl. the new GQA fixture, the
+temperature / whole-window / NULL-RNG sampler pins, the UTF-8
+offset-0 refusal; the ring + defaults CLI pins live in
+text_prompt_check.sh), gguf 101/0, converter 38/0;
+`text_prompt_check.sh` ok (parity + ring pin + defaults pin);
+`server_test.js` 47/0; ASan+UBSan **with detect_leaks=1** all five
+binaries 0 errors / 0 leaks; gcc -fanalyzer rc 0 on all four
+translation units (26 pre-existing false-positive notes in
+hydra_moe.c, down from 40 before the fixes); workflow YAML/lint
+gates ok; test-count baseline 234 unchanged (main suite untouched).
+
+## 2026-10-27..30 (round 12, issue #72) — the `.hydra2` MoE inference engine, block-scaled ternary, the BPE vocabulary path, and the GGUF -> `.hydra2` converter (M1-M5 full scope)
+
+Owner directive 2026-10-27: "alles fixen was geht!!!!" (fix everything that can be fixed) — every
+actionable item of issue #72 in one branch/PR (audit with per-claim
+file:line evidence: `.agents/docs/ISSUE-72-AUDIT.md`).
+
+1. **JNI v3/v4 batch gap (M1).** `tests/test_jni_batch.c` 109 -> **128**:
+   deterministic v3/v4 writers, batched-run == direct-run stream
+   equality for greedy AND fixed-seed sampling through the same C
+   logic the bridge calls, the v4 stream pin, the token-0 fixed point
+   of the bias-free design, the 17-step partial block with a real step
+   function.
+2. **Trunk mmap (M3.2).** `src/hydra_v2_container.c` maps the resident
+   trunk region when possible (page-aligned extent + base offset);
+   tensor reads serve from the mapping, `pread` stays the documented
+   portable fallback; `trunk_backend` names the live path. The
+   hydra2 suite grew to **152** checks (both backends pinned).
+3. **Block-scaled ternary (M2.2).** New types `0x0040` TERNARY2_S64 /
+   `0x0041` TERNARY2_S128 (2-bit codes + per-group F32 scales, paired
+   `<name>.scale` tensor, `ceil(n/G)` scale count — FORMAT-V2.md 3.2.1);
+   `hydra_tf_row_dot_scaled` (integer-exact group partials * F32 FMA,
+   group-64 SIMD / group-128 scalar split); +9 main-suite checks
+   (x86 baseline 234 / arm 243 in `tools/test_count_baseline.txt`).
+4. **MoE inference engine (M3.1).** NEW `src/hydra_moe.c` +
+   `include/hydra_moe.h`: `.hydra2` `moe-transformer-v1` models run in
+   `hydra-run` — per-layer GQA (F32 attention, partial RoPE from
+   `v2.rope_theta`, per-layer sink+ring KV), deterministic top-k
+   routing, one-pread-per-expert FFN (F32 or ternary+scales layout),
+   real per-vocabulary logits, min-p/rep sampler. Documented
+   deviations: non-causal attention over cached positions, fixed 1e-6
+   RMSNorm epsilon, bounded KV (2+8). NEW `tests/test_hydra_moe.c`:
+   **138 checks** (parity vs independent reference, greedy stream pins
+   per layout — incl. the attention-ternary fixture — KV pins, ternary
+   dequant unit vs independent reference, tamper + metadata refusals).
+   `main.c` magic-dispatches `.hydra2` to the engine; the v1 path is
+   bit-identical (pinned streams re-verified).
+5. **Vocabulary + BPE + web inspection (M4).** Role-8 tensors
+   (`vocab` 0x0050 VOCAB_UTF8 / `merges` 0x0051 U16_PAIRS, FORMAT-V2.md
+   3.2.3), strict codec in the engine (byte-level tokens, loud
+   refusals: duplicates, out-of-range ids, missing concat target,
+   missing trailing NUL), `hydra-run --text-prompt` (BPE-encodes user
+   text with the embedded vocab; parity with numeric `--prompt`
+   pinned; JSON "text" echo; mutual exclusion; refusals), web console
+   `.hydra2` inspection (`/api/models/inspect`, `public/app.js`;
+   `server_test.js` 47 checks), `make_model.py --moe-full`
+   vocab/merges fixtures. Gate: `tools/text_prompt_check.sh` (CI gate
+   1h).
+6. **GGUF -> .hydra2 converter (M2.2/M3.1/M4).** NEW
+   `tools/gguf_to_hydra2.py`: a decoder-only llama GGUF (official AND
+   pinned-build tensor names; F32/F16/BF16/Q8_0) becomes a
+   complete-contract `.hydra2` MoE model — linears transposed, dense
+   FFN decomposed into E full-width masked experts (gate/up rows
+   partitioned and x E, down full, all-zero uniform router -> exact up
+   to F32 order), embedded vocab 1:1, merges filtered to expressible
+   rules (skips documented), rope_theta/bos carried; loud refusals for
+   non-GGUF / non-llama / undecodable tensors / missing tokens / dim
+   mismatch. NEW gate `tools/gguf_to_hydra2_test.py` (26 checks:
+   engine determinism, expert-CRC tamper refusal, F32-exact embed
+   transpose + masked-expert identity + byte-exact vocab + metadata,
+   merges roundtrip, five refusal controls); Makefile
+   `gguf-conv-test` in `test-run`; CI gate 1i. Docs: GGUF-IMPORT.md
+   12, FORMAT-V2.md 3.2.1/3.2.3 + implementation status.
+7. **Sanitizers in CI (found a real UB).** An ASan+UBSan rebuild
+   (same sources) flagged a misaligned float load in the ternary
+   expert scale read (rows*cols % 4 == 2): fixed with a memcpy read in
+   `src/hydra_moe.c` + the test reference (bit-identical values); NEW
+   CI step "Sanitizers (ASan+UBSan) over the whole test suite" runs
+   all five test binaries with `UBSAN_OPTIONS=halt_on_error=1`.
+   `errors.md` entry. Also fixed: the lint job never built `./hydra-run`
+   although gate 1h drives it — a build step now precedes the
+   binary-driven gates.
+
+Verification (local sandbox 2026-10-30: Linux e2b.local 6.1.158+
+x86_64, gcc 12.2.0, Python 3.11.2): `make clean && make && make test`
+green; `make test-run`: hydra-test 234/0 (x86 baseline), jni-batch
+128/0, large-model 7/0, gguf 101/0 (v1 gate untouched), gguf-conv
+26/0, hydra2-test 152/0, hydra-moe-test 138/0;
+`node --test tools/server_test.js` 47/0; ASan+UBSan all five binaries
+0 runtime errors; gcc -fanalyzer clean on all translation units;
+cppcheck 2.13.2 exact CI command NOT runnable in this sandbox (the
+repo-proxy whitelist stopped serving cppcheck/cppcheck and the sandbox
+has no root) — covered by the CI lint gate; all shell gates green.
+
 ## 2026-10-29 (round 14) — the seventh sub-agent scans for AI instruction malware, and CI enforces it
 
 1. **A repository is now treated as untrusted input.** Rule R34
@@ -705,9 +1208,6 @@ byte-identical, and no v1/v2/v3 file or code path was rewritten.
    concurrency findings; flawfinder `--minlevel=4` no hits;
    `make test-run` rc=0; gguf_test 59/0; server_test 37/37;
    test_count 142 vs baseline.
-
-All notable changes to this project, per change, are recorded here and in
-`.agents/session.md` (.agents/rules.md R2). Newest entries first.
 
 ## 2026-10-26 — Local lint stack (no CI deferral), PR/main CI split, code-scanning alert handling, .agents/Environment.md
 

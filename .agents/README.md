@@ -31,8 +31,9 @@
 | `pr-gpu-feasibility.md` | The PR companion for the GPU feasibility work. |
 | `TECHNICAL-AUDIT.md` | Evidence-based technical audit of the whole repo (2026-10-26). |
 | `AI-THREAT-MODEL.md` | Threat classes, sources and blind spots for instructions aimed at an AI agent; rule set of `.subagents/ai-threat-scan/` (2026-10-29). |
+| `ISSUE-72-AUDIT.md` | The issue-#72 milestone audit (2026-10-27, round 12): every M1–M5 claim verified against the code at the time. |
 | `RESEARCH-LOG.md` | Permanent in-repo research record (owner decision 2026-10-26): crash root causes, CI decisions, investigations with follow-up obligations. **Append, never delete.** |
-| `SESSION-ARCHIVE.md` | The complete session.md round log for everything before round 6 (2026-10-26), moved verbatim when session.md was slimmed (R33 context-budget finding). **Append, never delete.** |
+| `SESSION-ARCHIVE.md` | The complete session.md round log for everything before the current round — pre-round-6 (2026-10-26, R33 context-budget finding), rounds 6–11 (added 2026-10-30), rounds 12–15 (added 2026-10-31). **Append, never delete.** |
 
 ## Skills (`skills/` — canonical home, 2026 Agent Skills spec)
 
@@ -54,6 +55,8 @@ auto-discovery keeps working while all agent docs stay in `.agents/`
 ## Related (not moved, by design)
 
 - `docs/` at the root — **product** documentation (FORMAT.md, FORMAT-V2.md,
+  GGUF-IMPORT.md, ARCHITECTURE.md, LARGE-MODELS.md): read by humans and
+  agents, shipped with the project.
   GGUF-IMPORT.md, ARCHITECTURE.md): read by humans and agents, shipped with
   the project.
 - `.subagents/` — the seven-member team (three research, three critics, one

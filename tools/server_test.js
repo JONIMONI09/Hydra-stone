@@ -16,6 +16,7 @@ const assert = require('node:assert');
 const { spawn, execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
+const net = require('node:net');
 const path = require('node:path');
 const { writeGgufFile, buildGgufBytes, GGML_Q8_0 } = require('./gguf_fixture');
 
@@ -213,6 +214,56 @@ test('/api/infer sampler: the same config is reproducible (seed default 0)', asy
     'same model + seed + config must give the same stream');
 });
 
+/* Seed pass-through (round 20): the web console must be able to PIN the
+ * RNG stream, and a web-seeded run must be byte-identical to the CLI run
+ * with the same seed - the cross-surface same-results proof (R9). The
+ * CLI is the reference: the server spawns the same hydra-run binary, so
+ * any argument-assembly typo (dropped flag, wrong name, coerced value)
+ * changes the stream and this test goes red. */
+test('/api/infer sampler: a seeded run matches the CLI with the same seed exactly', async () => {
+  const model = await firstModel();
+  const web = await postJSON('/api/infer', {
+    path: model.path, token: 11, steps: 16,
+    temperature: 1.5, minP: 0.5, repWindow: 8, seed: 42,
+  });
+  assert.strictEqual(web.status, 200);
+  const cliOut = execFileSync(path.join(ROOT, 'hydra-run'), [
+    path.join(ROOT, model.path), '11', '16',
+    '--temp', '1.5', '--min-p', '0.5', '--rep-window', '8',
+    '--seed', '42', '--json',
+  ], { cwd: ROOT, encoding: 'utf8' });
+  const cli = JSON.parse(cliOut);
+  assert.deepStrictEqual(
+    web.body.tokens,
+    cli.tokens,
+    'web (seed 42) and CLI (--seed 42) must produce the identical token stream');
+  /* A different seed on the web must follow the CLI with that seed,
+   * not just the default stream. */
+  const web2 = await postJSON('/api/infer', {
+    path: model.path, token: 11, steps: 16,
+    temperature: 1.5, minP: 0.5, repWindow: 8, seed: 7,
+  });
+  const cli2 = JSON.parse(execFileSync(path.join(ROOT, 'hydra-run'), [
+    path.join(ROOT, model.path), '11', '16',
+    '--temp', '1.5', '--min-p', '0.5', '--rep-window', '8',
+    '--seed', '7', '--json',
+  ], { cwd: ROOT, encoding: 'utf8' }));
+  assert.deepStrictEqual(web2.body.tokens, cli2.tokens,
+    'web (seed 7) and CLI (--seed 7) must produce the identical token stream');
+});
+
+test('/api/infer sampler: the seed field is validated like the other sampler fields', async () => {
+  const model = await firstModel();
+  const base = { path: model.path, token: 11, steps: 4, temperature: 1.5 };
+  for (const bad of [-1, 1.5, 4294967296, '42', null, true]) {
+    const { status, body } = await postJSON('/api/infer', { ...base, seed: bad });
+    assert.strictEqual(status, 400, `seed ${JSON.stringify(bad)} must be rejected`);
+    assert.match(body.error, /seed/, `the error must name the seed (${body.error})`);
+  }
+  const { status } = await postJSON('/api/infer', { ...base, seed: 4294967295 });
+  assert.strictEqual(status, 200, 'the 32-bit ceiling itself is valid');
+});
+
 test('/api/infer sampler: the full config (all four flags) is accepted', async () => {
   const model = await firstModel();
   const { status, body } = await postJSON('/api/infer', {
@@ -320,11 +371,7 @@ test('/api/infer rejects a malformed prompt', async () => {
 });
 
 test('/api/models/upload stores a valid model and it appears in the list', async () => {
-  const modelPath = path.join(os.tmpdir(), `hydra-upload-${process.pid}.hydra`);
-  execFileSync('python3', [path.join(ROOT, 'tools', 'make_model.py'), modelPath], {
-    stdio: 'ignore',
-  });
-  const bytes = fs.readFileSync(modelPath);
+  const bytes = buildModelBytes({});
 
   const before = (await json('/api/models')).body.models.length;
   const res = await fetch(`${BASE}/api/models/upload?name=uploaded-${process.pid}.hydra`, {
@@ -345,7 +392,6 @@ test('/api/models/upload stores a valid model and it appears in the list', async
   const after = (await json('/api/models')).body.models.length;
   assert.ok(after > before, 'the uploaded model must be listed');
 
-  fs.unlinkSync(modelPath);
 });
 
 test('/api/models/upload rejects invalid bytes and stores nothing', async () => {
@@ -750,6 +796,11 @@ test('the crash dialog and the error button exist and are wired', () => {
   assert.match(html, /id="error-dialog"/, 'the crash dialog must exist');
   assert.match(html, /id="error-copy"/, 'the copy button must exist');
   assert.match(html, /id="errors-open"/, 'the error indicator must exist');
+  /* Every field app.js reads with $('opt-*') must exist in the HTML -
+   * a missing id is a null dereference in the console's send path. */
+  for (const id of ['opt-temp', 'opt-minp', 'opt-reppen', 'opt-repwin', 'opt-seed']) {
+    assert.match(html, new RegExp(`id="${id}"`), `the sampler field ${id} must exist`);
+  }
   assert.match(js, /addEventListener\('error'/, 'window.onerror must be handled');
   assert.match(js, /addEventListener\('unhandledrejection'/, 'promise rejections must be handled');
   assert.match(js, /clipboard/, 'the copy must use the clipboard API with a fallback');
@@ -764,6 +815,14 @@ test('the crash dialog and the error button exist and are wired', () => {
 function writeModelFile(name, fields) {
   const dir = path.join(ROOT, 'models', 'uploaded');
   fs.mkdirSync(dir, { recursive: true });
+  const data = buildModelBytes(fields);
+  const file = path.join(dir, name);
+  fs.writeFileSync(file, data);
+  createdFiles.push(file);
+  return 'models/uploaded/' + name;
+}
+
+function buildModelBytes(fields) {
   const b = Buffer.alloc(24);
   b.writeUInt32LE(fields.magic ?? 0x48594452, 0);
   b.writeUInt16LE(fields.version ?? 1, 4);
@@ -772,10 +831,7 @@ function writeModelFile(name, fields) {
   b.writeUInt32LE(fields.layers ?? 4, 12);
   b.writeUInt32LE(fields.weightsOffset ?? 24, 16);
   b.writeUInt32LE(fields.weightsLen ?? 256, 20);
-  const file = path.join(dir, name);
-  fs.writeFileSync(file, Buffer.concat([b, Buffer.alloc(fields.pad ?? 256)]));
-  createdFiles.push(file);
-  return 'models/uploaded/' + name;
+  return Buffer.concat([b, Buffer.alloc(fields.pad ?? 256)]);
 }
 
 /** Boots an extra server with extra env, e.g. a smaller upload cap. */
@@ -834,12 +890,166 @@ test('an over-sized upload answers 413 with a body the client can read', async (
     'a refused upload must not reach its final name');
 });
 
+test('an over-sized upload lets the client finish sending before the socket closes (drain, no reset)', async (t) => {
+  /* The first 413 fix made the server answer before destroying the
+   * request, but it still destroyed the socket as soon as the response
+   * was flushed. If the client had not finished sending the body by
+   * then, the destroy reset the connection (unread body bytes in the
+   * socket buffer) and the client saw a socket error instead of the
+   * 413 - a timing race that flaked the previous test (observed 2 of
+   * 14 runs, 2026-11-09).
+   *
+   * A raw socket makes the bad ordering deterministic: the body bytes
+   * are in the server's socket buffer and UNREAD (the pre-check
+   * rejects before the stream is even attached), so the pre-drain
+   * destroy sends RST, not FIN - and the next write below fails with
+   * ECONNRESET. After the drain fix the server reads the remainder
+   * to the end before closing, so every byte the client sends is
+   * delivered. */
+  const base = await bootServer(t, { HYDRA_MAX_UPLOAD: '1MiB' });
+  const url = new URL(base);
+  const total = 3 * 1024 * 1024;
+  const first = Buffer.alloc(1024 * 1024, 0x41);
+  const rest = Buffer.alloc(total - first.length, 0x42);
+
+  const sent = await new Promise((resolve, reject) => {
+    let settled = false;
+    const fail = (err) => { if (!settled) { settled = true; reject(err); } };
+    const done = (r) => { if (!settled) { settled = true; resolve(r); } };
+    const socket = net.connect(Number(url.port), url.hostname, () => {
+      socket.write(
+        `POST /api/models/upload?name=raw-413.hydra HTTP/1.1\r\n` +
+        `Host: ${url.host}\r\n` +
+        `Content-Type: application/octet-stream\r\n` +
+        `Content-Length: ${total}\r\n` +
+        `Connection: close\r\n\r\n`
+      );
+      socket.write(first);
+      /* Give the server time to pre-check (declared 3 MiB > 1 MiB),
+       * answer, and - without the drain fix - destroy the socket with
+       * `first` still unread in its buffer (RST). */
+      setTimeout(() => {
+        socket.write(rest, (err) => {
+          if (err) {
+            fail(new Error(
+              `the server reset the connection while the client was still ` +
+              `sending the body (first megabyte was never read): ${err.message}`));
+            return;
+          }
+          /* Success path: wait for the server to close - the close
+           * handler validates the 413 answer before resolving. */
+        });
+      }, 100);
+    });
+    let response = '';
+    socket.on('data', (d) => { response += d; });
+    socket.on('error', (err) => {
+      if (err.code === 'ECONNRESET') {
+        fail(new Error(
+          'ECONNRESET: the server destroyed the socket before the client ' +
+          'finished sending the body (the pre-drain 413 bug)'));
+      } else {
+        fail(err);
+      }
+    });
+    socket.on('close', () => {
+      /* The socket dies after all bytes were delivered: the server
+       * drained the body and closed. Verify the answer from what
+       * arrived. */
+      const match = response.match(/HTTP\/1\.1 (\d{3})/);
+      const status = match ? Number(match[1]) : 0;
+      if (status !== 413) {
+        fail(new Error(`expected a 413 from the raw upload, got status ${status}\n${response.slice(0, 400)}`));
+        return;
+      }
+      if (!/larger than the 1\.0 MiB limit/.test(response)) {
+        fail(new Error('the 413 must name the limit\n' + response.slice(0, 400)));
+        return;
+      }
+      done(total);
+    });
+  });
+
+  assert.strictEqual(sent, total, 'the client must be able to send every byte it declared');
+  assert.ok(!fs.existsSync(path.join(ROOT, 'models', 'uploaded', 'raw-413.hydra')),
+    'a refused upload must not reach its final name');
+});
+
+test('an over-sized JSON body answers 400 while the client is still sending (readBody drain, no reset)', async (t) => {
+  /* Same bug class as the 413 upload fix (round 19): readBody used to
+   * reject AND destroy the socket the moment the limit was passed, so
+   * a client still sending its (oversized or slow) body saw a socket
+   * reset instead of the 400 the route wanted to send. The raw-socket
+   * pattern makes the bad ordering deterministic: 1 MiB sits unread in
+   * the server's buffer when the pre-fix destroy fires (RST). After
+   * the fix readBody discards the remainder and the route closes only
+   * after the client finished sending. */
+  const base = await bootServer(t, { HYDRA_MAX_TRAIN_BODY: '1MiB' });
+  const url = new URL(base);
+  const total = 2 * 1024 * 1024;
+  const first = Buffer.alloc(1024 * 1024, 0x7b); /* '{' repeated */
+  const rest = Buffer.alloc(total - first.length, 0x20);
+
+  const sent = await new Promise((resolve, reject) => {
+    let settled = false;
+    const fail = (err) => { if (!settled) { settled = true; reject(err); } };
+    const done = (r) => { if (!settled) { settled = true; resolve(r); } };
+    const socket = net.connect(Number(url.port), url.hostname, () => {
+      socket.write(
+        `POST /api/cancel HTTP/1.1\r\n` +
+        `Host: ${url.host}\r\n` +
+        `Content-Type: application/json\r\n` +
+        `Content-Length: ${total}\r\n` +
+        `Connection: close\r\n\r\n`
+      );
+      socket.write(first);
+      setTimeout(() => {
+        socket.write(rest, (err) => {
+          if (err) {
+            fail(new Error(
+              `the server reset the connection while the client was still ` +
+              `sending the JSON body (first megabyte was never read): ${err.message}`));
+            return;
+          }
+          /* Success path: wait for the server to close - the close
+           * handler validates the 400 answer before resolving. */
+        });
+      }, 100);
+    });
+    let response = '';
+    socket.on('data', (d) => { response += d; });
+    socket.on('error', (err) => {
+      if (err.code === 'ECONNRESET') {
+        fail(new Error(
+          'ECONNRESET: the server destroyed the socket before the client ' +
+          'finished sending the JSON body (the pre-drain readBody bug)'));
+      } else {
+        fail(err);
+      }
+    });
+    socket.on('close', () => {
+      const match = response.match(/HTTP\/1\.1 (\d{3})/);
+      const status = match ? Number(match[1]) : 0;
+      if (status !== 400) {
+        fail(new Error(`expected a 400 for the over-sized JSON body, got status ${status}\n${response.slice(0, 400)}`));
+        return;
+      }
+      if (!/invalid JSON body/.test(response)) {
+        fail(new Error('the 400 must carry the JSON error body\n' + response.slice(0, 400)));
+        return;
+      }
+      done(total);
+    });
+  });
+
+  assert.strictEqual(sent, total, 'the client must be able to send every byte it declared');
+});
+
 test('the same upload succeeds once the cap allows it (negative control)', async (t) => {
   /* If 413 were returned by an over-eager check, this is the case that
    * catches it: under a generous cap the identical body must be stored. */
   const base = await bootServer(t, { HYDRA_MAX_UPLOAD: '16MiB' });
-  const list = await (await fetch(`${base}/api/models`)).json();
-  const starter = fs.readFileSync(path.join(ROOT, list.models[0].path));
+  const starter = buildModelBytes({});
 
   const res = await fetch(`${base}/api/models/upload?name=passt.hydra`, {
     method: 'POST',
@@ -979,13 +1189,77 @@ test('/api/models/inspect names a GGUF and refuses paths outside the models', as
   assert.strictEqual(noParam.status, 400, 'path is required');
 });
 
+/** Generates a REAL .hydra2 container (make_model.py --v2 fixture) in
+ * models/uploaded/ - the inspect route must report the C reader's
+ * verdict on a file that actually validates. */
+function writeHydra2File(name, truncateTo) {
+  const dir = path.join(ROOT, 'models', 'uploaded');
+  fs.mkdirSync(dir, { recursive: true });
+  const file = path.join(dir, name);
+  execFileSync('python3', ['tools/make_model.py', file, '--v2'], { cwd: ROOT });
+  if (truncateTo !== undefined) fs.writeFileSync(file, fs.readFileSync(file).slice(0, truncateTo));
+  createdFiles.push(file);
+  return 'models/uploaded/' + name;
+}
+
+test('/api/models/inspect reports the .hydra2 container the reader validated', async () => {
+  const rel = writeHydra2File('fix2.hydra2');
+  const { status, body } = await json(`/api/models/inspect?path=${encodeURIComponent(rel)}`);
+  assert.strictEqual(status, 200);
+  assert.strictEqual(body.format, 'hydra2');
+  assert.strictEqual(body.reader, 'ok', `the fixture must validate: ${JSON.stringify(body)}`);
+  assert.strictEqual(body.routing.architecture, 'moe-transformer-v1');
+  assert.ok(body.routing.top_k >= 1, 'the reader extracts the required top_k');
+  assert.ok(Array.isArray(body.tensors) && body.tensors.length >= 6,
+    'every trunk tensor is listed (router.{l}, embed, norm)');
+  const roles = new Set(body.tensors.map((t) => t.role));
+  assert.ok(roles.has('ROUTER') && roles.has('EMBEDDING') && roles.has('NORM'),
+    `tensor roles are named, got ${[...roles]}`);
+  assert.ok(body.experts.count > 0 && Array.isArray(body.experts.sample),
+    'the expert directory count and a sample are reported');
+  assert.ok(Array.isArray(body.metadata) &&
+        body.metadata.some((m) => m.key === 'v2.top_k'),
+    'the metadata K/V block is reported');
+  assert.strictEqual(body.path, rel);
+});
+
+test('/api/models/inspect names the refusal for a broken .hydra2', async () => {
+  const rel = writeHydra2File('fix2-trunc.hydra2', 60);
+  const { status, body } = await json(`/api/models/inspect?path=${encodeURIComponent(rel)}`);
+  assert.strictEqual(status, 200, 'a refusal is a diagnosis, not a server error');
+  assert.strictEqual(body.format, 'hydra2');
+  assert.strictEqual(body.reader, 'refused');
+  assert.strictEqual(body.error_code, -3, 'HYDRA2_E_SMALL for a 60-byte file');
+  assert.ok(typeof body.reader_message === 'string' && body.reader_message.length > 0,
+    'the reader\'s stderr message (field/value/bound) travels with the report');
+});
+
+test('/api/models lists .hydra2 files with their own shape', async () => {
+  const rel = writeHydra2File('fix2-list.hydra2');
+  const { status, body } = await json('/api/models');
+  assert.strictEqual(status, 200);
+  const m = body.models.find((x) => x.path === rel);
+  assert.ok(m, 'the .hydra2 container must be listed');
+  assert.strictEqual(m.format, 'hydra2');
+  assert.strictEqual(m.valid, true);
+  assert.strictEqual(m.dim, null, 'v1-only header fields are null, not guessed');
+});
+
+test('/api/models/inspect refuses .hydra2 path escapes too', async () => {
+  const escape = await json('/api/models/inspect?path=' +
+    encodeURIComponent('../../etc/hostname.hydra2'));
+  assert.strictEqual(escape.status, 400, 'the suffix check must not open a new escape route');
+});
+
 test('the upload refusal and the inspect report state the same reason', async () => {
   /* Two code paths reporting on the same file must not drift apart: the
    * user is told one thing on upload and another in the console. */
   const rel = writeModelFile('abweichend.hydra', {
     layers: 99999, weightsLen: 65536, pad: 65536,
   });
-  const bytes = fs.readFileSync(path.join(ROOT, rel));
+  const bytes = buildModelBytes({
+    layers: 99999, weightsLen: 65536, pad: 65536,
+  });
 
   const up = await fetch(`${BASE}/api/models/upload?name=abweichend-upload.hydra`, {
     method: 'POST',
@@ -1043,7 +1317,7 @@ function writeGguf(name, { rows = 64, cols = 32, tokens = ['a', 'b', '▁c', 'd'
 test('a GGUF upload is converted into a loadable .hydra with a full report', async () => {
   const src = writeGguf('server-fixture.gguf');
   createdFiles.push(src);
-  const bytes = fs.readFileSync(src);
+  const bytes = buildGgufBytes();
 
   const res = await fetch(`${BASE}/api/models/import?name=server-fixture.gguf`, {
     method: 'POST',
@@ -1233,7 +1507,7 @@ test('a converted model shows up in the chat model list as converted', async () 
   const up = await fetch(`${BASE}/api/models/import?name=listed.gguf`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/octet-stream' },
-    body: fs.readFileSync(src),
+    body: buildGgufBytes(),
   });
   assert.strictEqual(up.status, 200);
   createdFiles.push(path.join(ROOT, 'models', 'converted', 'listed.hydra'));
@@ -1334,4 +1608,213 @@ test('the console binds to loopback unless HYDRA_ALLOW_REMOTE=1', async (t) => {
   assert.ok(publicBind.length > 0, 'the opt-in server must be listening');
   assert.ok(publicBind.includes('0.0.0.0') || publicBind.includes('*'),
     `HYDRA_ALLOW_REMOTE=1 must bind every interface, got ${publicBind.join(',')}`);
+});
+/* ------------------------------------------------------------------ */
+/* Round 16: "intelligent + configurable everywhere"                  */
+/* ------------------------------------------------------------------ */
+
+test('/api/config reports every knob with value, default, source and override', async () => {
+  const { status, body } = await json('/api/config');
+  assert.strictEqual(status, 200);
+  assert.ok(Array.isArray(body.settings) && body.settings.length >= 10,
+    'the full configuration surface must be reported');
+  const byName = Object.fromEntries(body.settings.map((s) => [s.name, s]));
+  for (const name of ['port', 'defaultModel', 'inferTimeoutMs', 'maxPrompt',
+    'maxTrainBodyBytes', 'maxUploadBytes', 'convertTimeoutMs',
+    'defaultSteps', 'importMode']) {
+    assert.ok(byName[name], `setting ${name} must be reported`);
+    for (const k of ['value', 'default', 'source', 'env']) {
+      assert.ok(k in byName[name], `${name} must carry ${k}`);
+    }
+  }
+  assert.strictEqual(byName.importMode.allowed.join(','), 'auto,v1,v2');
+  assert.strictEqual(byName.maxPrompt.engineCap, 256,
+    'the engine cap must be visible next to the effective value');
+  assert.ok(body.engine.sampler, 'the sampler contract must be reported');
+});
+
+test('env overrides change the effective config and are marked as such', async () => {
+  const port = PORT + 3;
+  const c = spawn(process.execPath, ['server.js'], {
+    cwd: ROOT,
+    env: {
+      ...process.env,
+      PORT: String(port),
+      HYDRA_DEFAULT_STEPS: '7',
+      HYDRA_MAX_PROMPT: '64',
+      HYDRA_IMPORT_MODE: 'v2',
+    },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  try {
+    const base = `http://127.0.0.1:${port}`;
+    let up = false;
+    for (let i = 0; i < 150 && !up; i++) {
+      try {
+        const r = await fetch(`${base}/api/config`);
+        up = r.ok;
+      } catch {
+        /* not up yet */
+      }
+      if (!up) await new Promise((r) => setTimeout(r, 100));
+    }
+    assert.ok(up, 'the override server did not start');
+    const body = await (await fetch(`${base}/api/config`)).json();
+    const byName = Object.fromEntries(body.settings.map((s) => [s.name, s]));
+    assert.strictEqual(byName.defaultSteps.value, 7);
+    assert.strictEqual(byName.defaultSteps.source, 'env');
+    assert.strictEqual(byName.maxPrompt.value, 64);
+    assert.strictEqual(byName.importMode.value, 'v2');
+    assert.strictEqual(byName.importMode.source, 'env');
+  } finally {
+    c.kill('SIGKILL');
+  }
+});
+
+test('an invalid HYDRA_IMPORT_MODE refuses to start and names the variable', async () => {
+  const { code, out } = await new Promise((resolve) => {
+    const c = spawn(process.execPath, ['server.js'], {
+      cwd: ROOT,
+      env: { ...process.env, PORT: String(PORT + 4), HYDRA_IMPORT_MODE: 'bogus' },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    let err = '';
+    c.stderr.on('data', (d) => { err += d; });
+    const timer = setTimeout(() => { c.kill('SIGKILL'); resolve({ code: 'timeout', out: err }); }, 8000);
+    c.on('exit', (code) => { clearTimeout(timer); resolve({ code, out: err }); });
+  });
+  assert.notStrictEqual(code, 0, 'a server-level misconfiguration must not start silently');
+  assert.notStrictEqual(code, 'timeout');
+  assert.ok(String(out).includes('HYDRA_IMPORT_MODE'),
+    `the message must name the variable: ${out}`);
+});
+
+/** Builds a complete minimal-llama GGUF with the in-repo builder. */
+function writeFullLlamaGguf(name, dtype) {
+  const dir = path.join(ROOT, 'models', 'converted');
+  const src = path.join(dir, name);
+  execFileSync('python3', [
+    path.join(ROOT, 'tools', 'gguf_minimal_llama.py'),
+    '--out', src, '--dtype', dtype,
+  ], { cwd: ROOT });
+  createdFiles.push(src);
+  return src;
+}
+
+test('import mode=v2 of an F32 llama GGUF: .hydra2, t4 auto, engine runs it', async () => {
+  const src = writeFullLlamaGguf(`r16-v2-f32-${process.pid}.gguf`, 'f32');
+  const res = await fetch(
+    `${BASE}/api/models/import?name=r16-v2-f32-${process.pid}.gguf&mode=v2`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: fs.readFileSync(src),
+    });
+  const j = await res.json();
+  assert.strictEqual(res.status, 200, JSON.stringify(j));
+  assert.strictEqual(j.ok, true);
+  assert.strictEqual(j.mode, 'v2');
+  assert.ok(j.model.path.endsWith('.hydra2'), j.model.path);
+  assert.strictEqual(j.model.format, 'hydra2');
+  assert.strictEqual(j.t4.effective, true,
+    'auto is size-optimal: a dim%32==0 source converts to t4');
+  assert.strictEqual(j.t4.all_q4_0, false,
+    'an F32 source is re-quantised, not a raw copy');
+  createdFiles.push(path.join(ROOT, j.model.path));
+
+  const list = await json('/api/models');
+  assert.ok(list.body.models.some((m) => m.path === j.model.path),
+    'the imported .hydra2 must be listed');
+
+  const run = await postJSON('/api/infer', { path: j.model.path, token: 0, steps: 4 });
+  assert.strictEqual(run.status, 200, JSON.stringify(run.body));
+  assert.strictEqual(run.body.tokens.length, 4);
+});
+
+test('import mode=v2 of a Q4_0 llama GGUF: bit-exact raw copy (t4.all_q4_0)', async () => {
+  const src = writeFullLlamaGguf(`r16-v2-q40-${process.pid}.gguf`, 'q40');
+  const res = await fetch(
+    `${BASE}/api/models/import?name=r16-v2-q40-${process.pid}.gguf&mode=v2`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: fs.readFileSync(src),
+    });
+  const j = await res.json();
+  assert.strictEqual(res.status, 200, JSON.stringify(j));
+  assert.strictEqual(j.t4.all_q4_0, true,
+    'a Q4_0 source is recognised as the bit-exact path');
+  assert.strictEqual(j.t4.effective, true);
+  assert.ok(j.t4.note.includes('bit-exact'), j.t4.note);
+  createdFiles.push(path.join(ROOT, j.model.path));
+
+  const run = await postJSON('/api/infer', { path: j.model.path, token: 0, steps: 4 });
+  assert.strictEqual(run.status, 200, JSON.stringify(run.body));
+  assert.strictEqual(run.body.tokens.length, 4);
+});
+
+test('import t4=none keeps the v2 output F32-resident', async () => {
+  const src = writeFullLlamaGguf(`r16-v2-nt4-${process.pid}.gguf`, 'f32');
+  const res = await fetch(
+    `${BASE}/api/models/import?name=r16-v2-nt4-${process.pid}.gguf&mode=v2&t4=none`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: fs.readFileSync(src),
+    });
+  const j = await res.json();
+  assert.strictEqual(res.status, 200, JSON.stringify(j));
+  assert.strictEqual(j.t4.effective, false, 'an explicit override wins over auto');
+  createdFiles.push(path.join(ROOT, j.model.path));
+});
+
+test('import auto (the default) keeps v1 and reports the v2 verdict', async () => {
+  const src = writeFullLlamaGguf(`r16-auto-${process.pid}.gguf`, 'f32');
+  const res = await fetch(`${BASE}/api/models/import?name=r16-auto-${process.pid}.gguf`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: fs.readFileSync(src),
+    });
+  const j = await res.json();
+  assert.strictEqual(res.status, 200, JSON.stringify(j));
+  assert.strictEqual(j.mode, 'v1',
+    'auto must keep the existing behaviour for existing clients');
+  assert.ok(j.model.path.endsWith('.hydra'), j.model.path);
+  assert.strictEqual(j.v2.available, true,
+    'a full llama decoder is v2-able and the client must be told');
+  createdFiles.push(path.join(ROOT, j.model.path));
+});
+
+test('import rejects an invalid mode, t4 and max_experts before reading the body', async () => {
+  for (const q of ['mode=bogus', 't4=bogus', 'max_experts=9', 'max_experts=0']) {
+    const res = await fetch(
+      `${BASE}/api/models/import?name=r16-inv-${process.pid}.gguf&${q}`,
+      { method: 'POST', body: Buffer.alloc(16) });
+    assert.strictEqual(res.status, 400, `${q} must be refused: ${await res.text()}`);
+  }
+});
+
+test('a .hydra2 upload is accepted on the magic and listed', async () => {
+  const buf = Buffer.alloc(128);
+  buf.write('HYDRA2', 0, 'latin1');
+  const name = `r16-up-${process.pid}.hydra2`;
+  const res = await fetch(`${BASE}/api/models/upload?name=${name}`,
+    { method: 'POST', body: buf });
+  assert.strictEqual(res.status, 200, await res.text());
+  createdFiles.push(path.join(ROOT, 'models', 'uploaded', name));
+  const list = await json('/api/models');
+  assert.ok(list.body.models.some((m) => m.path.includes(name)),
+    'the uploaded .hydra2 must be listed');
+});
+
+test('a .hydra2 upload without the magic is refused and stored nothing', async () => {
+  const buf = Buffer.alloc(128);
+  buf.write('NOTGGUF', 0, 'latin1');
+  const name = `r16-bad-${process.pid}.hydra2`;
+  const res = await fetch(`${BASE}/api/models/upload?name=${name}`,
+    { method: 'POST', body: buf });
+  assert.strictEqual(res.status, 400, await res.text());
+  assert.ok(!fs.existsSync(path.join(ROOT, 'models', 'uploaded', name)),
+    'a refused upload must not be stored');
 });

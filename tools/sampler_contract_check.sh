@@ -3,7 +3,8 @@
 #
 # The accept/reject rules for a sampling run must be the SAME on every
 # surface that exposes one:
-#   1. the CLI      (src/main.c: --temp/--min-p/--rep-penalty/--rep-window)
+#   1. the CLI      (src/main.c: --temp/--min-p/--rep-penalty/--rep-window
+#                    /--seed)
 #   2. the Android  (android/app/src/main/cpp/hydra_sample_cfg.h, used by
 #                    hydra_jni.c runInferenceSampled)
 #   3. the web      (server.js /api/infer)
@@ -109,6 +110,20 @@ check "server.js passes --temp only when sent" "$WEB" "if (sampler && sampler.te
 check "server.js passes --min-p only when sent" "$WEB" "if (sampler && sampler.minP !== undefined) args.push('--min-p'"
 check "server.js passes --rep-penalty only when sent" "$WEB" "if (sampler && sampler.repetitionPenalty !== undefined) args.push('--rep-penalty'"
 check "server.js passes --rep-window only when sent" "$WEB" "if (sampler && sampler.repWindow !== undefined) args.push('--rep-window'"
+check "server.js pins SAMPLER_SEED_MAX" "$WEB" "const SAMPLER_SEED_MAX = 4294967295;"
+check "server.js passes --seed only when sent" "$WEB" "if (sampler && sampler.seed !== undefined) args.push('--seed'"
+check "CLI exposes --seed" "$CLI" '"--seed"'
+# The web seed ceiling must stay 32-bit so a web-seeded run is reproducible
+# on the Android surface, whose bridge takes a jint.
+check "JNI bridge takes a jint seed" "$JNI_C" "jfloat temperature, jfloat minP, jfloat repPenalty, jint seed"
+js_seed=$(sed -n 's/.*SAMPLER_SEED_MAX = \([0-9]*\);.*/\1/p' "$WEB" 2>/dev/null | head -1)
+checks=$((checks + 1))
+if [ -n "${js_seed:-}" ] && awk -v b="${js_seed}" 'BEGIN { exit (b == 4294967295 ? 0 : 1) }'; then
+  echo "ok   seed ceiling is 2^32-1 (the Android jint range): $js_seed"
+else
+  echo "FAIL: seed ceiling drifted from the 32-bit contract: '${js_seed:-?}'"
+  fail=1
+fi
 
 # ---- computed agreement: C header vs server.js --------------------------
 # Two separately pinned literals can both be present yet disagree; the

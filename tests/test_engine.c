@@ -59,6 +59,12 @@ static void tmp_path_new(char *out, size_t n)
     close(fd);
 }
 
+static FILE *open_private_file(const char *path)
+{
+    int fd = open(path, O_WRONLY | O_TRUNC | O_NOFOLLOW, S_IRUSR | S_IWUSR);
+    return fd < 0 ? NULL : fdopen(fd, "wb");
+}
+
 /* Header little-endian schreiben (docs/FORMAT.md: "<IHHIIII"), damit die
  * Tests auf jeder Host-Endianness dasselbe Modell erzeugen (BUG-10). */
 static void wr_u16le(FILE *f, uint16_t v)
@@ -103,7 +109,7 @@ static void test_header_endianness(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, 333, 17, 3, sizeof(HydraModelHeader), 17u * 3u);
     const uint8_t w[51] = {0};
@@ -138,7 +144,7 @@ static int run_single_weight_case(uint8_t weight_byte, uint16_t token_in,
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) return -1;
 
     wr_header(f, vocab, 1u, 1u, (uint32_t)sizeof(HydraModelHeader), 1u);
@@ -177,7 +183,7 @@ static void test_token_mask_collisions(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, 1024u, 1u, 1u, (uint32_t)sizeof(HydraModelHeader), 1u);
     fputc(0x01, f);   /* w1 = +1, w2 = 0 */
@@ -209,7 +215,7 @@ static void test_engine_step(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     const uint32_t dim = 16, layers = 2;
     wr_header(f, 256u, dim, layers, (uint32_t)sizeof(HydraModelHeader), dim * layers);
@@ -252,7 +258,7 @@ static void write_seeded_model(const char *path, uint32_t seed,
                                uint32_t dim, uint32_t layers, uint16_t vocab)
 {
     lcg_seed(seed);
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, vocab, dim, layers, (uint32_t)sizeof(HydraModelHeader), dim * layers);
     for (uint32_t i = 0; i < dim * layers; ++i) {
@@ -664,12 +670,12 @@ static void ref_unpack_v2_plane(int32_t *agg, const uint8_t *plane, size_t dim)
 }
 #endif /* HYDRA_NEON_V2_UNPACK || __AVX2__ */
 
-#if defined(__AVX2__) || defined(__ARM_NEON)
 /* Independent scalar reference for the transformer-format 2-bit row
  * dot: one row byte carries four 2-bit codes (code of dim d is
  * row[d/4] >> 2*(d%4) & 3), T3 = {0, 1, -1, 0}. Mirrors the engine's
- * scalar decode, written here so the AVX2/NEON parity tests compare
- * against a reference that does not share code with the kernels. */
+ * scalar decode, written here so the AVX2/NEON parity tests and the
+ * block-scaled parity test compare against a reference that does not
+ * share code with the kernels. */
 static int32_t ref_tf_row_dot(const uint8_t *row, const int8_t *x,
                               uint32_t dim)
 {
@@ -684,7 +690,6 @@ static int32_t ref_tf_row_dot(const uint8_t *row, const int8_t *x,
     }
     return acc;
 }
-#endif /* __AVX2__ || __ARM_NEON */
 
 #ifdef __ARM_NEON
 /* Skalare Referenzimplementierung von step() — unabhaengig vom NEON-Pfad.
@@ -732,7 +737,7 @@ static void ref_step_scalar(const HydraModelHeader *h, const uint8_t *w,
 static void write_code_pattern_model(const char *path, uint32_t dim,
                                      uint32_t layers, uint16_t vocab)
 {
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, vocab, dim, layers, (uint32_t)sizeof(HydraModelHeader), dim * layers);
     for (uint32_t i = 0; i < dim * layers; ++i) {
@@ -1098,7 +1103,7 @@ static void test_neon_v2_load_matches_scalar(void)
     CHECK(seen[0] && seen[1] && seen[2] && seen[3],
           "NEON v2 load model contains all four 2-bit codes");
 
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header_version(f, 2u, vocab, dim, layers,
                       (uint32_t)sizeof(HydraModelHeader), (dim / 4) * layers * 2u);
@@ -1203,7 +1208,7 @@ static void test_version_two_format(void)
      * The declared weights_len is exactly the read size (layers*dim/2),
      * i.e. the minimal valid v2 file. */
     {
-        FILE *f = fopen(p2, "wb");
+        FILE *f = open_private_file(p2);
         const uint8_t body[4] = {0x55, 0xAA, 0x63, 0x82};
         if (f) {
             wr_header_version(f, 2u, 64u, 4u, 2u, (uint32_t)sizeof(HydraModelHeader), 4u);
@@ -1213,7 +1218,7 @@ static void test_version_two_format(void)
     }
     /* v1 file with the same logical weights: one byte per (layer, dim). */
     {
-        FILE *f = fopen(p1, "wb");
+        FILE *f = open_private_file(p1);
         const uint8_t body[8] = {0x09, 0x09, 0x09, 0x09, 0x08, 0x00, 0x02, 0x09};
         if (f) {
             wr_header_version(f, 1u, 64u, 4u, 2u, (uint32_t)sizeof(HydraModelHeader), 8u);
@@ -1261,7 +1266,7 @@ static void test_version_two_format(void)
     {
         char p[64];
         tmp_path_new(p, sizeof(p));
-        FILE *f = fopen(p, "wb");
+        FILE *f = open_private_file(p);
         if (f) {
             wr_header_version(f, 2u, 64u, 2u, 1u, (uint32_t)sizeof(HydraModelHeader), 1u);
             fputc(0x55, f);
@@ -1278,7 +1283,7 @@ static void test_version_two_format(void)
     {
         char p[64];
         tmp_path_new(p, sizeof(p));
-        FILE *f = fopen(p, "wb");
+        FILE *f = open_private_file(p);
         if (f) {
             wr_header_version(f, 2u, 64u, 4u, 2u, (uint32_t)sizeof(HydraModelHeader), 3u);
             const uint8_t body[3] = {0x55, 0xAA, 0x63};
@@ -1297,7 +1302,7 @@ static void test_engine_rejects_garbage(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (f) {
         const uint8_t junk[32] = {0xDE,0xAD,0xBE,0xEF};
         fwrite(junk, 1, sizeof(junk), f);
@@ -1320,7 +1325,7 @@ static void test_engine_rejects_bounds_violation(void)
     /* Header behauptet mehr Gewichte als die Datei hergibt */
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (f) {
         wr_header(f, 64u, 64u, 4u, (uint32_t)sizeof(HydraModelHeader), 1024u);
         fclose(f);
@@ -1338,7 +1343,7 @@ static void test_engine_rejects_inconsistent_weights_len(void)
      * sonst liest step() hinter das mmap (OOB-Read). */
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (f) {
         wr_header(f, 64u, 64u, 4u, (uint32_t)sizeof(HydraModelHeader), 8u);
         const uint8_t w[8] = {1,1,1,1,1,1,1,1};
@@ -1365,7 +1370,7 @@ static void test_engine_rejects_layer_overflow(void)
     char path[64];
     tmp_path_new(path, sizeof(path));
     const uint32_t dim = 1, layers = 16909321u;
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (!f) { perror("fopen"); exit(1); }
     wr_header(f, 128u, dim, layers, (uint32_t)sizeof(HydraModelHeader), layers);
     {
@@ -1396,7 +1401,7 @@ static void test_engine_rejects_offset_in_header(void)
 {
     char path[64];
     tmp_path_new(path, sizeof(path));
-    FILE *f = fopen(path, "wb");
+    FILE *f = open_private_file(path);
     if (f) {
         wr_header(f, 64u, 4u, 4u, 8u, 16u);   /* weights_offset = 8 (< 24) */
         fclose(f);
@@ -2076,6 +2081,120 @@ static int float_near(float a, float b, float tol)
     float d = a - b;
     if (d < 0.0f) d = -d;
     return d <= tol;
+}
+
+/* Block-scaled ternary row dot (FORMAT-V2.md 3.2 TERNARY2_S64/S128,
+ * 2026-10-27): the per-group partial dot is integer-exact through the
+ * SAME SIMD dispatch as tf_row_dot; only the scale fusion is float
+ * (one f32 FMA per group, left to right - that is the contract).
+ * The reference computes each partial with the INDEPENDENT scalar
+ * ref_tf_row_dot and fuses the scales in the same order, so a
+ * regressed kernel (or a reassociated float sum) fails by bit.
+ *  - dims 64/128/192/256 x groups 64/128 (every legal combination);
+ *  - x allocated EXACTLY dim bytes (engine layout), full int8 range;
+ *  - pinned extremes: all-+1 codes / x=127 / scale 1 -> dim*127
+ *    exact; the sign-flip scale [1, -1] and the asymmetric group-1
+ *    case are hand-computed;
+ *  - guards: dim % group != 0 and a foreign group -> 0.0f, the
+ *    documented invalid-input answer (never a partial result). */
+static void test_tf_row_dot_scaled(void)
+{
+    static const uint32_t dims[] = {64, 128, 192, 256};
+    static const uint32_t groups[] = {64, 128};
+    int all_match = 1;
+    for (size_t di = 0; di < sizeof(dims) / sizeof(dims[0]); ++di) {
+        const uint32_t dim = dims[di];
+        for (size_t gi = 0; gi < sizeof(groups) / sizeof(groups[0]); ++gi) {
+            const uint32_t group = groups[gi];
+            const uint32_t ngroups = dim / group;
+            uint8_t *row = (uint8_t *)malloc(dim / 4);
+            int8_t *x = (int8_t *)malloc(dim); /* exactly dim bytes */
+            float *scale = (float *)malloc(ngroups * sizeof(float));
+            if (!row || !x || !scale) { free(row); free(x); free(scale); exit(1); }
+            for (int it = 0; it < 128; ++it) {
+                for (uint32_t b = 0; b < dim / 4; ++b)
+                    row[b] = (uint8_t)(lcg_byte() % 3); /* codes 0,1,2 */
+                for (uint32_t b = 0; b < dim; ++b)
+                    x[b] = (int8_t)lcg_byte(); /* full int8 range */
+                for (uint32_t g = 0; g < ngroups; ++g)
+                    scale[g] = lcg_float() * 4.0f;
+                const float got = hydra_tf_row_dot_scaled(row, x, dim, scale, group);
+                if (dim % group != 0u) {
+                    if (got != 0.0f) all_match = 0;
+                    continue; /* documented invalid input, no reference */
+                }
+                float acc = 0.0f;
+                for (uint32_t g = 0; g < dim; g += group)
+                    acc += scale[g / group] *
+                           (float)ref_tf_row_dot(row + g / 4, x + g, group);
+                if (got != acc) all_match = 0;
+            }
+            free(row); free(x); free(scale);
+        }
+    }
+    CHECK(all_match, "scaled row dot: per-group exact partials + f32 scale "
+          "FMA match the independent reference (512 random cases, 8 dims)");
+
+    /* Pinned extremes: all codes +1 (byte 0x55), x = 127, scale = 1. */
+    {
+        const uint32_t dim = 256, group = 64;
+        uint8_t *row = (uint8_t *)malloc(dim / 4);
+        int8_t *x = (int8_t *)malloc(dim);
+        float *scale = (float *)malloc(4 * sizeof(float));
+        if (!row || !x || !scale) { free(row); free(x); free(scale); exit(1); }
+        memset(row, 0x55, dim / 4);
+        for (uint32_t b = 0; b < dim; ++b) x[b] = 127;
+        for (uint32_t g = 0; g < 4; ++g) scale[g] = 1.0f;
+        CHECK(hydra_tf_row_dot_scaled(row, x, dim, scale, group) == 32512.0f,
+              "extreme: 256*127 = 32512 exact (4 groups of 8128)");
+        scale[1] = -1.0f;
+        CHECK(hydra_tf_row_dot_scaled(row, x, dim, scale, group) == 16256.0f,
+              "sign flip: 8128 - 8128 + 8128 + 8128 = 16256");
+        scale[1] = 1.0f; scale[2] = 0.0f;
+        CHECK(hydra_tf_row_dot_scaled(row, x, dim, scale, group) == 24384.0f,
+              "zero scale kills exactly one group (8128*3)");
+        free(row); free(x); free(scale);
+    }
+
+    /* Group-1 asymmetry (hand-computed): codes +1 (0x55) in group 0,
+     * -1 (0xAA) in group 1; x = 127 in group 0, x = -127 in group 1,
+     * scales [1, -1]. Group 1: (-1)*(-127) = +127 per weight ->
+     * partial 8128, fused with scale -1 -> -8128; total 8128-8128 = 0.
+     * Flipping ONE weight of group 1 (x[64] = +127) makes its partial
+     * 8128 - 254 = 7874, fused -> -7874; total 8128 - 7874 = 254. The
+     * non-zero result keeps the zero case from passing vacuously. */
+    {
+        const uint32_t dim = 128, group = 64;
+        uint8_t *row = (uint8_t *)malloc(dim / 4);
+        int8_t *x = (int8_t *)malloc(dim);
+        float scale[2] = { 1.0f, -1.0f };
+        if (!row || !x) { free(row); free(x); exit(1); }
+        memset(row, 0x55, 16);
+        memset(row + 16, 0xAA, 16);
+        for (uint32_t b = 0; b < 64; ++b) x[b] = 127;
+        for (uint32_t b = 64; b < 128; ++b) x[b] = -127;
+        CHECK(hydra_tf_row_dot_scaled(row, x, dim, scale, group) == 0.0f,
+              "asymmetric: 8128 + (-1 * 8128) = 0");
+        x[64] = 127; /* one weight against the flip */
+        CHECK(hydra_tf_row_dot_scaled(row, x, dim, scale, group) == 254.0f,
+              "asymmetric one-weight flip: 8128 + (-1 * 7874) = 254");
+        free(row); free(x);
+    }
+
+    /* Guards: the documented invalid-input answer, not a partial result. */
+    {
+        uint8_t row[64];
+        int8_t x[128];
+        float scale[2] = { 1.0f, 1.0f };
+        memset(row, 0x55, sizeof row);
+        for (int i = 0; i < 128; ++i) x[i] = 1;
+        CHECK(hydra_tf_row_dot_scaled(row, x, 100, scale, 64) == 0.0f,
+              "dim 100 % group 64 != 0 -> 0.0f");
+        CHECK(hydra_tf_row_dot_scaled(row, x, 64, scale, 32) == 0.0f,
+              "foreign group 32 -> 0.0f");
+        CHECK(hydra_tf_row_dot_scaled(NULL, x, 64, scale, 64) == 0.0f,
+              "NULL row -> 0.0f");
+    }
 }
 
 static void test_rmsnorm(void)
@@ -3932,6 +4051,7 @@ int main(void)
     test_avx2_v2_unpack();
     test_avx2_tf_row_dot();
 #endif
+    test_tf_row_dot_scaled();
     test_sampler_greedy_guard();
     test_sampler_repetition_penalty();
     test_sampler_min_p();

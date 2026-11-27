@@ -503,3 +503,133 @@
    annotations API (`gh api .../check-runs/<id>/annotations`) plus
    the job page on github.com (lists which step failed), and
    reproduce locally with the matching tool version (item 3).
+
+## 2026-10-31 (rounds 16/16.5/17) — /tmp reset again, CI diagnosis without logs, apt blocked
+
+Measurements from the R16.5 CI fix and the R17 documentation audit (this
+sandbox session, Debian 12 container, gcc 12.2.0, Python 3.11.2, Node 20):
+
+1. **/tmp is wiped between sandbox sessions** (again): `/tmp/lintenv` was
+   gone. Rebuilt in ~9 s: `python3 -m venv /tmp/lintenv &&
+   /tmp/lintenv/bin/pip install -q cppcheck pyflakes bandit pyyaml`
+   (measured: cppcheck 2.22.0, pyflakes, bandit 1.9.x, pyyaml). `npm ci`
+   (eslint) also re-run, ~8 s, rc=0. Both are prerequisites for the local
+   gates — check them first in every new session.
+2. **apt is BLOCKED in this sandbox (measured):** `sudo` works, but
+   `deb.debian.org` (and `debian-security`) fail with "Connection failed"
+   from `apt-get update` (egress allowlist). Therefore clang, clang-tidy,
+   flawfinder, javac, gcc-12-aarch64-linux-gnu and qemu-user-static are
+   NOT installable here — the clang strict syntax gate, L2/L3 (clang
+   analyzer / clang-tidy), flawfinder, the JNI signature gate and the
+   NEON/aarch64 parity gate must run in CI (ubuntu-latest has them all).
+   `gcc -fanalyzer`, cppcheck (pip wheel), pyflakes, bandit, pyyaml and
+   `npm ci` (registry.npmjs.org) DO work locally (measured green this
+   session). A "blocked, not measured" claim for the apt-gated tools is
+   the honest verdict here; the rest of the gate stack ran locally.
+3. **CI diagnosis without logs (R16.5 incident 41222651267):**
+   - `gh run view <run> --log` EOFs repeatedly from
+     results-receiver.actions.githubusercontent.com (known block, but
+     worse than before: no partial log). Do not retry-loop.
+   - `gh api .../check-runs/<id>` returns `steps: null` (not
+     expandable); `.../actions/jobs/{id}/steps` does not exist (404).
+   - What DOES work: `gh api .../actions/jobs?per_page=100` (job list
+     with per-job conclusion) and `gh api .../actions/jobs/{job_id}`
+     (per-job `steps[]` with name/status/conclusion). Step conclusions
+     + timing + a local byte-for-byte reproduction is a complete proof
+     without the log.
+   - `gh run view <run> --job <jobid> --log` prints nothing while the
+     run is in progress ("logs will be available when it is complete").
+   - Timing heuristic that caught the false "30 s = skipped?" alarm:
+     compare the green run's build-test duration (30 s) with the red
+     run's time-to-failure in the SAME step (36–38 s) — 30 s total is
+     this repo's normal build-test duration, not a skip.
+4. **The llama.cpp submodule is NOT checked out in a fresh sandbox**
+   (measured: `tools/llama_pin_check.sh` failed 2/5 on the missing
+   LICENSE). Fix, ~25 s: `git submodule update --init
+   android/app/src/main/cpp/llama` (github.com reachable). Run it once
+   per fresh checkout before the pin gates.
+5. **`tools/ci_release_version_test.sh` needs pyyaml on `python3`** —
+   the sandbox system python has none. Run it with the venv on PATH:
+   `PATH=/tmp/lintenv/bin:$PATH bash tools/ci_release_version_test.sh`
+   (measured green that way; fails with ModuleNotFoundError otherwise).
+
+## 2026-11-01 (round 17.6) — runner image refresh, blocked artifact/dispatch, shallow session branches
+
+Measurements from the round-17.5/17.6 session (this sandbox segment,
+Debian 12 container):
+
+1. **The GitHub ubuntu-latest runner image was refreshed around
+   2026-11-01** — one event, two CI symptoms (both fixed):
+   - newer distro **cppcheck** → newly reported 32
+     `nullPointerOutOfMemory` findings in the round-16 test code
+     (red lint job, run 41337186327) — fixed in code (PR #80, clean
+     under cppcheck 2.22 = superset).
+   - **`gcc-12-aarch64-linux-gnu` removed** from the image's apt
+     sources → `neon-test` and Release `CLI (Linux)` failed at their
+     install step (runs 41337186425, 41339831264, two days apart —
+     persistent, not transient) — fixed in ci.yml + release.yml with
+     the unversioned `gcc-aarch64-linux-gnu` + printed compiler
+     version. Lesson for all CI tool choices: "default tool +
+     behaviour gate" beats "pinned old version" (pins rot when the
+     image moves; gates don't). See RESEARCH-LOG.md §12/§13.
+2. **Workflow artifact download is blocked here:** `gh run download
+   <run> -n <artifact>` → EOF from
+   `productionresultssa19.blob.core.windows.net` (not on the egress
+   allowlist; same class as the results-receiver log EOF). The
+   artifact is visible in the run but unreadable from this sandbox —
+   diagnose via the Jobs API step conclusions + local reproduction
+   instead.
+3. **`gh run rerun` and `gh workflow run` (dispatch) are 403** from
+   this sandbox's token ("Resource not accessible by integration" /
+   "run cannot be rerun; its workflow file may be broken"). Only
+   push-triggered runs are controllable from here — a red
+   push-triggered job is re-tested by the next push to the triggering
+   branch, not by a manual rerun.
+4. **Session branches after a merge are SHALLOW clones:** the new
+   branch arrives with a pruned object DB (`.git/shallow` boundaries,
+   `origin/main~1` unknown). `git merge --ff-only origin/main` fails
+   with "refusing to merge unrelated histories" until the missing
+   chain is fetched: `git fetch --depth=50 origin main` restores it
+   (measured). Check `git rev-parse --is-shallow-repository` in every
+   fresh session segment before assuming the history is complete.
+5. **/tmp is wiped between sandbox segments** (again): rebuild
+   `/tmp/lintenv` (pyyaml et al.) at the start of each segment; the
+   `workflow_yaml_check.sh` gate needs `PATH=/tmp/lintenv/bin:$PATH`.
+
+## 2026-11-25 (round 20) — fresh segment: apt/clang blocked by the egress allowlist, submodules, sudo
+
+Measured in this sandbox segment (Debian 12 container, E2B-style):
+
+1. **`/tmp` wiped again + `node_modules` gone** (fresh segment):
+   rebuilt with `npm ci` (78 packages, eslint 10.x) and
+   `/tmp/lintenv` (cppcheck, clang-tidy, yamllint, shellcheck-py,
+   flawfinder, pyflakes, bandit, cpplint). Same recipe as the
+   2026-11-01 note.
+2. **The clang COMPILER cannot be installed here** (measured,
+   2026-11-25): plain `apt-get` has no root (permission denied on
+   /var/lib/dpkg); `sudo` works passwordless, but `sudo apt-get
+   update` fails with "Failed to fetch
+   http://deb.debian.org/debian-security/..." — deb.debian.org is not
+   on the sandbox egress allowlist (allowed: github.com,
+   codeload.github.com, api.github.com, registry.npmjs.org, pypi.org,
+   files.pythonhosted.org). The LLVM GitHub releases carry no binary
+   assets (checked via the API: `llvmorg-*` tags, empty asset lists),
+   and releases.llvm.org is not allowed either. Consequence:
+   **CI gate 1b (clang strict syntax) cannot be executed in this
+   sandbox and is proven by the PR's "C lint & static analysis" job
+   instead.** Every other gate (gcc strict, cppcheck, fanalyzer,
+   sanitizers, all test suites, eslint, python gates, server suite,
+   contract gates) runs locally. `clang-tidy` IS available (pip
+   package in /tmp/lintenv) — only the compiler frontend is missing.
+3. **Fresh clones need `git submodule update --init`** before
+   `tools/llama_pin_check.sh` passes: the check reads the pinned
+   llama.cpp submodule's LICENSE file; without the checkout it reports
+   "MIT licence missing" (2 of 5 checks red) although the gitlink pin
+   itself is correct.
+4. **`sudo -n true` succeeds** (passwordless root) — usable for
+   system installs where the network allows it.
+5. **GitHub connector is NOT available in this Arena environment**
+   (`list_connector_tools github` → unsupported): CI status is
+   reported in chat via `gh` CLI + the runs API, as the owner directed
+   ("if not, continue normally"). Linear IS connected and used for
+   task management.

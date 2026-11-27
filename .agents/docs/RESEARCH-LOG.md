@@ -22,6 +22,11 @@
 | 2026-10-26 | GitHub workflow compiler vs PyYAML (duplicate keys) | zero-job red run; gate 1h shipped |
 | 2026-10-26 | Auto-close target: issues → code-scanning alerts | issue-verify removed; auto-close is native GitHub behaviour — an event-triggered workflow cannot exist (see §7 correction) |
 | 2026-10-26 | Local lint stack from PyPI wheels (no apt needed) | 6 real pre-merge defects caught; path in .agents/Environment.md |
+| 2026-10-26 | Local/CI syntax drift: the five-file lesson (PR #55 first run) | ci_syntax_mirror_test.sh gate shipped |
+| 2026-10-26 | Darwin feature-test inversion: _POSIX_C_SOURCE hides, not enables | control-based string-format gate; release.yml green |
+| 2026-10-31 | CI fixture-list drift: 216 checks green locally, red on main | tools/make_moe_fixtures.sh single source; main 9/9 (§11) |
+| 2026-11-01 | Newer distro cppcheck flags R16 test allocations (main red post-#79) | checked allocations via kv_set_alloc/kv_set_free; PR #80 (§12) |
+| 2026-11-01 | Runner image drop: gcc-12-aarch64-linux-gnu gone from apt sources | unversioned gcc-aarch64-linux-gnu in ci.yml + release.yml (§13) |
 
 ---
 
@@ -373,15 +378,158 @@ aarch64 rc=0 (pin active), zig arm-32-bit rc=0 (pin inactive), C++
 parse rc=0, exact CI 1a rc=0, C suites green. Note: the PR tier
 caught this **before merge** - exactly the behaviour the owner asked
 for ("CI findet die Fehler auf dem PR").
-Second red of the same run (android-lint, step 9 "Kotlin-/C-
-Kompilierung"): the **universal** 664-byte compile-time pin broke the
-NDK **armeabi-v7a** build - 32-bit ABIs use the smaller ILP32 layout
-(sizeof != 664), reproduced locally with `zig cc -target
-arm-linux-gnueabihf` (the exact negative-size-array error). Fix: the
-pin is now LP64-conditional (`__LP64__`/`_LP64`/`__LP64`); the
-documented 664 B claim is a 64-bit statement, 32-bit targets
-legitimately compile a smaller layout. Verified: x86-64 rc=0, zig
-aarch64 rc=0 (pin active), zig arm-32-bit rc=0 (pin inactive), C++
-parse rc=0, exact CI 1a rc=0, C suites green. Note: the PR tier
-caught this **before merge** - exactly the behaviour the owner asked
-for ("CI findet die Fehler auf dem PR").
+
+## 11. CI fixture-list drift: 216 checks green locally, red on main (2026-10-31, after the round-16 merge)
+
+**Question:** after PR #77 merged (round 16), the main-tier `build-test`
+(macOS + Ubuntu) failed in the Sanitizers step (run 41222651267) while
+`make test-run` stayed green locally and in the PR-tier build. What was
+the drift, and how do you make the class of bug unrepeatable?
+
+**Method:** job conclusions + step timestamps from the REST jobs API
+(`gh run view --log` EOF'd repeatedly from the results-receiver — the
+known log-fetch block, see .agents/Environment.md), then local
+reproduction: built the 9-fixture `hydra-moe-test` from the merge commit
+and ran it with the 7 argv paths the ci.yml step still inlined.
+
+**Finding:** round 16 added two fixtures (`-q4`, `-q4f32`) to the
+`hydra-moe-test` argv contract (the binary now hard-requires 9 fixture
+paths, argv-count check before any test) and updated the Makefile's
+`test-run` recipe — but the ci.yml sanitizer step carried its OWN inline
+copy of the fixture list from before the addition. The binary refused
+loudly (`fixture paths missing`); the drift was invisible on the PR tier
+(lint-only by owner rule) and on local runs (Makefile updated), so the
+first main-tier functional run was the first to see it.
+
+**Resolution:** the fixture list now lives exactly once in
+`tools/make_moe_fixtures.sh <base>` — it generates all nine fixtures and
+prints their paths as the last stdout line; the Makefile recipe and the
+ci.yml sanitizer step both call it (`… | tee <args-file>` keeps the
+generator's byte-count lines in the logs, `tail -n 1` extracts the path
+list). Verified: the 7-argv error reproduced before the fix; after it,
+`make test-run` 234/128/7/101/152/216 all 0 and the sanitizer leg
+reproduced byte-for-byte locally (ASan + UBSan, `detect_leaks=1`,
+`halt_on_error=1`) → exit 0. Merged as PR #78 (`c5d281e`, main `8606d58`);
+main CI 41225936406 = 9/9 success.
+
+**Permanent artifact:** `tools/make_moe_fixtures.sh` (single source);
+prevention rule — any list that must stay in sync across build entries
+(fixtures, env contract, sampler ranges) is a script or a check, not a
+copy (the same reasoning that produced `tools/sampler_contract_check.sh`).
+Full incident record: `.agents/errors.md` (2026-10-31 entry).
+
+## 12. Newer distro cppcheck flags round-16 test allocations (2026-11-01, main red post-#79) — FIXED, PR #80 merged `2c11d20`
+
+**Question:** main CI run 41337186327 (the push of the round-17 docs
+audit, `07bf74d`) failed exactly one step: `lint` job → "Static
+analysis (cppcheck)". The identical code was green on `8606d58`
+(run 41225936406). Why?
+
+**Method:** the job log and the `lint-errors` artifact were both
+unreadable from this sandbox (results-receiver EOF; artifact blob host
+`productionresultssa19.blob.core.windows.net` also EOF — not on the
+egress allowlist). Proof without the log, in three steps:
+1. `git diff 8606d58..07bf74d -- src/ include/` = comments only
+   (`hydra_moe.h`, `hydra_v2_container.c`) + `.md` files → the doc PR
+   cannot change cppcheck's verdict on code.
+2. Reproduce the exact CI command locally with the newest available
+   cppcheck (2.22.0 from the PyPI wheel — a superset of the distro
+   2.13.x era): 32 findings, all `nullPointerOutOfMemory` (27× in
+   `tests/test_hydra_moe.c`) + 5× `nullPointerOutOfMemory` + 1×
+   `nullPointerArithmeticOutOfMemory` (512-cases block already checked
+   at line 2107, the two pinned-extremes/asymmetry blocks were not).
+3. All findings sit in the round-16 test code (KV cache helpers added
+   in PR #77) — pre-existing, invisible to the older distro cppcheck,
+   visible to the newer one. The runner image was refreshed between
+   the two runs; the cppcheck version change is the drift vector
+   (same event that also dropped `gcc-12-aarch64-linux-gnu`, §13).
+
+**Resolution:** `kv_set_alloc`/`kv_set_free` helpers in
+`tests/test_hydra_moe.c` own the whole per-layer cache chain (checked
+calloc + per-layer malloc, full cleanup on OOM, no leak, no NULL
+reaches `hydra_kv_cache_init`/`hydra_moe_forward`); all five KV test
+sites use them; the eviction sink's `k0/v0/ak/av` and the four
+unchecked `ref_get` calls got checks; the two `tests/test_engine.c`
+blocks got the file's own OOM convention. Post-fix: cppcheck 2.22
+(exact CI command) 0 findings; tests 234/128/7/101/152/216 all 0
+(baseline unchanged — the OOM paths never execute in practice);
+ASan+UBSan moe+engine clean.
+
+**Lesson:** unversioned apt packages in CI are a drift vector in BOTH
+directions — a newer version can newly REJECT code (this incident) and
+an image refresh can DELETE a pinned old version (§13). A code fix
+that is clean under the newest superset tool is the durable fix;
+pinning the old version would just move the failure to the next image
+refresh.
+
+## 13. Runner image drop: AArch64 toolchain gone from apt sources (2026-11-01) — FIXED in ci.yml + release.yml (probe lists, rounds 17.7–17.8)
+
+**Question:** two main-tier jobs failed at their first real step after
+the #80 merge: `CI` → `neon-test` (run 41339831236) and `Release` →
+`CLI (Linux)` (run 41339831264), both at "Install AArch64
+cross-compiler and qemu-user" / "Install cross toolchain + qemu" —
+`sudo apt-get install -y -qq gcc-12-aarch64-linux-gnu qemu-user-static`.
+The same step succeeded on the previous image (e.g. the 07bf74d
+Release run's sibling jobs all passed; only the apt step failed).
+
+**Method:** job steps via the Jobs API (`/actions/jobs/{id}` — the
+steps endpoint that works while the log endpoint EOFs): both failures
+are the apt install step, everything downstream skipped. The identical
+step failed on two consecutive runs two days apart on two different
+commits → not transient, the package is gone from the current image's
+apt sources. Consistent with the same image refresh that bumped
+cppcheck (§12) — one event, two symptoms.
+
+**Resolution (round 17.6, PR #81, merged `a3f5c44`):** the
+unversioned cross-compiler (`gcc-aarch64-linux-gnu` →
+`aarch64-linux-gnu-gcc`, whatever gcc the image ships) in both
+workflows. **Insufficient** — see the second phase below.
+
+**Second phase (round 17.7):** the unversioned fix was red on the
+next main push (runs 41340751971 neon-test, 41340751982 CLI Linux —
+same step). The refresh turned out to be a major-version move:
+`ubuntu-latest` switched to **Ubuntu 26.04 in November 2026**
+(actions/runner-images#14748, GA issue #14747), and the new image's
+apt sources provide neither the gcc-12 pin nor the unversioned
+metapackage (the log endpoint stayed unreachable — EOF — so the
+exact apt error was not retrievable from here). The install steps now
+walk a **probe list** (`gcc-aarch64-linux-gnu`, then
+`gcc-15/14/13-aarch64-linux-gnu`), export the working compiler as
+`$CC_AARCH64` via GITHUB_ENV (all three aarch64 build steps use it),
+and — if the whole list fails — emit `::error::`/`::notice::`
+annotations with the apt error tail and `apt-cache search`
+candidates, readable through the Checks API without the log
+endpoint.
+
+**Third phase (round 17.8):** the post-#82 main runs
+(41342270169/41342270201) proved the gcc probe works —
+`gcc-aarch64-linux-gnu` installed fine (the metapackage IS on
+26.04; the #81 failure was this next line all along) — but failed at
+`sudo apt-get install -y -qq qemu-user-static` with `E: Package
+'qemu-user-static' has no installation candidate`. The qemu install
+is now a probe too (`qemu-user-static` → `qemu-user`), exporting
+`$QEMU_AARCH64` for all three emulator invocations. The emulator is
+always invoked explicitly (never via binfmt), so the static-vs-
+dynamic distinction is irrelevant. Two further lessons from this
+phase: (a) in a multi-package `apt-get install a b c`, the failing
+package is not necessarily the one in apt's summary — audit the
+workflow's whole package list when an image major move breaks the
+install; (b) the self-diagnosis pattern (probe list + export +
+`::error::`/`::notice::` annotations with `apt-cache search`
+candidates) made each of the three failures diagnosable in one
+Checks-API call without the log endpoint.
+
+**Gates that make the compiler version non-load-bearing** (unchanged):
+the test-count drift gate (ARM baseline), the NEON-vs-scalar
+comparison tests, and the x86-vs-ARM/NEON bit-identical parity check
+in both workflows. If any future compiler change broke NEON
+behaviour, those gates would catch it — the pin was buying nothing
+that the gates don't already prove.
+
+**Lesson (updated 17.7):** in CI, prefer "default + prove it"
+(unversioned tool + behaviour gates) over "pin the exact old version"
+— pins rot when the image moves, behaviour gates don't. But a
+major-version image move can drop even the default *name*, so an
+install step that is load-bearing for the job should **probe a small
+list, export what it found, and self-diagnose via annotations** —
+especially while the log endpoint is not reachable.

@@ -41,6 +41,10 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+/* execFile: async, used by the request handlers. execFileSync: ONLY
+ * at startup (ensureDefaultModel, before server.listen - there is no
+ * event-loop traffic yet); a sync spawn inside a request handler
+ * would stall every other request (round 13, Qodo #27). */
 const { execFile, execFileSync } = require('child_process');
 const { randomUUID } = require('node:crypto');
 const trainer = require('./tools/hydra_train');
@@ -62,29 +66,84 @@ const GGUF_CONVERTER = path.join(ROOT, 'tools', 'gguf_to_hydra.py');
 const CONVERT_TIMEOUT_MS = parseInt(process.env.HYDRA_CONVERT_TIMEOUT_MS || '600000', 10);
 const MAX_VERIFY_DIM = 4096;
 const VOCAB_DIR = path.join(ROOT, 'models', 'vocab');
-const DEFAULT_MODEL = path.join(MODELS_DIR, 'starter.hydra');
+/* Round 16 ("intelligent + configurable everywhere"): every hard-coded
+ * knob in this file now has an environment override, and GET /api/config
+ * reports the effective value of each one plus how to change it. All
+ * defaults are UNCHANGED - a server started without any HYDRA_* variable
+ * behaves exactly like before, bit for bit.
+ *
+ * An invalid env value is a server-level misconfiguration, so it is
+ * refused at startup with the variable named - never silently ignored
+ * (a default that silently eats a typo is a configuration bug). */
+function envInt(name, dflt, min, max) {
+  const raw = process.env[name];
+  if (raw === undefined || raw === '') return dflt;
+  const v = Number(raw);
+  if (!Number.isInteger(v) || v < min || v > max) {
+    console.error(`[server] ${name}=${JSON.stringify(raw)} is not an integer in [${min}, ${max}]`);
+    process.exit(1);
+  }
+  return v;
+}
+function envEnum(name, dflt, allowed) {
+  const raw = process.env[name];
+  if (raw === undefined || raw === '') return dflt;
+  if (!allowed.includes(raw)) {
+    console.error(`[server] ${name}=${JSON.stringify(raw)} is not one of: ${allowed.join(', ')}`);
+    process.exit(1);
+  }
+  return raw;
+}
 
-const MAX_BODY = 2 * 1024 * 1024; /* training corpora are text; 2 MiB is ample */
+const DEFAULT_MODEL = (() => {
+  const raw = process.env.HYDRA_DEFAULT_MODEL;
+  if (raw === undefined || raw === '') return path.join(MODELS_DIR, 'starter.hydra');
+  const abs = path.resolve(ROOT, raw);
+  if (abs !== path.resolve(ROOT) && !abs.startsWith(path.resolve(ROOT) + path.sep)) {
+    console.error(`[server] HYDRA_DEFAULT_MODEL=${JSON.stringify(raw)} must stay inside the repository root`);
+    process.exit(1);
+  }
+  return abs;
+})();
+
+/* Training corpora are text; 2 MiB is ample. Overridable (HYDRA_MAX_TRAIN_BODY). */
+const MAX_BODY = parseByteSize(process.env.HYDRA_MAX_TRAIN_BODY, 2 * 1024 * 1024);
 /* Upload cap, overridable because the model size ceiling is a FORMAT limit,
  * not a transport one: a future .hydra v2 is allowed to be far bigger than
  * today's (measured: v1 can describe at most 256 KiB of weights). Bytes can
  * be set directly, sizes with a suffix: HYDRA_MAX_UPLOAD=2GB. */
 const MAX_UPLOAD = parseByteSize(process.env.HYDRA_MAX_UPLOAD, 64 * 1024 * 1024);
-const MAX_PROMPT = 256; /* must match MAX_PROMPT in src/main.c */
-const ENGINE_TIMEOUT_MS = 20000;
+/* The engine's hard cap (MAX_PROMPT in src/main.c). The override may LOWER
+ * the server's limit, never raise it above what the engine will accept -
+ * raising it would only turn a loud engine refusal into a confusing one. */
+const ENGINE_MAX_PROMPT = 256;
+const MAX_PROMPT = Math.min(envInt('HYDRA_MAX_PROMPT', ENGINE_MAX_PROMPT, 1, 1024), ENGINE_MAX_PROMPT);
+const ENGINE_TIMEOUT_MS = envInt('HYDRA_INFER_TIMEOUT_MS', 20000, 100, 3600000);
+/* The /api/infer steps default when the client sends none (the request
+ * value still wins, clamped to [1, 256] by the handler). */
+const DEFAULT_STEPS = envInt('HYDRA_DEFAULT_STEPS', 16, 1, 256);
+/* Server-level default for the GGUF import mode: auto (today's v1
+ * behaviour) / v1 / v2 (full-fidelity MoE container). Per-request
+ * ?mode=... always wins. */
+const IMPORT_MODE_DEFAULT = envEnum('HYDRA_IMPORT_MODE', 'auto', ['auto', 'v1', 'v2']);
 
 /* Sampler pass-through for /api/infer. The ranges are the SAME rules the
  * Android bridge applies (android/app/src/main/cpp/hydra_sample_cfg.h,
  * used by hydra_jni.c runInferenceSampled) and are pinned by
  * tools/sampler_contract_check.sh: temperature in [0, 20] (0 = greedy),
  * min-p in [0, 1] (1 = greedy), repetition penalty >= 1 (1 = off),
- * penalty window an integer in [0, 4096]. A request without any of the
- * fields emits NO sampler flag, so a legacy client keeps the bit-
- * identical greedy run. */
+ * penalty window an integer in [0, 4096], seed an integer in
+ * [0, 2^32-1] (the Android bridge's seed is a jint, so capping here at
+ * the same 32-bit range keeps every web-seeded run reproducible on
+ * EVERY surface, CLI and Android included). A request without any of
+ * the fields emits NO sampler flag, so a legacy client keeps the bit-
+ * identical greedy run (seed 0 and no seed are the same: the engine
+ * maps 0 to its fixed non-zero start constant). */
 const SAMPLER_TEMP_MAX = 20;
 const SAMPLER_MINP_MAX = 1;
 const SAMPLER_REP_MIN = 1;
 const SAMPLER_REP_WINDOW_MAX = 4096;
+const SAMPLER_SEED_MAX = 4294967295;
 
 /* The console talks to a local engine and can run arbitrary uploaded code
  * paths, so binding it to every interface must be an explicit decision.
@@ -139,11 +198,18 @@ function sendJSON(res, code, obj) {
 function readBody(req) {
   return new Promise((resolve, reject) => {
     let data = '';
+    let overflowed = false;
     req.on('data', (c) => {
+      /* After the limit: discard, do NOT destroy. The route answers the
+       * 400 and closeAfterBodyDrained decides when the socket dies;
+       * destroying here reset the connection while the client was still
+       * sending (the same bug class as the 413 upload path, round 19). */
+      if (overflowed) return;
       data += c;
       if (data.length > MAX_BODY) {
+        overflowed = true;
+        data = '';
         reject(new Error('body too large'));
-        req.destroy();
       }
     });
     req.on('end', () => resolve(data));
@@ -159,7 +225,11 @@ function readBody(req) {
  * error message revealed the target's size). The path is therefore resolved
  * with realpath and checked again, and it must be a regular file. */
 function safeModelPath(p) {
-  if (typeof p !== 'string' || !p.endsWith('.hydra')) return null;
+  /* .hydra2 containers pass through too: inspection (and later
+   * tooling) must reach them with the SAME escape protection as
+   * .hydra files. No other suffix is accepted. */
+  if (typeof p !== 'string' ||
+      (!p.endsWith('.hydra') && !p.endsWith('.hydra2'))) return null;
   if (p.includes('\0')) return null;
   const abs = path.resolve(ROOT, p);
   if (!abs.startsWith(ROOT + path.sep)) return null;
@@ -239,17 +309,21 @@ function streamToTmpFile(req, tmpPath, limit) {
       try { fs.unlinkSync(tmpPath); } catch { /* already gone */ }
       reject(err);
     };
-    req.on('data', (chunk) => {
+    const onData = (chunk) => {
       written += chunk.length;
       if (written > limit) {
         /* Unpipe and pause - do NOT destroy. req.pause() keeps the socket
-         * alive so the 413 can still be written; the route closes it once
-         * the answer has been flushed. */
+         * alive so the 413 can still be written. The handler removes
+         * itself so the route can drain the rest of the body (see
+         * closeAfterBodyDrained) without this listener pausing the
+         * stream again on every chunk. */
+        req.removeListener('data', onData);
         req.unpipe(out);
         req.pause();
         fail(new UploadTooLarge(limit));
       }
-    });
+    };
+    req.on('data', onData);
     out.on('error', fail);
     req.on('error', fail);
     out.on('finish', () => {
@@ -259,6 +333,31 @@ function streamToTmpFile(req, tmpPath, limit) {
     });
     req.pipe(out);
   });
+}
+
+/**
+ * Ends a rejected upload's connection WITHOUT taking the socket away
+ * from the client while it is still writing.
+ *
+ * Destroying the socket before the client has finished sending the
+ * request body resets the connection: undici/curl report a socket
+ * error ("fetch failed") instead of the 413 the server just answered
+ * with. The race is timing-dependent (how fast the client streams the
+ * body), which is why the regression test is flaky rather than always
+ * red. The safe order: discard the rest of the body (never buffer it),
+ * answer, and only then close - once BOTH the response is flushed and
+ * the client has finished sending (or gone away).
+ */
+function closeAfterBodyDrained(req, res) {
+  req.resume(); /* the remainder of the body is discarded, not buffered */
+  let settled = 0;
+  const settle = () => {
+    settled += 1;
+    if (settled >= 2 && !req.destroyed) req.destroy();
+  };
+  res.on('finish', settle);
+  req.on('end', settle);
+  req.on('close', settle);
 }
 
 /**
@@ -303,9 +402,9 @@ function describeMagic(magic) {
  *
  * @returns a report object; never throws for a merely invalid model.
  */
-function analyseHydraFile(absPath, sizeArg) {
-  const stat = fs.statSync(absPath);
-  const size = sizeArg === undefined ? stat.size : sizeArg;
+function analyseHydraFile(absPath) {
+  const fd = fs.openSync(absPath, 'r');
+  const size = fs.fstatSync(fd).size;
   const report = {
     path: null,
     bytes: size,
@@ -340,10 +439,10 @@ function analyseHydraFile(absPath, sizeArg) {
   if (size < HEADER_BYTES) {
     rule('size', false,
       `file is ${formatBytes(size)}, smaller than the ${HEADER_BYTES}-byte header`);
+    fs.closeSync(fd);
     return report;
   }
 
-  const fd = fs.openSync(absPath, 'r');
   let buf;
   try {
     buf = Buffer.alloc(HEADER_BYTES);
@@ -419,10 +518,35 @@ function analyseHydraFile(absPath, sizeArg) {
  * The single error message for a refused model, derived from the analysis
  * above. Returns null when the file is fine.
  */
-function validateHydraHeader(file, size) {
+/* The .hydra2 upload check: the C container reader's full verdict is what
+ * /api/models/inspect and the engine give, and neither runs on the upload
+ * path - so the header check stays a header check: the 8-byte magic and
+ * the minimum header size. A deeper fake (valid magic, corrupt body) is
+ * caught by the inspect endpoint and by the engine at load, the same
+ * layering as the v1 path. */
+function validateHydra2Header(file, size) {
+  if (size < 128) {
+    return `file is ${formatBytes(size)}, smaller than the 128-byte .hydra2 header`;
+  }
+  const fd = fs.openSync(file, 'r');
+  try {
+    const buf = Buffer.alloc(8);
+    if (fs.readSync(fd, buf, 0, 8, 0) < 8) {
+      return 'the 8-byte .hydra2 magic could not be read';
+    }
+    if (buf.toString('latin1', 0, 8) !== 'HYDRA2\u0000\u0000') {
+      return 'the file claims the .hydra2 suffix but does not start with the HYDRA2 magic';
+    }
+  } finally {
+    fs.closeSync(fd);
+  }
+  return null;
+}
+
+function validateHydraHeader(file) {
   let report;
   try {
-    report = analyseHydraFile(file, size);
+    report = analyseHydraFile(file);
   } catch (e) {
     return `model could not be read: ${e.message}`;
   }
@@ -435,11 +559,17 @@ function validateHydraHeader(file, size) {
 
 /** Resolve an upload name to a path inside models/uploaded/, or null. */
 function uploadTarget(name) {
-  if (typeof name !== 'string' || !name.endsWith('.hydra')) return null;
-  const key = modelKey(name.slice(0, -'.hydra'.length));
+  /* Both container generations are uploadable (round 16): .hydra is the
+   * v1 training format, .hydra2 the full-fidelity MoE container. */
+  if (typeof name !== 'string') return null;
+  const suffix = name.endsWith('.hydra2') ? '.hydra2'
+    : name.endsWith('.hydra') ? '.hydra'
+    : null;
+  if (suffix === null) return null;
+  const key = modelKey(name.slice(0, -suffix.length));
   if (key === null) return null;
   const dir = path.resolve(UPLOAD_DIR);
-  const file = path.resolve(dir, `${key}.hydra`);
+  const file = path.resolve(dir, `${key}${suffix}`);
   const rel = path.relative(dir, file);
   if (rel === '' || rel.startsWith('..') || path.isAbsolute(rel)) return null;
   return file;
@@ -550,6 +680,7 @@ function runInference(modelPath, token, steps, prompt, requestId, sampler) {
   if (sampler && sampler.minP !== undefined) args.push('--min-p', String(sampler.minP));
   if (sampler && sampler.repetitionPenalty !== undefined) args.push('--rep-penalty', String(sampler.repetitionPenalty));
   if (sampler && sampler.repWindow !== undefined) args.push('--rep-window', String(sampler.repWindow));
+  if (sampler && sampler.seed !== undefined) args.push('--seed', String(sampler.seed));
   return engineJson(args, requestId);
 }
 
@@ -631,6 +762,99 @@ function runGgufConverter(ggufPath, outPath) {
 }
 
 /* ------------------------------------------------------------------ */
+/* GGUF -> .hydra2 (round 16, full-fidelity MoE container)            */
+/* ------------------------------------------------------------------ */
+
+/** Resolve an import name to a .hydra2 path inside models/converted/. */
+function convertedTargetV2(name) {
+  if (typeof name !== 'string' || !name.endsWith('.hydra2')) return null;
+  const key = modelKey(name.slice(0, -'.hydra2'.length));
+  if (key === null) return null;
+  const dir = path.resolve(CONVERTED_DIR);
+  const file = path.resolve(dir, `${key}.hydra2`);
+  const rel = path.relative(dir, file);
+  if (rel === '' || rel.startsWith('..') || path.isAbsolute(rel)) return null;
+  return file;
+}
+
+/**
+ * Header-only probe of the v2 converter: runs every acceptance check
+ * (architecture, tensors, shapes, t4 divisibility) WITHOUT touching a
+ * payload byte and returns its JSON report. This is what makes the
+ * import "intelligent": the server can tell the client up front whether
+ * the full-fidelity container is available for this file, and which
+ * t4 path (bit-exact copy vs re-quantisation) would be taken.
+ */
+function probeV2(ggufPath) {
+  const args = [path.join(ROOT, 'tools', 'gguf_to_hydra2.py'), '--probe', ggufPath];
+  return new Promise((resolve) => {
+    execFile('python3', args, {
+      cwd: ROOT,
+      timeout: CONVERT_TIMEOUT_MS,
+      maxBuffer: 8 * 1024 * 1024,
+    }, (err, stdout, stderr) => {
+      let report = null;
+      try {
+        report = JSON.parse(stdout);
+      } catch {
+        /* no JSON: the probe refused (exit 2 with the user message) or
+         * the converter itself crashed. */
+      }
+      if (err && !report) {
+        resolve({ ok: false, reason: (stderr || '').trim() || `probe failed: ${err.message}` });
+        return;
+      }
+      if (!report || report.ok !== true) {
+        resolve({ ok: false, reason: 'probe refused the file' });
+        return;
+      }
+      resolve({ ok: true, report });
+    });
+  });
+}
+
+/**
+ * Run tools/gguf_to_hydra2.py (the streaming, round-16 converter).
+ * t4: 'auto' resolves to the size-correct mode (Q4_0 storage whenever
+ * the geometry allows - a Q4_0 source is then a bit-exact raw copy,
+ * anything else is re-quantised deterministically); 'force' keeps the
+ * decision with the client and lets the converter refuse loudly when
+ * the geometry does not allow it.
+ */
+function runV2Converter(ggufPath, outPath, opts, probeReport) {
+  const args = [path.join(ROOT, 'tools', 'gguf_to_hydra2.py')];
+  let t4 = false;
+  if (opts.t4 === 'force') {
+    t4 = true;
+  } else if (opts.t4 === 'auto' && probeReport
+      && probeReport.t4 && probeReport.t4.ok) {
+    t4 = true;
+  }
+  if (t4) args.push('--t4');
+  if (opts.maxExperts > 1) args.push('--max-experts', String(opts.maxExperts));
+  args.push(ggufPath, outPath);
+  return new Promise((resolve) => {
+    execFile('python3', args, {
+      cwd: ROOT,
+      timeout: CONVERT_TIMEOUT_MS,
+      maxBuffer: 8 * 1024 * 1024,
+    }, (err, stdout, stderr) => {
+      if (err) {
+        resolve({
+          ok: false,
+          t4,
+          error: (stderr || '').trim() || `converter failed: ${err.message}`,
+        });
+        return;
+      }
+      /* The converter prints a single summary line on success; the
+       * container's own header is re-validated by the caller. */
+      resolve({ ok: true, t4, summary: (stdout || '').trim() });
+    });
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Model discovery                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -643,7 +867,10 @@ function listHydraFiles(dir, prefix) {
   }
   const out = [];
   for (const e of entries) {
-    if (e.isFile() && e.name.endsWith('.hydra')) {
+    /* .hydra2 containers are listed too: they are inspectable
+     * (GET /api/models/inspect dispatches on the format) even though
+     * the v1 infer path does not run them. */
+    if (e.isFile() && (e.name.endsWith('.hydra') || e.name.endsWith('.hydra2'))) {
       out.push(path.join(prefix, e.name));
     } else if (e.isDirectory() && e.name !== 'vocab' && !e.name.startsWith('.')) {
       out.push(...listHydraFiles(path.join(dir, e.name), path.join(prefix, e.name)));
@@ -659,13 +886,35 @@ function inspectHeader(relPath) {
   let fd;
   try {
     fd = fs.openSync(abs, 'r');
-    const buf = Buffer.alloc(24);
-    const n = fs.readSync(fd, buf, 0, 24, 0);
+    const buf = Buffer.alloc(128);
+    const n = fs.readSync(fd, buf, 0, 128, 0);
     if (n < 24) return null;
     const st = fs.fstatSync(fd);
+    /* The .hydra2 container starts with the 8-byte magic "HYDRA2\0\0"
+     * (a 128-byte header): the list entry carries its own shape - the
+     * full report is GET /api/models/inspect. */
+    if (n >= 8 && buf.toString('latin1', 0, 8) === 'HYDRA2\u0000\u0000') {
+      return {
+        path: relPath,
+        bytes: st.size,
+        format: 'hydra2',
+        magic: null,
+        version: n >= 10 ? buf.readUInt16LE(8) : null,
+        vocab: null,
+        dim: null,
+        layers: null,
+        weightsOffset: null,
+        weightsLen: null,
+        valid: true,
+        trained: relPath.startsWith('models' + path.sep + 'trained' + path.sep),
+        uploaded: relPath.startsWith('models' + path.sep + 'uploaded' + path.sep),
+        converted: relPath.startsWith('models' + path.sep + 'converted' + path.sep),
+      };
+    }
     return {
       path: relPath,
       bytes: st.size,
+      format: 'hydra',
       magic: buf.readUInt32LE(0),
       version: buf.readUInt16LE(4),
       vocab: buf.readUInt16LE(6),
@@ -810,6 +1059,8 @@ async function handleTrain(body, requestId) {
  */
 async function verifyModelFile(file, cfg, seedToken, steps, requestId) {
   const dim = clampInt(cfg.dim, 1, MAX_VERIFY_DIM, 32);
+  const layers = clampInt(cfg.layers, 1, trainer.MAX_LAYERS, 8);
+  const vocab = clampInt(cfg.vocab, 2, trainer.MAX_VOCAB, 64);
   const buf = fs.readFileSync(file);
   const header = {
     magic: buf.readUInt32LE(0),
@@ -818,13 +1069,13 @@ async function verifyModelFile(file, cfg, seedToken, steps, requestId) {
     dim: buf.readUInt32LE(8),
     layers: buf.readUInt32LE(12),
   };
-  const decoded = trainer.unpack(buf.subarray(24), cfg.layers, dim);
+  const decoded = trainer.unpack(buf.subarray(24), layers, dim);
 
   const state = new Array(dim).fill(0);
   const simulated = [];
   let token = seedToken;
   for (let t = 0; t < steps; t += 1) {
-    const r = trainer.step(decoded.w1, decoded.w2, cfg.layers, dim, cfg.vocab, state, token);
+    const r = trainer.step(decoded.w1, decoded.w2, layers, dim, vocab, state, token);
     simulated.push(r.out);
     token = r.out;
   }
@@ -966,7 +1217,7 @@ const server = http.createServer(async (req, res) => {
       const target = uploadTarget(url.searchParams.get('name') || '');
       if (!target) {
         return sendJSON(res, 400, {
-          error: 'invalid file name: use letters, digits, dot, dash, underscore and the .hydra suffix',
+          error: 'invalid file name: use letters, digits, dot, dash, underscore and the .hydra or .hydra2 suffix',
         });
       }
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -977,9 +1228,18 @@ const server = http.createServer(async (req, res) => {
       } catch (e) {
         /* The stream already removed the temp file. */
         if (e.tooLarge) {
-          /* Answer FIRST, close afterwards. Destroying the request here is
-           * what used to make this reply arrive empty. */
-          res.setHeader('Connection', 'close');
+          /* Answer FIRST, close afterwards - and only close once the
+           * client has finished sending the body (closeAfterBodyDrained):
+           * destroying the socket mid-body-send resets the connection and
+           * the client sees a socket error instead of the 413. The old
+           * req.destroy()-on-finish lost that race under load. */
+          /* No 'Connection: close' here: that header makes Node itself
+           * destroy the socket when the response finishes - before the
+           * body drain below completes - and a destroy with unread body
+           * bytes still in the buffer is an RST, not a FIN (client saw
+           * EPIPE on 15 of 30 runs). The header-less path lets the
+           * request finish; closeAfterBodyDrained closes the socket
+           * afterwards (clean FIN, buffer empty). */
           sendJSON(res, e.status, {
             error: e.message,
             rejected: true,
@@ -987,12 +1247,15 @@ const server = http.createServer(async (req, res) => {
             limitHuman: formatBytes(e.limitBytes),
             raiseWith: 'HYDRA_MAX_UPLOAD',
           });
-          res.on('finish', () => { if (!req.destroyed) req.destroy(); });
+          closeAfterBodyDrained(req, res);
           return;
         }
         return sendJSON(res, e.status || 400, { error: e.message });
       }
-      const reason = validateHydraHeader(tmp, size);
+      const isV2 = target.endsWith('.hydra2');
+      const reason = isV2
+        ? validateHydra2Header(tmp, size)
+        : validateHydraHeader(tmp);
       if (reason !== null) {
         fs.unlinkSync(tmp);
         return sendJSON(res, 400, { error: reason, rejected: true });
@@ -1039,7 +1302,33 @@ const server = http.createServer(async (req, res) => {
               + '(a .hydra model goes to /api/models/upload)',
           });
         }
-        const target = convertedTarget(`${name.slice(0, -'.gguf'.length)}.hydra`);
+        /* Round 16: the import mode. auto keeps today's v1 behaviour
+         * (existing clients see the same files and the same report - the
+         * response gains an additive v2 field) and v2 converts with
+         * tools/gguf_to_hydra2.py into the full-fidelity MoE container,
+         * t4 size-optimal by default with explicit overrides for both
+         * knobs. The server-level default is HYDRA_IMPORT_MODE. */
+        const modeRaw = url.searchParams.get('mode') || IMPORT_MODE_DEFAULT;
+        if (!['auto', 'v1', 'v2'].includes(modeRaw)) {
+          return sendJSON(res, 400, {
+            error: `invalid import mode ${JSON.stringify(modeRaw)}: use auto, v1 or v2`,
+          });
+        }
+        const t4Raw = url.searchParams.get('t4') || 'auto';
+        if (!['auto', 'force', 'none'].includes(t4Raw)) {
+          return sendJSON(res, 400, {
+            error: `invalid t4 ${JSON.stringify(t4Raw)}: use auto, force or none (v2 mode only)`,
+          });
+        }
+        const maxExperts = Number(url.searchParams.get('max_experts') || '1');
+        if (!Number.isInteger(maxExperts) || maxExperts < 1 || maxExperts > 8) {
+          return sendJSON(res, 400, {
+            error: 'max_experts must be an integer in [1, 8]',
+          });
+        }
+        const target = modeRaw === 'v2'
+          ? convertedTargetV2(`${name.slice(0, -'.gguf'.length)}.hydra2`)
+          : convertedTarget(`${name.slice(0, -'.gguf'.length)}.hydra`);
         if (!target) {
           return sendJSON(res, 400, {
             error: 'invalid file name: use letters, digits, dot, dash and underscore before the suffix',
@@ -1051,7 +1340,10 @@ const server = http.createServer(async (req, res) => {
           await streamToTmpFile(req, tmp, MAX_UPLOAD);
         } catch (e) {
           if (e.tooLarge) {
-            res.setHeader('Connection', 'close');
+            /* Same close ordering as the .hydra upload route (no
+             * 'Connection: close' header - it makes Node destroy the
+             * socket on response finish, before the drain completes;
+             * see closeAfterBodyDrained). */
             sendJSON(res, e.status, {
               error: e.message,
               rejected: true,
@@ -1059,10 +1351,69 @@ const server = http.createServer(async (req, res) => {
               limitHuman: formatBytes(e.limitBytes),
               raiseWith: 'HYDRA_MAX_UPLOAD',
             });
-            res.on('finish', () => { if (!req.destroyed) req.destroy(); });
+            closeAfterBodyDrained(req, res);
             return;
           }
           return sendJSON(res, e.status || 400, { error: e.message });
+        }
+
+        /* The probe is header-only and cheap: it runs before ANY
+         * conversion, so a file the v2 path cannot take gets its answer
+         * before a single payload byte is read - and the v1/auto path
+         * can report the full-fidelity option honestly. */
+        const probe = await probeV2(tmp);
+
+        if (modeRaw === 'v2') {
+          if (!probe.ok) {
+            fs.unlinkSync(tmp);
+            return sendJSON(res, 400, {
+              error: `the v2 converter cannot take this GGUF: ${probe.reason}`,
+              rejected: true,
+              mode: 'v2',
+            });
+          }
+          const report = await runV2Converter(tmp, target,
+            { t4: t4Raw, maxExperts }, probe.report);
+          /* The source GGUF never reaches a model path: only the
+           * converted .hydra2 is offered, and only after the check
+           * below. */
+          fs.unlinkSync(tmp);
+          if (!report.ok) {
+            if (fs.existsSync(target)) fs.unlinkSync(target);
+            return sendJSON(res, 400, {
+              error: report.error, rejected: true, mode: 'v2',
+            });
+          }
+          const info = inspectHeader(path.relative(ROOT, target));
+          if (info.format !== 'hydra2') {
+            fs.unlinkSync(target);
+            return sendJSON(res, 500, {
+              error: 'the v2 converter produced a file that is not a .hydra2 container',
+              rejected: true,
+            });
+          }
+          return sendJSON(res, 200, {
+            ok: true,
+            mode: 'v2',
+            model: info,
+            t4: {
+              requested: t4Raw,
+              effective: report.t4,
+              all_q4_0: probe.report.t4.all_q4_0,
+              note: report.t4
+                ? (probe.report.t4.all_q4_0
+                    ? 'Q4_0 source blocks were copied bit-exact'
+                    : 'the non-Q4_0 source tensors were re-quantised to Q4_0 deterministically')
+                : 'F32-resident (t4 not requested or not possible)',
+            },
+            maxExperts,
+            conversion: {
+              ok: true,
+              converter: 'tools/gguf_to_hydra2.py (streaming, round 16)',
+              probe: probe.report,
+              summary: report.summary,
+            },
+          });
         }
 
         const report = await runGgufConverter(tmp, target);
@@ -1086,8 +1437,24 @@ const server = http.createServer(async (req, res) => {
 
         const info = inspectHeader(path.relative(ROOT, target));
         /* The conversion report is the answer, not a log line: it is the only
-         * place that says what the new model actually is. */
-        return sendJSON(res, 200, { ok: true, model: info, conversion: report });
+         * place that says what the new model actually is. The additive v2
+         * field says whether the full-fidelity container is available for
+         * this exact file (the probe's verdict, not a guess). */
+        return sendJSON(res, 200, {
+          ok: true,
+          mode: 'v1',
+          model: info,
+          v2: probe.ok
+            ? {
+                available: true,
+                mode: 'v2',
+                t4: probe.report.t4,
+                note: 're-import with ?mode=v2 for the full-fidelity MoE '
+                  + 'container (t4 size-optimal by default)',
+              }
+            : { available: false, reason: probe.reason },
+          conversion: report,
+        });
       } finally {
         /* Every exit from above lands here: the 400s, the 413, the 429s, a
          * converter crash, a client that hung up mid-upload. */
@@ -1110,7 +1477,7 @@ const server = http.createServer(async (req, res) => {
        * deliberately conflates the two (realpath fails for a missing file),
        * which would make "no such model" indistinguishable from "not
        * allowed". */
-      if (rel.includes('\0') || !rel.endsWith('.hydra')) {
+      if (rel.includes('\0') || (!rel.endsWith('.hydra') && !rel.endsWith('.hydra2'))) {
         return sendJSON(res, 400, { error: 'invalid model path', checked: rel });
       }
       const resolved = path.resolve(ROOT, rel);
@@ -1125,10 +1492,60 @@ const server = http.createServer(async (req, res) => {
         return sendJSON(res, 400, { error: 'invalid model path', checked: rel });
       }
       let report;
-      try {
-        report = analyseHydraFile(abs);
-      } catch (e) {
-        return sendJSON(res, 500, { error: 'model could not be read', detail: e.message });
+      if (rel.endsWith('.hydra2')) {
+        /* The .hydra2 report is the C container reader's OWN verdict
+         * (hydra-run --inspect): one validator, the same one the
+         * engine runs. Round 13 (Qodo #27): ASYNC execFile - the
+         * sync variant blocked the ENTIRE event loop for up to the
+         * 10 s timeout, stalling every other request (health checks,
+         * running inferences) behind one inspect call. No shell, the
+         * same invariant as every other spawn in this file. */
+        try {
+          const out = await new Promise((resolve, reject) => {
+            execFile(
+              HYDRA_RUN,
+              ['--inspect', abs],
+              {
+                timeout: 10000,
+                maxBuffer: 8 * 1024 * 1024,
+                encoding: 'utf8',
+                stdio: ['ignore', 'pipe', 'pipe'],
+              },
+              (err, stdout, stderr) => {
+                if (err) {
+                  err.stdout = stdout;
+                  err.stderr = stderr;
+                  reject(err);
+                } else {
+                  resolve(stdout);
+                }
+              }
+            );
+          });
+          report = JSON.parse(out);
+        } catch (e) {
+          /* rc 2 = the reader refused the file: that is still a
+           * successful diagnosis. Anything else (binary missing,
+           * crash) is a server-side failure. The ASYNC execFile error
+           * carries the exit code in .code (the sync throw used
+           * .status), so both are probed (round 13, Qodo #27). */
+          const rc = e.status !== undefined ? e.status : e.code;
+          if (rc === 2) {
+            try { report = JSON.parse(e.stdout || '{}'); } catch { report = {}; }
+            report.reader_message = (e.stderr || '').trim();
+          } else {
+            return sendJSON(res, 500, {
+              error: 'hydra-run --inspect failed',
+              detail: e.message,
+            });
+          }
+        }
+      } else {
+        try {
+          report = analyseHydraFile(abs);
+        } catch (e) {
+          return sendJSON(res, 500, { error: 'model could not be read', detail: e.message });
+        }
       }
       report.path = rel;
       report.trained = rel.startsWith('models' + path.sep + 'trained' + path.sep);
@@ -1147,7 +1564,12 @@ const server = http.createServer(async (req, res) => {
       try {
         body = JSON.parse((await readBody(req)) || '{}');
       } catch {
-        return sendJSON(res, 400, { error: 'invalid JSON body' });
+        /* The body may still be arriving (oversized or slow): drain it
+         * before the socket closes, or the client sees a reset instead
+         * of this 400 (round 19, same class as the 413 upload fix). */
+        sendJSON(res, 400, { error: 'invalid JSON body' });
+        closeAfterBodyDrained(req, res);
+        return;
       }
       if (body === null || typeof body !== 'object' || Array.isArray(body)) {
         return sendJSON(res, 400, { error: 'body must be a JSON object' });
@@ -1224,6 +1646,13 @@ const server = http.createServer(async (req, res) => {
         }
         sampler.repWindow = v;
       }
+      if (body.seed !== undefined) {
+        const v = body.seed;
+        if (typeof v !== 'number' || !Number.isInteger(v) || v < 0 || v > SAMPLER_SEED_MAX) {
+          return sendJSON(res, 400, { error: `seed must be an integer in [0, ${SAMPLER_SEED_MAX}]` });
+        }
+        sampler.seed = v;
+      }
 
       /* An explicitly requested but forbidden path must not silently fall
        * back to the default model. */
@@ -1281,7 +1710,12 @@ const server = http.createServer(async (req, res) => {
       try {
         body = JSON.parse((await readBody(req)) || '{}');
       } catch {
-        return sendJSON(res, 400, { error: 'invalid JSON body' });
+        /* The body may still be arriving (oversized or slow): drain it
+         * before the socket closes, or the client sees a reset instead
+         * of this 400 (round 19, same class as the 413 upload fix). */
+        sendJSON(res, 400, { error: 'invalid JSON body' });
+        closeAfterBodyDrained(req, res);
+        return;
       }
       if (body === null || typeof body !== 'object' || Array.isArray(body)) {
         return sendJSON(res, 400, { error: 'body must be a JSON object' });
@@ -1314,12 +1748,17 @@ const server = http.createServer(async (req, res) => {
       try {
         body = JSON.parse((await readBody(req)) || '{}');
       } catch {
-        return sendJSON(res, 400, { error: 'invalid JSON body' });
+        /* The body may still be arriving (oversized or slow): drain it
+         * before the socket closes, or the client sees a reset instead
+         * of this 400 (round 19, same class as the 413 upload fix). */
+        sendJSON(res, 400, { error: 'invalid JSON body' });
+        closeAfterBodyDrained(req, res);
+        return;
       }
       if (body === null || typeof body !== 'object' || typeof body.map !== 'object') {
         return sendJSON(res, 400, { error: 'map object is required' });
       }
-      const clean = {};
+      const clean = Object.create(null);
       for (const [k, v] of Object.entries(body.map)) {
         const id = Number(v);
         if (Number.isInteger(id) && id >= 0 && id < trainer.MAX_VOCAB) clean[k] = id;
@@ -1340,7 +1779,12 @@ const server = http.createServer(async (req, res) => {
       try {
         body = JSON.parse((await readBody(req)) || '{}');
       } catch {
-        return sendJSON(res, 400, { error: 'invalid JSON body' });
+        /* The body may still be arriving (oversized or slow): drain it
+         * before the socket closes, or the client sees a reset instead
+         * of this 400 (round 19, same class as the 413 upload fix). */
+        sendJSON(res, 400, { error: 'invalid JSON body' });
+        closeAfterBodyDrained(req, res);
+        return;
       }
       const id = String(body.id || '');
       if (!runningEngines.has(id)) {
@@ -1354,6 +1798,66 @@ const server = http.createServer(async (req, res) => {
       /* Only what the caller may see: no stack from another process, and
        * a client cannot clear the buffer by accident. */
       return sendJSON(res, 200, { errors: errorLog });
+    }
+
+    /* The whole configuration surface, one place (round 16: "configurable
+     * everywhere"). Every server-level knob is reported with its EFFECTIVE
+     * value, its default, whether an env variable overrode it, and the
+     * request-level override where one exists - so a client can always see
+     * what it is running against and how to change it. */
+    if (url.pathname === '/api/config' && req.method === 'GET') {
+      const setting = (name, value, dflt, env, extra) => {
+        const o = Object.assign({
+          name,
+          value,
+          default: dflt,
+          source: process.env[env] === undefined || process.env[env] === ''
+            ? 'default' : 'env',
+          env,
+        }, extra || {});
+        return o;
+      };
+      return sendJSON(res, 200, {
+        engine: {
+          binary: 'hydra-run',
+          jsonMode: true,
+          sampler: {
+            temperature: [0, SAMPLER_TEMP_MAX],
+            minP: [0, SAMPLER_MINP_MAX],
+            repetitionPenalty: [SAMPLER_REP_MIN, 'unbounded (CLI)'],
+            repWindow: [0, SAMPLER_REP_WINDOW_MAX],
+          },
+          maxPrompt: ENGINE_MAX_PROMPT,
+        },
+        settings: [
+          setting('port', PORT, 8787, 'PORT'),
+          setting('host', HOST, '127.0.0.1', 'HYDRA_ALLOW_REMOTE',
+            { note: 'HYDRA_ALLOW_REMOTE=1 binds 0.0.0.0 (explicit opt-in)' }),
+          setting('defaultModel', path.relative(ROOT, DEFAULT_MODEL),
+            'models/starter.hydra', 'HYDRA_DEFAULT_MODEL'),
+          setting('inferTimeoutMs', ENGINE_TIMEOUT_MS, 20000,
+            'HYDRA_INFER_TIMEOUT_MS'),
+          setting('maxPrompt', MAX_PROMPT, ENGINE_MAX_PROMPT,
+            'HYDRA_MAX_PROMPT',
+            { engineCap: ENGINE_MAX_PROMPT,
+              note: 'may lower the engine cap, never raise it' }),
+          setting('maxTrainBodyBytes', MAX_BODY, 2 * 1024 * 1024,
+            'HYDRA_MAX_TRAIN_BODY'),
+          setting('maxUploadBytes', MAX_UPLOAD, 64 * 1024 * 1024,
+            'HYDRA_MAX_UPLOAD'),
+          setting('convertTimeoutMs', CONVERT_TIMEOUT_MS, 600000,
+            'HYDRA_CONVERT_TIMEOUT_MS'),
+          setting('defaultSteps', DEFAULT_STEPS, 16, 'HYDRA_DEFAULT_STEPS',
+            { requestOverride: '/api/infer { steps } (clamped 1..256)' }),
+          setting('importMode', IMPORT_MODE_DEFAULT, 'auto',
+            'HYDRA_IMPORT_MODE',
+            { allowed: ['auto', 'v1', 'v2'],
+              requestOverride: '/api/models/import?mode=auto|v1|v2',
+              note: 'auto = v1 (the existing behaviour); v2 = full-fidelity '
+                + 'MoE container (round 16)' }),
+        ],
+        docs: ['docs/GGUF-IMPORT.md', 'docs/LARGE-MODELS.md', 'README.md'],
+      });
     }
 
     if (url.pathname.startsWith('/api/')) {
