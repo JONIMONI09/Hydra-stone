@@ -5,6 +5,11 @@ description: "Mandatory session protocol: read .agents/session.md, .agents/error
 
 # Session Workflow — Hydra-Stone
 
+## When to use
+
+Use at the start, during and at the end of every session that edits this repository. Not for answering a pure question about the code: read, answer, change nothing,
+so no round section is needed.
+
 Mandatory working protocol for every session. **A session is not
 complete unless `.agents/session.md` and `.agents/errors.md` are updated.**
 
@@ -26,7 +31,7 @@ rounds live in `.agents/docs/SESSION-ARCHIVE.md`):
    what the owner directed.
 3. **Read `.agents/errors.md`** — the top recent entries; check
    whether the current task touches an area with past errors.
-4. **Read `.agents/rules.md`** — the standing rules (R1–R33).
+4. **Read `.agents/rules.md`** — the standing rules (R1–R35).
 5. **Read `.agents/user.md`** — the owner's standing directives
    (highest priority after safety).
 6. **Read `.agents/Environment.md`** — the section for this AI only

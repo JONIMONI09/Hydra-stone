@@ -1,0 +1,710 @@
+{
+  "generated_at": "2026-11-27T22:31:40",
+  "stats": {
+    "scanned": 250,
+    "skipped": {
+      "binary": 18,
+      "large": 0,
+      "unreadable": 0,
+      "generated": 15
+    },
+    "findings": {
+      "high": 0,
+      "medium": 0,
+      "low": 21
+    },
+    "waived": 48
+  },
+  "rules": {
+    "invisible-tag-block": {
+      "id": "invisible-tag-block",
+      "severity": "high",
+      "why": "Unicode tag characters (U+E0000-U+E007F) - encode hidden ASCII"
+    },
+    "invisible-zero-width": {
+      "id": "invisible-zero-width",
+      "severity": "medium",
+      "why": "zero-width joiner/space/BOM used to hide text"
+    },
+    "invisible-bidi": {
+      "id": "invisible-bidi",
+      "severity": "high",
+      "why": "bidirectional control characters (Trojan Source, CVE-2021-42574)"
+    },
+    "invisible-variation-selector": {
+      "id": "invisible-variation-selector",
+      "severity": "medium",
+      "why": "variation-selector run - can encode data"
+    },
+    "invisible-control": {
+      "id": "invisible-control",
+      "severity": "low",
+      "why": "C0/C1 control characters in text"
+    },
+    "covert-instruction": {
+      "id": "covert-instruction",
+      "severity": "high",
+      "why": "secrecy instruction ('do not tell the user' class)"
+    },
+    "prompt-override": {
+      "id": "prompt-override",
+      "severity": "high",
+      "why": "instruction override ('ignore previous instructions' class)"
+    },
+    "hidden-html": {
+      "id": "hidden-html",
+      "severity": "high",
+      "why": "content hidden by CSS/HTML that a reader cannot see"
+    },
+    "hidden-with-instructions": {
+      "id": "hidden-with-instructions",
+      "severity": "high",
+      "why": "invisible content wrapped around instruction-like text"
+    },
+    "html-hidden-attr": {
+      "id": "html-hidden-attr",
+      "severity": "low",
+      "why": "hidden/aria-hidden element (normal for UI, worth a glance)"
+    },
+    "css-hidden-content": {
+      "id": "css-hidden-content",
+      "severity": "low",
+      "why": "invisible content with no instruction language nearby"
+    },
+    "pipe-to-shell": {
+      "id": "pipe-to-shell",
+      "severity": "high",
+      "why": "download piped into a shell"
+    },
+    "base64-pipe-to-shell": {
+      "id": "base64-pipe-to-shell",
+      "severity": "high",
+      "why": "base64 payload piped into a shell"
+    },
+    "reverse-shell": {
+      "id": "reverse-shell",
+      "severity": "high",
+      "why": "interactive shell over a socket"
+    },
+    "netcat-shell": {
+      "id": "netcat-shell",
+      "severity": "high",
+      "why": "netcat executing a shell"
+    },
+    "powershell-encoded": {
+      "id": "powershell-encoded",
+      "severity": "high",
+      "why": "encoded PowerShell command"
+    },
+    "eval-remote": {
+      "id": "eval-remote",
+      "severity": "high",
+      "why": "eval of downloaded content"
+    },
+    "rm-rf-root": {
+      "id": "rm-rf-root",
+      "severity": "high",
+      "why": "recursive delete of /"
+    },
+    "chmod-777-root": {
+      "id": "chmod-777-root",
+      "severity": "medium",
+      "why": "world-writable root path"
+    },
+    "aws-access-key": {
+      "id": "aws-access-key",
+      "severity": "high",
+      "why": "string shaped like an AWS access key"
+    },
+    "github-token": {
+      "id": "github-token",
+      "severity": "high",
+      "why": "string shaped like a GitHub token"
+    },
+    "api-key-shape": {
+      "id": "api-key-shape",
+      "severity": "high",
+      "why": "string shaped like an API key"
+    },
+    "private-key": {
+      "id": "private-key",
+      "severity": "high",
+      "why": "private key block"
+    },
+    "slack-token": {
+      "id": "slack-token",
+      "severity": "high",
+      "why": "string shaped like a Slack token"
+    },
+    "data-uri-payload": {
+      "id": "data-uri-payload",
+      "severity": "medium",
+      "why": "base64 data: URI"
+    },
+    "long-base64-blob": {
+      "id": "long-base64-blob",
+      "severity": "low",
+      "why": "very long base64 run (possible encoded payload)"
+    },
+    "symlink-escape": {
+      "id": "symlink-escape",
+      "severity": "medium",
+      "why": "symlink resolving outside the tree"
+    },
+    "encoded-instruction": {
+      "id": "encoded-instruction",
+      "severity": "high",
+      "why": "base64/hex/percent/rot13 payload that decodes to instruction text"
+    },
+    "homoglyph-instruction": {
+      "id": "homoglyph-instruction",
+      "severity": "high",
+      "why": "Cyrillic/Greek look-alikes that spell an instruction once de-confused"
+    },
+    "comment-instruction": {
+      "id": "comment-instruction",
+      "severity": "low",
+      "why": "comment that addresses an agent and then issues an action"
+    },
+    "private-use-character": {
+      "id": "private-use-character",
+      "severity": "low",
+      "why": "private-use-area character: no standard meaning, can carry hidden data"
+    },
+    "waiver-invalid": {
+      "id": "waiver-invalid",
+      "severity": "low",
+      "why": "waiver marker that names a known rule but carries no usable reason - it suppresses nothing"
+    }
+  },
+  "findings": [
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": ".agents/errors.md",
+      "line": 594,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "`<button hidden>`, `<pre hidden>` and `<input hidden>`, and the"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": ".agents/errors.md",
+      "line": 594,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "`<button hidden>`, `<pre hidden>` and `<input hidden>`, and the"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": ".agents/errors.md",
+      "line": 594,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "`<button hidden>`, `<pre hidden>` and `<input hidden>`, and the"
+    },
+    {
+      "rule": "css-hidden-content",
+      "severity": "low",
+      "path": ".agents/errors.md",
+      "line": 595,
+      "column": 1,
+      "detail": "display:none (no instruction language nearby)",
+      "snippet": "`css-hidden-content` window flagged a `display:none` declaration followed by"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": ".subagents/ai-threat-scan/ERROR.md",
+      "line": 61,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "(`<button \u2026 hidden>`, `<pre \u2026 hidden>`), because the rule looked \u00b1300 characters"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": ".subagents/ai-threat-scan/ERROR.md",
+      "line": 61,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "(`<button \u2026 hidden>`, `<pre \u2026 hidden>`), because the rule looked \u00b1300 characters"
+    },
+    {
+      "rule": "css-hidden-content",
+      "severity": "low",
+      "path": ".subagents/ai-threat-scan/PROPOSALS.md",
+      "line": 45,
+      "column": 1,
+      "detail": "display:none (no instruction language nearby)",
+      "snippet": "| `public/style.css:354` | `css-hidden-content` | `.fold > summary::-webkit-details-marker { display:none }` hides a browser artefact, not text |"
+    },
+    {
+      "rule": "css-hidden-content",
+      "severity": "low",
+      "path": ".subagents/ai-threat-scan/REQUESTS.md",
+      "line": 23,
+      "column": 1,
+      "detail": "display:none (no instruction language nearby)",
+      "snippet": "`hidden` attributes and one `display:none` marker in `public/style.css`). Lowering"
+    },
+    {
+      "rule": "css-hidden-content",
+      "severity": "low",
+      "path": ".subagents/critic-final/REVIEW.md",
+      "line": 180,
+      "column": 1,
+      "detail": "display:none (no instruction language nearby)",
+      "snippet": "`public/index.html` UI attributes and one is the `display:none` marker in <!-- ai-threat-scan: allow hidden-with-instructions (the review names the property it "
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 15,
+      "column": 1,
+      "detail": "aria-hidden (no instruction language nearby)",
+      "snippet": "<span class=\"brand-mark\" aria-hidden=\"true\">\u2b22</span>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 28,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<input type=\"file\" id=\"upload-input\" accept=\".hydra,.gguf,application/octet-stream\" hidden>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 34,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<button class=\"btn ghost small\" id=\"errors-open\" hidden>Errors</button>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 69,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<button class=\"btn ghost\" id=\"cancel\" type=\"button\" hidden>Cancel</button>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 78,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<section class=\"panel output\" id=\"view-engine\" role=\"tabpanel\" aria-labelledby=\"tab-engine\" aria-label=\"Engine output\" hidden>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 91,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<canvas id=\"token-chart\" height=\"180\" role=\"img\" aria-labelledby=\"chart-summary\" hidden></canvas>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 110,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<section class=\"panel train\" id=\"view-train\" role=\"tabpanel\" aria-labelledby=\"tab-train\" aria-label=\"Training\" hidden>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 139,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<div class=\"train-result\" id=\"train-result\" hidden></div>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 144,
+      "column": 1,
+      "detail": "aria-hidden (no instruction language nearby)",
+      "snippet": "<aside class=\"settings\" id=\"settings\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Settings\" aria-hidden=\"true\">"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 233,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<pre class=\"log\" id=\"upload-report\" tabindex=\"0\" hidden></pre>"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "severity": "low",
+      "path": "public/index.html",
+      "line": 255,
+      "column": 1,
+      "detail": "hidden attribute (no instruction language nearby)",
+      "snippet": "<div class=\"scrim\" id=\"scrim\" hidden></div>"
+    },
+    {
+      "rule": "css-hidden-content",
+      "severity": "low",
+      "path": "public/style.css",
+      "line": 354,
+      "column": 1,
+      "detail": "display:none (no instruction language nearby)",
+      "snippet": ".fold > summary::-webkit-details-marker { display: none; }"
+    }
+  ],
+  "waived": [
+    {
+      "rule": "chmod-777-root",
+      "path": ".agents/session.md",
+      "line": 813,
+      "reason": "rule name listed in the round plan",
+      "detail": "matches /chmod\\s+777\\s+//"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".agents/docs/AI-THREAT-MODEL.md",
+      "line": 51,
+      "reason": "quoted example, class T2",
+      "detail": "matches /do not (?:tell|inform|mention (?:this |it )?to) the user/"
+    },
+    {
+      "rule": "prompt-override",
+      "path": ".agents/docs/AI-THREAT-MODEL.md",
+      "line": 62,
+      "reason": "quoted example, class T3",
+      "detail": "matches /ignore (?:all |any )?(?:the )?(?:previous|prior|above) instructions?/"
+    },
+    {
+      "rule": "pipe-to-shell",
+      "path": ".agents/docs/AI-THREAT-MODEL.md",
+      "line": 83,
+      "reason": "quoted example, class T5",
+      "detail": "matches /(?:curl|wget)[^\\n|]{0,200}\\|\\s*(?:sudo\\s+)?(?:ba)?sh\\b/"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".agents/docs/AI-THREAT-MODEL.md",
+      "line": 69,
+      "reason": "this paragraph names the CSS properties it detects",
+      "detail": "display:none (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".agents/docs/AI-THREAT-MODEL.md",
+      "line": 69,
+      "reason": "this paragraph names the CSS properties it detects",
+      "detail": "visibility:hidden (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".agents/docs/AI-THREAT-MODEL.md",
+      "line": 69,
+      "reason": "this paragraph names the CSS properties it detects",
+      "detail": "font-size:0 (no instruction language nearby)"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 13,
+      "reason": "class name in the module docstring",
+      "detail": "matches /do not (?:tell|inform|mention (?:this |it )?to) the user/"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 120,
+      "reason": "pattern definition (this is the rule itself",
+      "detail": "matches /never mention that i gave you/"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 121,
+      "reason": "pattern definition (this is the rule itself",
+      "detail": "matches /don't notify the user/"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 122,
+      "reason": "pattern definition (this is the rule itself",
+      "detail": "matches /sage dem nutzer nichts/"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 123,
+      "reason": "pattern definition (this is the rule itself",
+      "detail": "matches /sag dem benutzer nichts/"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 124,
+      "reason": "pattern definition (this is the rule itself",
+      "detail": "matches /ohne den nutzer zu informieren/"
+    },
+    {
+      "rule": "prompt-override",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 131,
+      "reason": "pattern definition (this is the rule itself",
+      "detail": "matches /new system prompt/"
+    },
+    {
+      "rule": "prompt-override",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 133,
+      "reason": "pattern definition (this is the rule itself",
+      "detail": "matches /developer mode/"
+    },
+    {
+      "rule": "prompt-override",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 134,
+      "reason": "pattern definition (this is the rule itself",
+      "detail": "matches /jailbreak/"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 260,
+      "reason": "rule metadata quoting the class name it describes",
+      "detail": "matches /do not (?:tell|inform|mention (?:this |it )?to) the user/"
+    },
+    {
+      "rule": "prompt-override",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 261,
+      "reason": "rule metadata quoting the class name it describes",
+      "detail": "matches /ignore (?:all |any )?(?:the )?(?:previous|prior|above) instructions?/"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 703,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /do not (?:tell|inform|mention (?:this |it )?to) the user/"
+    },
+    {
+      "rule": "prompt-override",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 704,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /ignore (?:all |any )?(?:the )?(?:previous|prior|above) instructions?/"
+    },
+    {
+      "rule": "base64-pipe-to-shell",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 711,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /base64\\s+(?:-d|--decode)[^\\n|]{0,80}\\|\\s*(?:sudo\\s+)?(?:ba)?sh\\b/"
+    },
+    {
+      "rule": "reverse-shell",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 712,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /bash\\s+-i\\s+>&\\s*/dev/tcp//"
+    },
+    {
+      "rule": "netcat-shell",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 713,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /\\bnc\\s+-e\\s+/(?:bin/)?(?:ba)?sh\\b/"
+    },
+    {
+      "rule": "powershell-encoded",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 714,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /powershell(?:\\.exe)?\\s+-(?:enc|encodedcommand)\\b/"
+    },
+    {
+      "rule": "eval-remote",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 715,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /eval\\s+\\$\\(\\s*(?:curl|wget)/"
+    },
+    {
+      "rule": "rm-rf-root",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 716,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /rm\\s+-rf\\s+/(?:\\s|$)/"
+    },
+    {
+      "rule": "chmod-777-root",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 717,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /chmod\\s+777\\s+//"
+    },
+    {
+      "rule": "aws-access-key",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 718,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "secret-shaped string (value not printed)"
+    },
+    {
+      "rule": "private-key",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 721,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "secret-shaped string (value not printed)"
+    },
+    {
+      "rule": "slack-token",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 722,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "secret-shaped string (value not printed)"
+    },
+    {
+      "rule": "prompt-override",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 732,
+      "reason": "self-test: the instruction phrase the encoded fixtures are built from",
+      "detail": "matches /ignore (?:all |any )?(?:the )?(?:previous|prior|above) instructions?/"
+    },
+    {
+      "rule": "pipe-to-shell",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 734,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "matches /(?:curl|wget)[^\\n|]{0,200}\\|\\s*(?:sudo\\s+)?(?:ba)?sh\\b/"
+    },
+    {
+      "rule": "covert-instruction",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 838,
+      "reason": "self-test fixture: the secrecy phrase assigned to a variable here",
+      "detail": "matches /do not (?:tell|inform|mention (?:this |it )?to) the user/"
+    },
+    {
+      "rule": "hidden-html",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 706,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "HTML comment carries instruction-like text (invisible when rendered)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 158,
+      "reason": "hidden-spot pattern definition (this is the rule itself",
+      "detail": "display:none (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 555,
+      "reason": "comment quoting the prose that caused the round-14 false positive",
+      "detail": "display:none (no instruction language nearby)"
+    },
+    {
+      "rule": "hidden-with-instructions",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 705,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "display:none wraps instruction-like text after the declaration"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 899,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "display:none (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 159,
+      "reason": "hidden-spot pattern definition (this is the rule itself",
+      "detail": "visibility:hidden (no instruction language nearby)"
+    },
+    {
+      "rule": "hidden-with-instructions",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 707,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "visibility:hidden wraps instruction-like text after the declaration"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 899,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "visibility:hidden (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 160,
+      "reason": "hidden-spot pattern definition (this is the rule itself",
+      "detail": "font-size:0 (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 708,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "font-size:0 (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 899,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "font-size:0 (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 161,
+      "reason": "hidden-spot pattern definition (this is the rule itself",
+      "detail": "opacity:0 (no instruction language nearby)"
+    },
+    {
+      "rule": "css-hidden-content",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 709,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "opacity:0 (no instruction language nearby)"
+    },
+    {
+      "rule": "html-hidden-attr",
+      "path": ".subagents/ai-threat-scan/scan.py",
+      "line": 710,
+      "reason": "self-test fixture, written to a temp dir to trip this rule on purpose",
+      "detail": "hidden attribute (no instruction language nearby)"
+    },
+    {
+      "rule": "pipe-to-shell",
+      "path": ".subagents/critic-final/REVIEW.md",
+      "line": 153,
+      "reason": "quoted as the probe content, not a command to run",
+      "detail": "matches /(?:curl|wget)[^\\n|]{0,200}\\|\\s*(?:sudo\\s+)?(?:ba)?sh\\b/"
+    }
+  ],
+  "verdict": "PASS"
+}

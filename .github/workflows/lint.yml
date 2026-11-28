@@ -352,6 +352,63 @@ jobs:
       - name: Banned claims absent (zero-RAM, all-models, counts, provenance)
         run: bash tools/docs_claim_check.sh
 
+  # ---------- AI: untrusted input ----------
+  # A repository is input to an AI agent, so documentation is instruction text.
+  # This job scans every text file for the two ways that becomes dangerous:
+  # content a human cannot see (tag-block and zero-width Unicode, bidi controls,
+  # CSS-hidden text, HTML comments) and content a human would reject (secrecy
+  # phrasing, instruction override, pipe-to-shell, encoded blobs, secret shapes).
+  # Rules, sources and blind spots: .agents/docs/AI-THREAT-MODEL.md; binding rule:
+  # .agents/rules.md R34. Waivers are in-line and printed by the report, so a
+  # waiver is a reviewed line, not a switch.
+  ai-threat-scan:
+    name: AI threat scan (hidden instructions + payloads)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # PyYAML is for the structure gate below (strict Agent Skills frontmatter).
+      # The scanner itself is stdlib-only and never touches the network.
+      - name: Install PyYAML, pyflakes, bandit
+        run: python3 -m pip install --quiet pyyaml pyflakes bandit
+
+      # Self-test FIRST: if a rule stopped firing, the tree scan would look green
+      # while detecting nothing. Every rule must fire on its fixture (R25).
+      - name: Self-test (every detection rule fires, the waiver rule is proven, clean file/tree stay green, own source checked)
+        run: python3 .subagents/ai-threat-scan/scan.py --self-test
+
+      - name: Scan the tree (fails on high)
+        run: python3 .subagents/ai-threat-scan/scan.py . --fail-on high
+
+      # The seven sub-agent folders are a contract plus tooling; a contract
+      # nobody checks decays like prose does (R35). Reports are generated first,
+      # because the gate requires the receipt of a run, not a promise of one.
+      - name: Generate the sub-agent reports
+        run: python3 .subagents/tools/run_all.py
+
+      - name: Structure gate (strict YAML frontmatter, ERROR/REQUESTS present)
+        run: python3 .subagents/tools/check_subagents.py
+
+      - name: Negative control - the structure gate must still be able to fail
+        run: python3 .subagents/tools/check_subagents.py --self-test
+
+      # The new Python is outside the python-lint job's scope (tools/ only), so
+      # the same two analyzers run here on .subagents/.
+      - name: pyflakes (.subagents)
+        run: python3 -m pyflakes .subagents/
+
+      # B610 is Django's QuerySet.extra(). Here `extra=` is the keyword of the
+      # shared codegraph_core writer (a dict of report rows) and there is no
+      # database anywhere in .subagents/. That one check is skipped after a
+      # manual read of all seven call sites; every other medium+ finding stays
+      # fatal.
+      - name: bandit (medium+, .subagents; B610 triaged as a Django false positive)
+        run: python3 -m bandit -r .subagents/ --severity-level medium -s B610
+
   # ---------- Android ----------
   android-lint:
     name: Android lint

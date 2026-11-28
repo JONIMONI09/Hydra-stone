@@ -432,6 +432,7 @@ without log access).
 ├── src/hydra_neon.h           ARM NEON kernel (actively integrated; scalar fallback on x86)
 ├── tools/make_model.py        Starter-model generator (format reference)
 ├── tools/gguf_reader.py       GGUF header/tensor reader (Python stdlib only)
+├── tools/bf16.py              Shared BF16 → F32 decoder: one conversion rule for both converters (CA-1)
 ├── tools/gguf_inspect.py      Read-only GGUF report (no numpy, no torch)
 ├── tools/gguf_to_hydra.py     GGUF → .hydra converter, absmean ternarisation (--v3: per-layer blocks + scales)
 ├── tools/gguf_to_hydra2.py    GGUF → .hydra2 converter (full-fidelity MoE model + embedded BPE vocab, see GGUF-IMPORT.md §12)
@@ -450,10 +451,12 @@ without log access).
 ├── docs/GGUF-IMPORT.md        GGUF import, absmean ternarisation, limits
 ├── docs/FORMAT-V2.md          .hydra2 sparse-MoE format — CANONICAL v2 spec, implemented (container + MoE inference + GGUF converter)
 ├── .agents/                     everything an agent reads: rules, errors, session, skills, docs
-├── .agents/rules.md                   33 standing rules (R1–R33)
+├── .agents/rules.md                   35 standing rules (R1–R35)
 ├── .agents/errors.md                  Every bug: symptom / cause / fix / prevention
 ├── .agents/session.md                 Live session plan (old rounds: .agents/docs/SESSION-ARCHIVE.md)
 ├── .agents/skills/                    Agent Skills (2026 spec); .claude/skills is a symlink here
+├── .subagents/                 the team: 7 read-only agents + shared graph engine + gate (procedure: .agents/skills/sub-agents/)
+├── .agents/docs/AI-THREAT-MODEL.md    AI instruction-malware threat model: classes, sources, blind spots
 ├── .agents/docs/HYDRA2-RESEARCH.md    research spec: bounded measured memory, load strategies, ternary math
 ├── .agents/docs/RESEARCH.md           external research: BitNet b1.58 (W1.58A8), bitnet.cpp I2_S 2-bit packing
 ├── .agents/docs/ANDROID_SKILL.md      Android NDK/JNI integration guide (from experience)
